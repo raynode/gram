@@ -1,0 +1,6 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`schemaBuilder should render an empty Schema 1`] = `
+"type Query
+"
+`;

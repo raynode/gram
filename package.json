@@ -1,0 +1,64 @@
+{
+  "name": "@raynode/gql-builder",
+  "version": "0.8.3",
+  "description": "",
+  "main": "lib/index.js",
+  "typings": "lib/index.d.ts",
+  "scripts": {
+    "prepublish": "npm run build",
+    "dev": "npm run test:watch",
+    "build": "rimraf lib && tsc --p ./tsconfig.prod.json",
+    "test": "npm run test:coverage",
+    "test-only": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/raynode/gql-builder.git"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "src/**/*.{ts,tsx}": [
+      "prettier --write",
+      "tslint --fix",
+      "git add"
+    ]
+  },
+  "keywords": [],
+  "author": "Tobias Kopelke <nox@raynode.de>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/raynode/gql-builder/issues"
+  },
+  "homepage": "https://github.com/raynode/gql-builder/src/gql-builder#readme",
+  "dependencies": {
+    "@types/inflection": "^1.5.28",
+    "@types/lodash": "^4.14.123",
+    "graphql": "^14.2.1",
+    "graphql-subscriptions": "^1.1.0",
+    "inflection": "^1.12.0",
+    "lodash": "^4.17.11"
+  },
+  "peerDependencies": {
+    "graphql": "^14.2.1"
+  },
+  "devDependencies": {
+    "@types/graphql": "^14.2.0",
+    "@types/jest": "^24.0.11",
+    "husky": "^1.3.1",
+    "jest": "^24.7.1",
+    "lint-staged": "^8.1.5",
+    "prettier": "^1.17.0",
+    "rimraf": "^2.6.3",
+    "ts-jest": "^24.0.2",
+    "ts-node": "^8.1.0",
+    "tsconfig-paths": "^3.8.0",
+    "tslint": "^5.16.0",
+    "typescript": "^3.4.4"
+  }
+}
