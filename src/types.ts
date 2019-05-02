@@ -2,6 +2,7 @@
 import {
   GraphQLFieldConfig,
   GraphQLFieldConfigMap,
+  GraphQLInputFieldConfigMap,
   GraphQLInputObjectType,
   GraphQLObjectType,
   GraphQLSchema,
@@ -13,12 +14,17 @@ import { Names } from 'strategies/naming'
 
 export type Fields = Thunk<GraphQLFieldConfigMap<any, any>>
 
+export type DataType = 'create' | 'filter' | 'data' | 'page' | 'where' | 'order'
+
 export interface ContextModel {
+  id: string
   name: string
   getFields: () => GraphQLFieldConfigMap<any, any>
   addField: (name: string, field: GraphQLFieldConfig<any, any>) => void
   getType: () => GraphQLType
+  baseFilters: () => GraphQLInputFieldConfigMap
   getListType: () => GraphQLType
+  dataFields: (type: DataType) => GraphQLInputFieldConfigMap | GraphQLFieldConfigMap<any, any>
   visibility: ModelVisibility
   names: Names
 }
@@ -31,6 +37,7 @@ export interface Wrapped<Context> {
 
 export type ContextFn<Context, Result = boolean> = (context: Wrapped<Context>) => Result
 export type ContextMutator<Context> = (model: ContextModel, context: Wrapped<Context>) => void
+export type ContextModelFieldFn<Type> = (contextModel: ContextModel) => Type
 
 export type ModelType<Context> = GraphQLType | ModelBuilder<Context, any>
 

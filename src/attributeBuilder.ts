@@ -1,12 +1,23 @@
 
-import { GraphQLNonNull, GraphQLOutputType, isType, GraphQLList, GraphQLSchema, GraphQLType, GraphQLFieldConfig } from 'graphql'
-import { AttributeBuilder, ContextFn, Wrapped } from './types'
-
-import { ModelBuilder } from './modelBuilder'
+import {
+  GraphQLFieldConfig,
+  GraphQLList,
+  GraphQLNonNull,
+  GraphQLOutputType,
+  GraphQLSchema,
+  GraphQLType,
+  isType,
+} from 'graphql'
+import {
+  AttributeBuilder,
+  ContextFn,
+  ModelBuilder,
+  Wrapped,
+} from 'types'
 
 const buildType = <Context>(attr: AttributeBuilder<any, any>, context: Wrapped<Context>): GraphQLOutputType => {
   const type = attr.type(context)
-  const gqlType = isType(type) ? type : type.type
+  const gqlType = isType(type) ? type : context.getModel(type.name).getType()
   if(attr.listType)
     return GraphQLNonNull(GraphQLList(GraphQLNonNull(gqlType)))
   if(!attr.nullable)

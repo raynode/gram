@@ -1,8 +1,16 @@
 
 import { GraphQLObjectType, GraphQLSchema } from 'graphql'
 import { forEach, reduce } from 'lodash'
-import { createModelBuilder } from './modelBuilder'
-import { ModelBuilder, SchemaBuilder, Wrapped } from './types'
+import { createModelBuilder } from 'modelBuilder'
+import { ModelBuilder, SchemaBuilder, Wrapped } from 'types'
+
+import {
+  create,
+  findMany,
+  findOne,
+  remove,
+  update,
+} from 'field-types'
 
 const wrapContext = <Context>(context: Context): Wrapped<Context> => {
   const models = {}
@@ -25,23 +33,35 @@ export const createSchemaBuilder = <Context>(): SchemaBuilder<Context> => {
     build: context => {
       const wrapped = wrapContext<Context>(context)
       forEach(models, model => model.setup(wrapped))
-      const fields = reduce(models, (fields, model) => {
+
+      const queryFields = reduce(models, (fields, model) => {
         const contextModel = model.build(wrapped)
         if(contextModel.visibility.findOneQuery)
-          fields[contextModel.names.fields.findOne] = {
-            type: contextModel.getType(),
-          }
+          fields[contextModel.names.fields.findOne] = findOne(contextModel)
         if(contextModel.visibility.findManyQuery)
-          fields[contextModel.names.fields.findMany] = {
-            type: contextModel.getListType(),
-          }
+          fields[contextModel.names.fields.findMany] = findMany(contextModel)
+        return fields
+      }, {})
+
+      const mutationFields = reduce(models, (fields, model) => {
+        const contextModel = model.build(wrapped)
+        if(contextModel.visibility.createMutation)
+          fields[contextModel.names.fields.create] = create(contextModel)
+        if(contextModel.visibility.updateMutation)
+          fields[contextModel.names.fields.update] = update(contextModel)
+        if(contextModel.visibility.deleteMutation)
+          fields[contextModel.names.fields.delete] = remove(contextModel)
         return fields
       }, {})
 
       return new GraphQLSchema({
         query: new GraphQLObjectType({
           name: 'Query',
-          fields,
+          fields: queryFields,
+        }),
+        mutation: new GraphQLObjectType({
+          name: 'Mutation',
+          fields: mutationFields,
         }),
       })
     },

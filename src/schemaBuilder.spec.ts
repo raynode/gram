@@ -4,6 +4,8 @@ import { GraphQLID, GraphQLInt, GraphQLList, GraphQLString, printSchema } from '
 import { createSchemaBuilder } from './schemaBuilder'
 import { ModelBuilder, SchemaBuilder } from './types'
 
+import { toList } from 'utils'
+
 describe('schemaBuilder', () => {
   let builder: SchemaBuilder<number>
 
@@ -28,31 +30,37 @@ interface NodeType {
   updatedAt: Date
   deletedAt: Date | null
 }
+interface Page {
+  limit: number
+  offset: number
+  page: number
+}
+interface Paged<Type> {
+  page: Page
+  nodes: Type[]
+}
+
 interface Account {
   id: string
   name: string
-  tags: Tag[]
-  swarmId: string
-}
-interface Tag {
-  id: string
-  val: string
+  user: User
 }
 interface User {
   id: string
   name: string
-  // touchpoints: Account[]
+  accounts: Paged<Account>
 }
 
 describe.only('example', () => {
   // services
-  const Touchpoints = { findAll: () => [] }
-  const Tags = { findAll: () => [] }
-  const Swarms = { find: () => null }
+  let db = {}
+  const Accounts = { findAll: () => [] }
+  const Users = { find: () => null }
 
   let builder: SchemaBuilder<number>
 
   beforeAll(() => {
+    db = {}
     builder = createSchemaBuilder<number>()
   })
 
@@ -90,7 +98,7 @@ describe.only('example', () => {
       return builder.models[name]
     const list = hide(addListAttributes(builder.model<Type>(name).interface('List'), model))
     model.listType(list)
-    return model
+    return list
   }
 
   it('should add User to the Schema', () => {
@@ -115,11 +123,9 @@ describe.only('example', () => {
     console.log(printSchema(builder.build(0)))
   })
 
-  it.skip('should add account to the model', () => {
-    const account = addNodeAttributes(builder.model<Account>('Account'))
+  it('should add account to the model', () => {
+    const account = addNodeAttributes(builder.model<Account>('Account').interface('Node'))
     const accounts = createListOf('Accounts', account)
-
-    account.listType(accounts)
 
     // will add input types for "STRING"
     account.attr('name', GraphQLString)
@@ -127,9 +133,7 @@ describe.only('example', () => {
     account
       .attr('user', builder.models.User)
       .isNotNullable()
-
-    account.interface('Node')
-
+    // add accounts to the user model
     builder.models.User
       .attr('accounts', accounts)
 
