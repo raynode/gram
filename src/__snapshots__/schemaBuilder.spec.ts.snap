@@ -1,5 +1,544 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`example should accept an interface type 1`] = `
+"input CreateUserData {
+  AND: [UserFilter!]
+  OR: [UserFilter!]
+  NOT: UserFilter
+  name: String
+  name_not: String
+  name_in: [String!]
+  name_not_in: [String!]
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  createdAt: String
+  createdAt_not: String
+  createdAt_in: [String!]
+  createdAt_not_in: [String!]
+  updatedAt: String
+  updatedAt_not: String
+  updatedAt_in: [String!]
+  updatedAt_not_in: [String!]
+  deletedAt: String
+  deletedAt_not: String
+  deletedAt_in: [String!]
+  deletedAt_not_in: [String!]
+}
+
+interface List {
+  page: Page
+  nodes: [Node!]!
+}
+
+type Mutation {
+  createUser(data: CreateUserData): User
+  updateUser(data: UpdateUserData, where: UserWhere): [User!]!
+  deleteUsers(where: UserWhere): [User!]!
+}
+
+interface Node {
+  id: ID
+  createdAt: String
+  updatedAt: String
+  deletedAt: String
+}
+
+type Page {
+  page: Int
+  limit: Int
+  offset: Int
+}
+
+type Query {
+  getUser(where: UserWhere, order: UserSortOrder): User
+  getUsers(order: UserSortOrder, page: UserPage, where: UserWhere): Users
+}
+
+type Subscription {
+  onCreateUser: Users!
+  onUpdateUser: [Users!]!
+  onDeleteUsers: [Users!]!
+  onCreateNode: Node!
+  onUpdateNode: [Node!]!
+  onDeleteNodes: [Node!]!
+  onCreatePage: Page!
+  onUpdatePage: [Page!]!
+  onDeletePages: [Page!]!
+  onCreateList: List!
+  onUpdateList: [List!]!
+  onDeleteLists: [List!]!
+}
+
+input UpdateUserData {
+  AND: [UserFilter!]
+  OR: [UserFilter!]
+  NOT: UserFilter
+  name: String
+  id: ID
+  createdAt: String
+  updatedAt: String
+  deletedAt: String
+}
+
+type User implements Node {
+  name: String
+  id: ID
+  createdAt: String
+  updatedAt: String
+  deletedAt: String
+}
+
+input UserFilter {
+  AND: [UserFilter!]
+  OR: [UserFilter!]
+  NOT: UserFilter
+  name: String
+  name_not: String
+  name_in: [String!]
+  name_not_in: [String!]
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  createdAt: String
+  createdAt_not: String
+  createdAt_in: [String!]
+  createdAt_not_in: [String!]
+  updatedAt: String
+  updatedAt_not: String
+  updatedAt_in: [String!]
+  updatedAt_not_in: [String!]
+  deletedAt: String
+  deletedAt_not: String
+  deletedAt_in: [String!]
+  deletedAt_not_in: [String!]
+}
+
+input UserPage {
+  limit: Int
+  offset: Int
+}
+
+type Users implements List {
+  page: Page
+  nodes: [User!]!
+}
+
+enum UserSortOrder {
+  name_ASC
+  name_DESC
+  id_ASC
+  id_DESC
+  createdAt_ASC
+  createdAt_DESC
+  updatedAt_ASC
+  updatedAt_DESC
+  deletedAt_ASC
+  deletedAt_DESC
+}
+
+input UserWhere {
+  AND: [UserFilter!]
+  OR: [UserFilter!]
+  NOT: UserFilter
+  name: String
+  name_not: String
+  name_in: [String!]
+  name_not_in: [String!]
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  createdAt: String
+  createdAt_not: String
+  createdAt_in: [String!]
+  createdAt_not_in: [String!]
+  updatedAt: String
+  updatedAt_not: String
+  updatedAt_in: [String!]
+  updatedAt_not_in: [String!]
+  deletedAt: String
+  deletedAt_not: String
+  deletedAt_in: [String!]
+  deletedAt_not_in: [String!]
+}
+"
+`;
+
+exports[`example should add User to the Schema 1`] = `
+"input CreateUserData {
+  AND: [UserFilter!]
+  OR: [UserFilter!]
+  NOT: UserFilter
+  name: String
+  name_not: String
+  name_in: [String!]
+  name_not_in: [String!]
+}
+
+type Mutation {
+  createUser(data: CreateUserData): User
+  updateUser(data: UpdateUserData, where: UserWhere): [User!]!
+  deleteUsers(where: UserWhere): [User!]!
+}
+
+type Query {
+  getUser(where: UserWhere, order: UserSortOrder): User
+  getUsers(order: UserSortOrder, page: UserPage, where: UserWhere): [User!]!
+}
+
+type Subscription {
+  onCreateUser: User!
+  onUpdateUser: [User!]!
+  onDeleteUsers: [User!]!
+}
+
+input UpdateUserData {
+  AND: [UserFilter!]
+  OR: [UserFilter!]
+  NOT: UserFilter
+  name: String
+}
+
+type User {
+  name: String
+}
+
+input UserFilter {
+  AND: [UserFilter!]
+  OR: [UserFilter!]
+  NOT: UserFilter
+  name: String
+  name_not: String
+  name_in: [String!]
+  name_not_in: [String!]
+}
+
+input UserPage {
+  limit: Int
+  offset: Int
+}
+
+enum UserSortOrder {
+  name_ASC
+  name_DESC
+}
+
+input UserWhere {
+  AND: [UserFilter!]
+  OR: [UserFilter!]
+  NOT: UserFilter
+  name: String
+  name_not: String
+  name_in: [String!]
+  name_not_in: [String!]
+}
+"
+`;
+
+exports[`example should add account to the model 1`] = `
+"type Account implements Node {
+  id: ID
+  createdAt: String
+  updatedAt: String
+  deletedAt: String
+  name: String
+  user: User!
+}
+
+input AccountFilter {
+  AND: [AccountFilter!]
+  OR: [AccountFilter!]
+  NOT: AccountFilter
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  createdAt: String
+  createdAt_not: String
+  createdAt_in: [String!]
+  createdAt_not_in: [String!]
+  updatedAt: String
+  updatedAt_not: String
+  updatedAt_in: [String!]
+  updatedAt_not_in: [String!]
+  deletedAt: String
+  deletedAt_not: String
+  deletedAt_in: [String!]
+  deletedAt_not_in: [String!]
+  name: String
+  name_not: String
+  name_in: [String!]
+  name_not_in: [String!]
+}
+
+input AccountPage {
+  limit: Int
+  offset: Int
+}
+
+type Accounts implements List {
+  page: Page
+  nodes: [Account!]!
+}
+
+enum AccountSortOrder {
+  id_ASC
+  id_DESC
+  createdAt_ASC
+  createdAt_DESC
+  updatedAt_ASC
+  updatedAt_DESC
+  deletedAt_ASC
+  deletedAt_DESC
+  name_ASC
+  name_DESC
+  user_ASC
+  user_DESC
+}
+
+input AccountWhere {
+  AND: [AccountFilter!]
+  OR: [AccountFilter!]
+  NOT: AccountFilter
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  createdAt: String
+  createdAt_not: String
+  createdAt_in: [String!]
+  createdAt_not_in: [String!]
+  updatedAt: String
+  updatedAt_not: String
+  updatedAt_in: [String!]
+  updatedAt_not_in: [String!]
+  deletedAt: String
+  deletedAt_not: String
+  deletedAt_in: [String!]
+  deletedAt_not_in: [String!]
+  name: String
+  name_not: String
+  name_in: [String!]
+  name_not_in: [String!]
+}
+
+input CreateAccountData {
+  AND: [AccountFilter!]
+  OR: [AccountFilter!]
+  NOT: AccountFilter
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  createdAt: String
+  createdAt_not: String
+  createdAt_in: [String!]
+  createdAt_not_in: [String!]
+  updatedAt: String
+  updatedAt_not: String
+  updatedAt_in: [String!]
+  updatedAt_not_in: [String!]
+  deletedAt: String
+  deletedAt_not: String
+  deletedAt_in: [String!]
+  deletedAt_not_in: [String!]
+  name: String
+  name_not: String
+  name_in: [String!]
+  name_not_in: [String!]
+}
+
+input CreateUserData {
+  AND: [UserFilter!]
+  OR: [UserFilter!]
+  NOT: UserFilter
+  name: String
+  name_not: String
+  name_in: [String!]
+  name_not_in: [String!]
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  createdAt: String
+  createdAt_not: String
+  createdAt_in: [String!]
+  createdAt_not_in: [String!]
+  updatedAt: String
+  updatedAt_not: String
+  updatedAt_in: [String!]
+  updatedAt_not_in: [String!]
+  deletedAt: String
+  deletedAt_not: String
+  deletedAt_in: [String!]
+  deletedAt_not_in: [String!]
+}
+
+interface List {
+  page: Page
+  nodes: [Node!]!
+}
+
+type Mutation {
+  createUser(data: CreateUserData): User
+  updateUser(data: UpdateUserData, where: UserWhere): [User!]!
+  deleteUsers(where: UserWhere): [User!]!
+  createAccount(data: CreateAccountData): Account
+  updateAccount(data: UpdateAccountData, where: AccountWhere): [Account!]!
+  deleteAccounts(where: AccountWhere): [Account!]!
+}
+
+interface Node {
+  id: ID
+  createdAt: String
+  updatedAt: String
+  deletedAt: String
+}
+
+type Page {
+  page: Int
+  limit: Int
+  offset: Int
+}
+
+type Query {
+  getUser(where: UserWhere, order: UserSortOrder): User
+  getUsers(order: UserSortOrder, page: UserPage, where: UserWhere): Users
+  getAccount(where: AccountWhere, order: AccountSortOrder): Account
+  getAccounts(order: AccountSortOrder, page: AccountPage, where: AccountWhere): Accounts
+}
+
+type Subscription {
+  onCreateUser: Users!
+  onUpdateUser: [Users!]!
+  onDeleteUsers: [Users!]!
+  onCreateNode: Node!
+  onUpdateNode: [Node!]!
+  onDeleteNodes: [Node!]!
+  onCreatePage: Page!
+  onUpdatePage: [Page!]!
+  onDeletePages: [Page!]!
+  onCreateList: List!
+  onUpdateList: [List!]!
+  onDeleteLists: [List!]!
+  onCreateAccount: Accounts!
+  onUpdateAccount: [Accounts!]!
+  onDeleteAccounts: [Accounts!]!
+}
+
+input UpdateAccountData {
+  AND: [AccountFilter!]
+  OR: [AccountFilter!]
+  NOT: AccountFilter
+  id: ID
+  createdAt: String
+  updatedAt: String
+  deletedAt: String
+  name: String
+}
+
+input UpdateUserData {
+  AND: [UserFilter!]
+  OR: [UserFilter!]
+  NOT: UserFilter
+  name: String
+  id: ID
+  createdAt: String
+  updatedAt: String
+  deletedAt: String
+}
+
+type User implements Node {
+  name: String
+  id: ID
+  createdAt: String
+  updatedAt: String
+  deletedAt: String
+  accounts: Accounts
+}
+
+input UserFilter {
+  AND: [UserFilter!]
+  OR: [UserFilter!]
+  NOT: UserFilter
+  name: String
+  name_not: String
+  name_in: [String!]
+  name_not_in: [String!]
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  createdAt: String
+  createdAt_not: String
+  createdAt_in: [String!]
+  createdAt_not_in: [String!]
+  updatedAt: String
+  updatedAt_not: String
+  updatedAt_in: [String!]
+  updatedAt_not_in: [String!]
+  deletedAt: String
+  deletedAt_not: String
+  deletedAt_in: [String!]
+  deletedAt_not_in: [String!]
+}
+
+input UserPage {
+  limit: Int
+  offset: Int
+}
+
+type Users implements List {
+  page: Page
+  nodes: [User!]!
+}
+
+enum UserSortOrder {
+  name_ASC
+  name_DESC
+  id_ASC
+  id_DESC
+  createdAt_ASC
+  createdAt_DESC
+  updatedAt_ASC
+  updatedAt_DESC
+  deletedAt_ASC
+  deletedAt_DESC
+  accounts_ASC
+  accounts_DESC
+}
+
+input UserWhere {
+  AND: [UserFilter!]
+  OR: [UserFilter!]
+  NOT: UserFilter
+  name: String
+  name_not: String
+  name_in: [String!]
+  name_not_in: [String!]
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  createdAt: String
+  createdAt_not: String
+  createdAt_in: [String!]
+  createdAt_not_in: [String!]
+  updatedAt: String
+  updatedAt_not: String
+  updatedAt_in: [String!]
+  updatedAt_not_in: [String!]
+  deletedAt: String
+  deletedAt_not: String
+  deletedAt_in: [String!]
+  deletedAt_not_in: [String!]
+}
+"
+`;
+
 exports[`schemaBuilder should render an empty Schema 1`] = `
 "type Query
 "

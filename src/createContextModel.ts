@@ -2,21 +2,18 @@
 import {
   GraphQLFieldConfig,
   GraphQLFieldConfigMap,
-  GraphQLID,
-  GraphQLInputObjectType,
+  GraphQLInterfaceType,
   GraphQLList,
   GraphQLNonNull,
   GraphQLObjectType,
-  GraphQLType,
   isType,
-  printType,
 } from 'graphql'
-import { forEach, memoize } from 'lodash'
+import { memoize } from 'lodash'
 import { v4 as uuid } from 'uuid'
+import { PubSub } from 'graphql-subscriptions'
 
-import { createAttributeBuilder } from 'attributeBuilder'
 import { defaultNamingStrategy } from 'strategies/naming'
-import { AttributeBuilder, ContextFn, ContextModel, ContextMutator, ModelBuilder, Wrapped } from 'types'
+import { ContextModel, ModelBuilder, Wrapped } from 'types'
 
 import * as DataTypes from 'data-types'
 import { filter } from 'input-types'
@@ -29,6 +26,7 @@ const createBaseModel = (name: string) => ({
 export const createContextModel = <Context>(model: ModelBuilder<Context, any>, context: Wrapped<Context>) => {
   const fields: GraphQLFieldConfigMap<any, any> = {}
   const getFields = () => fields
+  let contextModelIsInterface: boolean = false
 
   const contextModel: ContextModel = {
     id: uuid(),
@@ -36,11 +34,19 @@ export const createContextModel = <Context>(model: ModelBuilder<Context, any>, c
     names: defaultNamingStrategy(model.name),
     addField: (name: string, field: GraphQLFieldConfig<any, any>) => fields[name] = field,
     getFields,
-    getType: memoize(() => new GraphQLObjectType({
-      name: model.name,
-      fields: getFields,
-      interfaces: (): any => model.getInterfaces().map(context.getModel).map(model => model.getType()),
-    })),
+    setInterface: () => { contextModelIsInterface = true },
+    isInterface: () => contextModelIsInterface,
+    getType: memoize(() => contextModelIsInterface
+      ? new GraphQLInterfaceType({
+        name: model.name,
+        fields: getFields,
+      })
+      : new GraphQLObjectType({
+        name: model.name,
+        fields: getFields,
+        interfaces: (): any => model.getInterfaces().map(context.getModel).map(model => model.getType()),
+      }),
+    ),
     baseFilters: memoize(() => ({
       AND: { type: GraphQLList(GraphQLNonNull(filter(contextModel))) },
       OR: { type: GraphQLList(GraphQLNonNull(filter(contextModel))) },
@@ -52,13 +58,18 @@ export const createContextModel = <Context>(model: ModelBuilder<Context, any>, c
         case 'data': return DataTypes.data(contextModel)
         case 'filter': return DataTypes.filter(contextModel)
         case 'page': return DataTypes.page(contextModel)
-        case 'type': return DataTypes.type(contextModel)
         case 'where': return DataTypes.where(contextModel)
       }
     }),
-    getListType: memoize(() => model.getListType()
-      ? context.getModel(model.getListType().name).getType()
-      : toList(contextModel.getType())),
+    getPubSub: memoize(() => new PubSub()),
+    getListType: memoize(() => {
+      const listType = model.getListType()
+      if(listType) {
+        console.log(listType)
+        return isType(listType) ? listType : context.getModel(listType.name).getType()
+      }
+      return toList(contextModel.getType())
+    }),
     visibility: {
       createMutation: true,
       deleteMutation: true,

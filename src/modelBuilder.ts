@@ -1,45 +1,42 @@
 
-import {
-  GraphQLFieldConfig,
-  GraphQLFieldConfigMap,
-  GraphQLID,
-  GraphQLInputObjectType,
-  GraphQLObjectType,
-  GraphQLType,
-  isType,
-  printType,
-} from 'graphql'
+import { GraphQLType, isType } from 'graphql'
 import { forEach } from 'lodash'
 
 import { createAttributeBuilder } from 'attributeBuilder'
 import { createContextModel } from 'createContextModel'
-import { defaultNamingStrategy } from 'strategies/naming'
-import { AttributeBuilder, ContextFn, ContextModel, ContextMutator, ModelBuilder, Wrapped } from 'types'
-import { toList } from 'utils'
-
-const createBaseModel = (name: string) => ({
-  name,
-})
+import { AttributeBuilder, ContextFn, ContextMutator, ModelBuilder } from 'types'
 
 export const createModelBuilder =
   <Context, Type>(modelName: string, contextFn?: ContextFn<Context>): ModelBuilder<Context, Type> => {
     const attributes: Record<string, AttributeBuilder<Context, Type>> = {}
     let contextMutation: ContextMutator<Context> = () => null
-    let listType: ModelBuilder<Context, any> = null
+    let listType: GraphQLType | ModelBuilder<Context, any>= null
+    let isInterface: boolean = false
     const interfaces: string[] = []
     const builder: ModelBuilder<Context, Type> = {
-      ...createBaseModel(modelName),
+      name: modelName,
       getInterfaces: () => interfaces,
       getListType: () => listType,
+      setInterface: () => {
+        isInterface = true
+        return builder
+      },
+      isInterface: () => isInterface,
       attr: (attributeName, type) => {
+        if(!type)
+          throw new Error(`${modelName}.attr(${attributeName}) needs to provide either a GraphQLType or a ModelBuilder`)
         return attributes[attributeName] = isType(type)
         // add attribute
         ? createAttributeBuilder<Context, Type>(attributeName, () => type)
         // add association
-        : createAttributeBuilder<Context, Type>(attributeName, context => context.getModel(type.name).getType())
+        : createAttributeBuilder<Context, Type>(attributeName, context =>
+            context.getModel(type.name).getType())
       },
       setup: context => {
-        context.addModel(modelName, createContextModel(builder, context))
+        const contextModel = createContextModel(builder, context)
+        if(isInterface)
+          contextModel.setInterface()
+        context.addModel(modelName, contextModel)
       },
       build: context => {
         const contextModel = context.getModel(modelName)

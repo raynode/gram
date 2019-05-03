@@ -1,10 +1,15 @@
 import { capitalize, pluralize, singularize } from 'inflection'
 
+export type Arguments = 'data' | 'filter' | 'order' | 'page' | 'where'
+export type Events = 'create' | 'delete' | 'update'
+export type Fields = 'create' | 'delete' | 'findMany' | 'findOne' | 'update'
+export type Types = 'createType' | 'dataType' | 'filterType' | 'orderType' | 'pageType' | 'whereType'
+
 export interface Names {
-  arguments: Record<'data' | 'filter' | 'order' | 'page' | 'where', string>
-  events: Record<'create' | 'delete' | 'update', string>
-  fields: Record<'create' | 'delete' | 'findMany' | 'findOne' | 'update', string>
-  types: Record<'createType' | 'dataType' | 'filterType' | 'orderType' | 'pageType' | 'whereType', string>
+  arguments: Record<Arguments, string>
+  events: Record<Events, string>
+  fields: Record<Fields, string>
+  types: Record<Types, string>
 }
 export type NamingStrategy<Models = any> = (name: string) => Names
 

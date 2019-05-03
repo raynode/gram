@@ -1,16 +1,10 @@
 
-import { GraphQLObjectType, GraphQLSchema } from 'graphql'
+import { GraphQLFieldConfigMap, GraphQLInputFieldConfigMap, GraphQLObjectType, GraphQLSchema } from 'graphql'
 import { forEach, reduce } from 'lodash'
 import { createModelBuilder } from 'modelBuilder'
 import { ModelBuilder, SchemaBuilder, Wrapped } from 'types'
 
-import {
-  create,
-  findMany,
-  findOne,
-  remove,
-  update,
-} from 'field-types'
+import { mutationFieldsReducer, queryFieldsReducer, subscriptionFieldsReducer } from 'field-reducers'
 
 const wrapContext = <Context>(context: Context): Wrapped<Context> => {
   const models = {}
@@ -23,36 +17,22 @@ const wrapContext = <Context>(context: Context): Wrapped<Context> => {
 
 export const createSchemaBuilder = <Context>(): SchemaBuilder<Context> => {
   const models: Record<string, ModelBuilder<Context, any>> = {}
-  return {
+  const builder: SchemaBuilder<Context> = {
     models,
     model: <Type>(modelName, contextFn = () => true) => {
       const model = createModelBuilder<Context, Type>(modelName, contextFn)
       models[modelName] = model
       return model
     },
+    interface: <Type>(interfaceName, contextFn = () => true) =>
+      builder.model<Type>(interfaceName, contextFn).setInterface(),
     build: context => {
       const wrapped = wrapContext<Context>(context)
       forEach(models, model => model.setup(wrapped))
 
-      const queryFields = reduce(models, (fields, model) => {
-        const contextModel = model.build(wrapped)
-        if(contextModel.visibility.findOneQuery)
-          fields[contextModel.names.fields.findOne] = findOne(contextModel)
-        if(contextModel.visibility.findManyQuery)
-          fields[contextModel.names.fields.findMany] = findMany(contextModel)
-        return fields
-      }, {})
-
-      const mutationFields = reduce(models, (fields, model) => {
-        const contextModel = model.build(wrapped)
-        if(contextModel.visibility.createMutation)
-          fields[contextModel.names.fields.create] = create(contextModel)
-        if(contextModel.visibility.updateMutation)
-          fields[contextModel.names.fields.update] = update(contextModel)
-        if(contextModel.visibility.deleteMutation)
-          fields[contextModel.names.fields.delete] = remove(contextModel)
-        return fields
-      }, {})
+      const mutationFields: GraphQLFieldConfigMap<any, any> = reduce(models, mutationFieldsReducer(wrapped), {})
+      const queryFields: GraphQLFieldConfigMap<any, any> = reduce(models, queryFieldsReducer(wrapped), {})
+      const subscriptionFields: GraphQLFieldConfigMap<any, any> = reduce(models, subscriptionFieldsReducer(wrapped), {})
 
       return new GraphQLSchema({
         query: new GraphQLObjectType({
@@ -63,7 +43,12 @@ export const createSchemaBuilder = <Context>(): SchemaBuilder<Context> => {
           name: 'Mutation',
           fields: mutationFields,
         }),
+        subscription: new GraphQLObjectType({
+          name: 'Subscription',
+          fields: subscriptionFields,
+        }),
       })
     },
   }
+  return builder
 }

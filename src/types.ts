@@ -4,6 +4,7 @@ import {
   GraphQLFieldConfigMap,
   GraphQLInputFieldConfigMap,
   GraphQLInputObjectType,
+  GraphQLInterfaceType,
   GraphQLObjectType,
   GraphQLSchema,
   GraphQLType,
@@ -17,16 +18,19 @@ export type Fields = Thunk<GraphQLFieldConfigMap<any, any>>
 export type DataType = 'create' | 'filter' | 'data' | 'page' | 'where' | 'order'
 
 export interface ContextModel {
+  addField: (name: string, field: GraphQLFieldConfig<any, any>) => void
+  baseFilters: () => GraphQLInputFieldConfigMap
+  dataFields: (type: DataType) => GraphQLInputFieldConfigMap | GraphQLFieldConfigMap<any, any>
+  getFields: () => GraphQLFieldConfigMap<any, any>
+  setInterface: () => void
+  isInterface: () => boolean
+  getListType: () => GraphQLType
+  getPubSub: () => any
+  getType: () => GraphQLType
   id: string
   name: string
-  getFields: () => GraphQLFieldConfigMap<any, any>
-  addField: (name: string, field: GraphQLFieldConfig<any, any>) => void
-  getType: () => GraphQLType
-  baseFilters: () => GraphQLInputFieldConfigMap
-  getListType: () => GraphQLType
-  dataFields: (type: DataType) => GraphQLInputFieldConfigMap | GraphQLFieldConfigMap<any, any>
-  visibility: ModelVisibility
   names: Names
+  visibility: ModelVisibility
 }
 
 export interface Wrapped<Context> {
@@ -46,20 +50,23 @@ export interface SchemaBuilder<Context> {
   // modelName = name of the Model in Graphql
   // contextFn = is the model visible in this context (default = true)
   model: <Type>(modelName: string, contextFn?: ContextFn<Context>) => ModelBuilder<Context, Type>
+  interface: <Type>(interfaceName: string, contextFn?: ContextFn<Context>) => ModelBuilder<Context, Type>
   models: Record<string, ModelBuilder<Context, any>>
   build: (context: Context) => GraphQLSchema
 }
 
 export interface ModelBuilder<Context, Type> {
-  name: string
   attr: (attributeName: string, type: ModelType<Context>) => AttributeBuilder<Context, Type>
-  setup: ContextFn<Context, void>
   build: (context: Wrapped<Context>) => ContextModel
   context: (contextMutation: ContextMutator<Context>) => this
-  interface: (model: string) => this
   getInterfaces: () => string[]
+  getListType: () => GraphQLType | ModelBuilder<Context, any>
+  interface: (model: string) => this
+  isInterface: () => boolean
   listType: (model: ModelBuilder<Context, any>) => this
-  getListType: () => ModelBuilder<Context, any>
+  name: string
+  setInterface: () => this
+  setup: ContextFn<Context, void>
 }
 
 export interface AttributeBuilder<Context, Type> {

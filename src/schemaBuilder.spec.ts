@@ -1,5 +1,5 @@
 
-import { GraphQLID, GraphQLInt, GraphQLList, GraphQLString, printSchema } from 'graphql'
+import { graphql, GraphQLID, GraphQLInt, GraphQLList, GraphQLString, printSchema } from 'graphql'
 
 import { createSchemaBuilder } from './schemaBuilder'
 import { ModelBuilder, SchemaBuilder } from './types'
@@ -105,14 +105,13 @@ describe.only('example', () => {
     const user = builder.model<User>('User')
     user.attr('name', GraphQLString)
 
-    console.log(printSchema(builder.build(0)))
-    // expect(printSchema(builder.build(0))).toMatchSnapshot()
+    expect(printSchema(builder.build(0))).toMatchSnapshot()
   })
 
   it('should accept an interface type', () => {
-    const node = hide(addNodeAttributes(builder.model<NodeType>('Node')))
+    const node = hide(addNodeAttributes(builder.interface<NodeType>('Node')))
     const page = hide(builder.model<NodeType>('Page'))
-    const list = hide(addListAttributes(builder.model<NodeType>('List'), node))
+    const list = hide(addListAttributes(builder.interface<NodeType>('List'), node))
 
     page.attr('page', GraphQLInt)
     page.attr('limit', GraphQLInt)
@@ -120,7 +119,7 @@ describe.only('example', () => {
 
     createListOf('Users', addNodeAttributes(builder.models.User.interface('Node')))
 
-    console.log(printSchema(builder.build(0)))
+    expect(printSchema(builder.build(0))).toMatchSnapshot()
   })
 
   it('should add account to the model', () => {
@@ -137,8 +136,24 @@ describe.only('example', () => {
     builder.models.User
       .attr('accounts', accounts)
 
-    console.log(printSchema(builder.build(0)))
-    // expect(printSchema(builder.build(0))).toMatchSnapshot()
+    expect(printSchema(builder.build(0))).toMatchSnapshot()
   })
 
+  it('should be able to use the schema', async () => {
+    const schema = builder.build(0)
+
+    const query = `{
+      getUser {
+        name
+      }
+    }`
+
+    console.log(printSchema(schema))
+    const { data, errors } = await graphql(schema, query, null)
+    if(errors) {
+      console.log(errors[0])
+      console.log(errors[0].locations)
+    }
+    console.log(data)
+  })
 })

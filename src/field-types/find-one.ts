@@ -10,4 +10,8 @@ export const findOne: ContextModelFieldFn<GraphQLFieldConfig<any, any>> = memoiz
     [contextModel.names.arguments.order]: { type: order(contextModel) },
   },
   type: contextModel.getType() as GraphQLOutputType,
+  resolve: () => {
+    console.log('TEST')
+    return null
+  },
 }))
