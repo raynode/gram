@@ -2,7 +2,7 @@
 import { graphql, GraphQLID, GraphQLInt, GraphQLList, GraphQLString, printSchema } from 'graphql'
 
 import { createSchemaBuilder } from './schemaBuilder'
-import { ModelBuilder, SchemaBuilder } from './types'
+import { ModelBuilder, SchemaBuilder, Service } from './types'
 
 import { toList } from 'utils'
 
@@ -39,28 +39,58 @@ interface Paged<Type> {
   page: Page
   nodes: Type[]
 }
-
-interface Account {
+interface Account extends NodeType {
   id: string
   name: string
   user: User
 }
-interface User {
+interface User extends NodeType {
   id: string
   name: string
-  accounts: Paged<Account>
+  accounts: string[]
 }
 
 describe.only('example', () => {
   // services
-  let db = {}
-  const Accounts = { findAll: () => [] }
-  const Users = { find: () => null }
+  let db: Record<string, NodeType> = {}
+  const Nodes: Service<NodeType> = {
+    findOne: async () => null,
+    findMany: async () => null,
+  }
+  const Accounts: Service<Account> = {
+    create: async () => null,
+    findMany: async () => null,
+    findOne: async () => null,
+    remove: async () => null,
+    update: async () => null,
+  }
+  const Users: Service<User> = {
+    create: async () => null,
+    findMany: async () => null,
+    findOne: async ({ where }) => {
+      if(where.id)
+        return db[where.id] as User
+      console.log(where)
+      return null
+    },
+    remove: async () => null,
+    update: async () => null,
+  }
 
   let builder: SchemaBuilder<number>
 
   beforeAll(() => {
-    db = {}
+    const user1: User = {
+      id: '1',
+      name: 'test',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      deletedAt: null,
+      accounts: [],
+    }
+    db = {
+      1: user1,
+    }
     builder = createSchemaBuilder<number>()
   })
 
@@ -81,37 +111,25 @@ describe.only('example', () => {
     return list
   }
 
-  const hide = <Type>(model: ModelBuilder<number, Type>) => {
-    const hidden = {
-      createMutation: false,
-      deleteMutation: false,
-      findManyQuery: false,
-      findOneQuery: false,
-      updateMutation: false,
-    }
-    model.context(model => { model.visibility = { ...model.visibility, ...hidden } })
-    return model
-  }
-
   const createListOf = <Type>(name: string, model: ModelBuilder<number, Type>) => {
     if(builder.models[name])
       return builder.models[name]
-    const list = hide(addListAttributes(builder.model<Type>(name).interface('List'), model))
+    const list = addListAttributes(builder.model<Type>(name).interface('List'), model)
     model.listType(list)
     return list
   }
 
   it('should add User to the Schema', () => {
-    const user = builder.model<User>('User')
+    const user = builder.model<User>('User', Users)
     user.attr('name', GraphQLString)
-
-    expect(printSchema(builder.build(0))).toMatchSnapshot()
+    const schema = builder.build(0)
+    expect(printSchema(schema)).toMatchSnapshot()
   })
 
   it('should accept an interface type', () => {
-    const node = hide(addNodeAttributes(builder.interface<NodeType>('Node')))
-    const page = hide(builder.model<NodeType>('Page'))
-    const list = hide(addListAttributes(builder.interface<NodeType>('List'), node))
+    const node = addNodeAttributes(builder.interface<NodeType>('Node', Nodes))
+    const page = builder.model<NodeType>('Page')
+    const list = addListAttributes(builder.interface<NodeType>('List'), node)
 
     page.attr('page', GraphQLInt)
     page.attr('limit', GraphQLInt)
@@ -119,11 +137,13 @@ describe.only('example', () => {
 
     createListOf('Users', addNodeAttributes(builder.models.User.interface('Node')))
 
+    const schema = builder.build(0)
+    console.log(printSchema(schema))
     expect(printSchema(builder.build(0))).toMatchSnapshot()
   })
 
   it('should add account to the model', () => {
-    const account = addNodeAttributes(builder.model<Account>('Account').interface('Node'))
+    const account = addNodeAttributes(builder.model<Account>('Account', Accounts).interface('Node'))
     const accounts = createListOf('Accounts', account)
 
     // will add input types for "STRING"
@@ -143,7 +163,9 @@ describe.only('example', () => {
     const schema = builder.build(0)
 
     const query = `{
-      getUser {
+      getUser(where: {
+        id: "1",
+      }) {
         name
       }
     }`

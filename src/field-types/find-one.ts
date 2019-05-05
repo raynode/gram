@@ -1,17 +1,16 @@
 
 import { GraphQLFieldConfig, GraphQLOutputType } from 'graphql'
 import { order, where } from 'input-types'
-import { ContextModelFieldFn } from 'types'
 import { memoizeContextModel } from 'utils'
 
-export const findOne: ContextModelFieldFn<GraphQLFieldConfig<any, any>> = memoizeContextModel(contextModel => ({
+export const findOne = memoizeContextModel<GraphQLFieldConfig<any, any>>(contextModel => ({
   args: {
     [contextModel.names.arguments.where]: { type: where(contextModel) },
     [contextModel.names.arguments.order]: { type: order(contextModel) },
   },
   type: contextModel.getType() as GraphQLOutputType,
-  resolve: () => {
-    console.log('TEST')
-    return null
-  },
+  resolve: (_, args, context) => contextModel.service.findOne({
+    where: args,
+    order: null,
+  }),
 }))

@@ -13,7 +13,10 @@ import {
 } from 'types'
 import { toList } from 'utils'
 
-export const buildType = <Context>(attr: AttributeBuilder<any, any>, context: Wrapped<Context>): GraphQLOutputType => {
+export const buildType = <Context>(
+  attr: AttributeBuilder<any, any>,
+  context: Wrapped<Context>,
+): GraphQLOutputType => {
   const type = attr.type(context)
   const gqlType = isType(type) ? type : context.getModel(type.name).getType()
   if(attr.listType)
@@ -40,7 +43,7 @@ export const createAttributeBuilder =
         return builder
       },
       build: context => ({
-        type: buildType(builder, context),
+        type: buildType<Context>(builder, context),
       }),
     }
     return builder

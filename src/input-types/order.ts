@@ -1,6 +1,6 @@
 
 import { GraphQLEnumType } from 'graphql'
-import { flatten, keyBy, map, mapKeys, memoize, upperFirst } from 'lodash'
+import { Dictionary, flatten, keyBy, map, mapKeys, memoize, upperFirst } from 'lodash'
 import { ContextModel } from 'types'
 import { memoizeContextModel } from 'utils'
 
@@ -14,7 +14,7 @@ const sanitizeEnumValue = memoize((value: string) => value
   .replace(/(^\d)/, '_$1'),
 )
 
-const buildOrderEnumValues = memoizeContextModel((contextModel: ContextModel) =>
+const buildOrderEnumValues = memoizeContextModel(contextModel =>
   mapKeys(flatten(Object.keys(contextModel.getFields())
     .map(sanitizeEnumValue)
     .map(name => [`${name}_ASC`, `${name}_DESC`])).map(value => ({ value }),
@@ -22,7 +22,7 @@ const buildOrderEnumValues = memoizeContextModel((contextModel: ContextModel) =>
   'value',
 ))
 
-export const order = memoizeContextModel((contextModel: ContextModel) => new GraphQLEnumType({
+export const order = memoizeContextModel(contextModel => new GraphQLEnumType({
   name: contextModel.names.types.orderType,
   values: buildOrderEnumValues(contextModel),
 }))

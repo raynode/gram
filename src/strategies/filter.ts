@@ -36,12 +36,12 @@ export const isGraphQLFloat = (type: GraphQLScalarType): type is GraphQLScalarTy
 export const isGraphQLInt = (type: GraphQLScalarType): type is GraphQLScalarTypeInstance<'Int'> => type.name === 'Int'
 export const isGraphQLID = (type: GraphQLScalarType): type is GraphQLScalarTypeInstance<'ID'> => type.name === 'ID'
 
-export type FilterMapper = <Type extends GraphQLType>(
-  contextModel: ContextModel,
-) => Record<string, GraphQLFieldConfigMap<any, any>>
+// export type FilterMapper = <Type extends GraphQLType>(
+//   contextModel: ContextModel<any>,
+// ) => Record<string, GraphQLFieldConfigMap<any, any>>
 
 export const filterStrategy = <Type extends GraphQLType = GraphQLType>(
-  inputType: Type | ContextModel,
+  inputType: Type | ContextModel<any>,
   inputName?: string,
 ) => {
   const type = getParentType(isType(inputType) ? inputType : inputType.getType())

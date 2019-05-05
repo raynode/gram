@@ -1,8 +1,14 @@
 
-import { GraphQLFieldConfigMap, GraphQLInputFieldConfigMap, GraphQLObjectType, GraphQLSchema } from 'graphql'
+import {
+  GraphQLFieldConfigMap,
+  GraphQLInputFieldConfigMap,
+  GraphQLObjectType,
+  GraphQLSchema,
+  GraphQLType,
+} from 'graphql'
 import { forEach, reduce } from 'lodash'
 import { createModelBuilder } from 'modelBuilder'
-import { ModelBuilder, SchemaBuilder, Wrapped } from 'types'
+import { ContextMutator, ModelBuilder, SchemaBuilder, Service, Wrapped } from 'types'
 
 import { mutationFieldsReducer, queryFieldsReducer, subscriptionFieldsReducer } from 'field-reducers'
 
@@ -15,17 +21,23 @@ const wrapContext = <Context>(context: Context): Wrapped<Context> => {
   }
 }
 
+type BaseTypes = 'page' | 'node'
+
 export const createSchemaBuilder = <Context>(): SchemaBuilder<Context> => {
   const models: Record<string, ModelBuilder<Context, any>> = {}
+  const types: Record<BaseTypes, GraphQLType | ModelBuilder<Context, any>> = {
+    node: null,
+    page: null,
+  }
   const builder: SchemaBuilder<Context> = {
     models,
-    model: <Type>(modelName, contextFn = () => true) => {
-      const model = createModelBuilder<Context, Type>(modelName, contextFn)
+    model: <Type>(modelName, service: Service<Type> = null, contextFn: ContextMutator<Context, Type> = () => null) => {
+      const model = createModelBuilder<Context, Type>(modelName, service, contextFn)
       models[modelName] = model
       return model
     },
-    interface: <Type>(interfaceName, contextFn = () => true) =>
-      builder.model<Type>(interfaceName, contextFn).setInterface(),
+    interface: <Type>(interfaceName, service: Service<Type>, contextFn: ContextMutator<Context, Type> = () => null) =>
+      builder.model<Type>(interfaceName, service, contextFn).setInterface(),
     build: context => {
       const wrapped = wrapContext<Context>(context)
       forEach(models, model => model.setup(wrapped))
@@ -48,6 +60,14 @@ export const createSchemaBuilder = <Context>(): SchemaBuilder<Context> => {
           fields: subscriptionFields,
         }),
       })
+    },
+    setNodeType: nodeType => {
+      types.node = nodeType
+      return builder
+    },
+    setPageType: pageType => {
+      types.page = pageType
+      return builder
     },
   }
   return builder

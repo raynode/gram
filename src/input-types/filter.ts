@@ -1,9 +1,9 @@
 
 import { GraphQLInputFieldConfigMap, GraphQLInputObjectType } from 'graphql'
-import { memoizeContextModel } from 'utils'
 import { ContextModel } from 'types'
+import { memoizeContextModel } from 'utils'
 
-export const filter = memoizeContextModel((contextModel: ContextModel) => new GraphQLInputObjectType({
+export const filter = memoizeContextModel(contextModel => new GraphQLInputObjectType({
   name: contextModel.names.types.filterType,
   fields: () => contextModel.dataFields('filter') as GraphQLInputFieldConfigMap,
 }))

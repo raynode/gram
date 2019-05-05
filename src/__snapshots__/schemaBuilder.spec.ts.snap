@@ -45,6 +45,66 @@ interface Node {
   deletedAt: String
 }
 
+input NodeFilter {
+  AND: [NodeFilter!]
+  OR: [NodeFilter!]
+  NOT: NodeFilter
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  createdAt: String
+  createdAt_not: String
+  createdAt_in: [String!]
+  createdAt_not_in: [String!]
+  updatedAt: String
+  updatedAt_not: String
+  updatedAt_in: [String!]
+  updatedAt_not_in: [String!]
+  deletedAt: String
+  deletedAt_not: String
+  deletedAt_in: [String!]
+  deletedAt_not_in: [String!]
+}
+
+input NodePage {
+  limit: Int
+  offset: Int
+}
+
+enum NodeSortOrder {
+  id_ASC
+  id_DESC
+  createdAt_ASC
+  createdAt_DESC
+  updatedAt_ASC
+  updatedAt_DESC
+  deletedAt_ASC
+  deletedAt_DESC
+}
+
+input NodeWhere {
+  AND: [NodeFilter!]
+  OR: [NodeFilter!]
+  NOT: NodeFilter
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  createdAt: String
+  createdAt_not: String
+  createdAt_in: [String!]
+  createdAt_not_in: [String!]
+  updatedAt: String
+  updatedAt_not: String
+  updatedAt_in: [String!]
+  updatedAt_not_in: [String!]
+  deletedAt: String
+  deletedAt_not: String
+  deletedAt_in: [String!]
+  deletedAt_not_in: [String!]
+}
+
 type Page {
   page: Int
   limit: Int
@@ -54,21 +114,14 @@ type Page {
 type Query {
   getUser(where: UserWhere, order: UserSortOrder): User
   getUsers(order: UserSortOrder, page: UserPage, where: UserWhere): Users
+  getNode(where: NodeWhere, order: NodeSortOrder): Node
+  getNodes(order: NodeSortOrder, page: NodePage, where: NodeWhere): [Node!]!
 }
 
 type Subscription {
-  onCreateUser: Users!
-  onUpdateUser: [Users!]!
-  onDeleteUsers: [Users!]!
-  onCreateNode: Node!
-  onUpdateNode: [Node!]!
-  onDeleteNodes: [Node!]!
-  onCreatePage: Page!
-  onUpdatePage: [Page!]!
-  onDeletePages: [Page!]!
-  onCreateList: List!
-  onUpdateList: [List!]!
-  onDeleteLists: [List!]!
+  onCreateUser: User!
+  onUpdateUser: [User!]!
+  onDeleteUsers: [User!]!
 }
 
 input UpdateUserData {
@@ -398,6 +451,66 @@ interface Node {
   deletedAt: String
 }
 
+input NodeFilter {
+  AND: [NodeFilter!]
+  OR: [NodeFilter!]
+  NOT: NodeFilter
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  createdAt: String
+  createdAt_not: String
+  createdAt_in: [String!]
+  createdAt_not_in: [String!]
+  updatedAt: String
+  updatedAt_not: String
+  updatedAt_in: [String!]
+  updatedAt_not_in: [String!]
+  deletedAt: String
+  deletedAt_not: String
+  deletedAt_in: [String!]
+  deletedAt_not_in: [String!]
+}
+
+input NodePage {
+  limit: Int
+  offset: Int
+}
+
+enum NodeSortOrder {
+  id_ASC
+  id_DESC
+  createdAt_ASC
+  createdAt_DESC
+  updatedAt_ASC
+  updatedAt_DESC
+  deletedAt_ASC
+  deletedAt_DESC
+}
+
+input NodeWhere {
+  AND: [NodeFilter!]
+  OR: [NodeFilter!]
+  NOT: NodeFilter
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  createdAt: String
+  createdAt_not: String
+  createdAt_in: [String!]
+  createdAt_not_in: [String!]
+  updatedAt: String
+  updatedAt_not: String
+  updatedAt_in: [String!]
+  updatedAt_not_in: [String!]
+  deletedAt: String
+  deletedAt_not: String
+  deletedAt_in: [String!]
+  deletedAt_not_in: [String!]
+}
+
 type Page {
   page: Int
   limit: Int
@@ -407,26 +520,19 @@ type Page {
 type Query {
   getUser(where: UserWhere, order: UserSortOrder): User
   getUsers(order: UserSortOrder, page: UserPage, where: UserWhere): Users
+  getNode(where: NodeWhere, order: NodeSortOrder): Node
+  getNodes(order: NodeSortOrder, page: NodePage, where: NodeWhere): [Node!]!
   getAccount(where: AccountWhere, order: AccountSortOrder): Account
   getAccounts(order: AccountSortOrder, page: AccountPage, where: AccountWhere): Accounts
 }
 
 type Subscription {
-  onCreateUser: Users!
-  onUpdateUser: [Users!]!
-  onDeleteUsers: [Users!]!
-  onCreateNode: Node!
-  onUpdateNode: [Node!]!
-  onDeleteNodes: [Node!]!
-  onCreatePage: Page!
-  onUpdatePage: [Page!]!
-  onDeletePages: [Page!]!
-  onCreateList: List!
-  onUpdateList: [List!]!
-  onDeleteLists: [List!]!
-  onCreateAccount: Accounts!
-  onUpdateAccount: [Accounts!]!
-  onDeleteAccounts: [Accounts!]!
+  onCreateUser: User!
+  onUpdateUser: [User!]!
+  onDeleteUsers: [User!]!
+  onCreateAccount: Account!
+  onUpdateAccount: [Account!]!
+  onDeleteAccounts: [Account!]!
 }
 
 input UpdateAccountData {

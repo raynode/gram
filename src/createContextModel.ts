@@ -8,27 +8,28 @@ import {
   GraphQLObjectType,
   isType,
 } from 'graphql'
+import { PubSub } from 'graphql-subscriptions'
 import { memoize } from 'lodash'
 import { v4 as uuid } from 'uuid'
-import { PubSub } from 'graphql-subscriptions'
 
 import { defaultNamingStrategy } from 'strategies/naming'
-import { ContextModel, ModelBuilder, Wrapped } from 'types'
+import { ContextModel, ModelBuilder, ModelVisibility, Service, Wrapped } from 'types'
 
 import * as DataTypes from 'data-types'
 import { filter } from 'input-types'
 import { toList } from 'utils'
 
-const createBaseModel = (name: string) => ({
-  name,
-})
-
-export const createContextModel = <Context>(model: ModelBuilder<Context, any>, context: Wrapped<Context>) => {
+export const createContextModel = <Context, Type>(
+  model: ModelBuilder<Context, any>,
+  service: Service<Type>,
+  context: Wrapped<Context>,
+  visibility: ModelVisibility,
+) => {
   const fields: GraphQLFieldConfigMap<any, any> = {}
   const getFields = () => fields
   let contextModelIsInterface: boolean = false
 
-  const contextModel: ContextModel = {
+  const contextModel: ContextModel<Type> = {
     id: uuid(),
     name: model.name,
     names: defaultNamingStrategy(model.name),
@@ -64,22 +65,12 @@ export const createContextModel = <Context>(model: ModelBuilder<Context, any>, c
     getPubSub: memoize(() => new PubSub()),
     getListType: memoize(() => {
       const listType = model.getListType()
-      if(listType) {
-        console.log(listType)
+      if(listType)
         return isType(listType) ? listType : context.getModel(listType.name).getType()
-      }
       return toList(contextModel.getType())
     }),
-    visibility: {
-      createMutation: true,
-      deleteMutation: true,
-      findManyQuery: true,
-      findOneQuery: true,
-      updateMutation: true,
-      createSubscription: true,
-      updateSubscription: true,
-      deleteSubscription: true,
-    },
+    service,
+    visibility: { ...visibility },
   }
   return contextModel
 }
