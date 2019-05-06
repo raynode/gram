@@ -645,7 +645,19 @@ input UserWhere {
 "
 `;
 
+exports[`example should be able to use the schema 1`] = `
+Object {
+  "getUser": Object {
+    "name": "test",
+  },
+}
+`;
+
 exports[`schemaBuilder should render an empty Schema 1`] = `
-"type Query
+"type Mutation
+
+type Query
+
+type Subscription
 "
 `;

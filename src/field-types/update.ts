@@ -10,7 +10,7 @@ export const update = memoizeContextModel<GraphQLInputFieldConfig>(contextModel 
   },
   type: toList(contextModel.getType()) as GraphQLInputType,
   resolve: (_, args, context) => contextModel.service.update({
-    data: null,
-    where: args,
+    data: args[contextModel.names.arguments.data],
+    where: args[contextModel.names.arguments.where],
   }),
 }))

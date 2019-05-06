@@ -10,7 +10,7 @@ export const findOne = memoizeContextModel<GraphQLFieldConfig<any, any>>(context
   },
   type: contextModel.getType() as GraphQLOutputType,
   resolve: (_, args, context) => contextModel.service.findOne({
-    where: args,
-    order: null,
+    where: args[contextModel.names.arguments.where] || {},
+    order: args[contextModel.names.arguments.order] || null,
   }),
 }))

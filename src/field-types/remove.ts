@@ -9,6 +9,6 @@ export const remove = memoizeContextModel<GraphQLInputFieldConfig>(contextModel 
   },
   type: toList(contextModel.getType()) as GraphQLInputType,
   resolve: (_, args, context) => contextModel.service.remove({
-    where: args,
+    where: args[contextModel.names.arguments.where],
   }),
 }))

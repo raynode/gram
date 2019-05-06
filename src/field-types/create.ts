@@ -9,6 +9,6 @@ export const create = memoizeContextModel<GraphQLInputFieldConfig>(contextModel 
   },
   type: contextModel.getType() as GraphQLInputType,
   resolve: (_, args, context) => contextModel.service.create({
-    data: args,
+    data: args[contextModel.names.arguments.data],
   }),
 }))

@@ -1,10 +1,22 @@
 
 import { graphql, GraphQLID, GraphQLInt, GraphQLList, GraphQLString, printSchema } from 'graphql'
 
-import { createSchemaBuilder } from './schemaBuilder'
-import { ModelBuilder, SchemaBuilder, Service } from './types'
-
+import { createSchemaBuilder } from 'schemaBuilder'
+import { ModelBuilder, SchemaBuilder, Service } from 'types'
 import { toList } from 'utils'
+
+import {
+  Account,
+  Accounts,
+  db,
+  Nodes,
+  NodeType,
+  Page,
+  Paged,
+  reset,
+  User,
+  Users,
+} from '__mocks__/database'
 
 describe('schemaBuilder', () => {
   let builder: SchemaBuilder<number>
@@ -23,74 +35,13 @@ describe('schemaBuilder', () => {
   })
 })
 
-// interfaces
-interface NodeType {
-  id: string
-  createdAt: Date
-  updatedAt: Date
-  deletedAt: Date | null
-}
-interface Page {
-  limit: number
-  offset: number
-  page: number
-}
-interface Paged<Type> {
-  page: Page
-  nodes: Type[]
-}
-interface Account extends NodeType {
-  id: string
-  name: string
-  user: User
-}
-interface User extends NodeType {
-  id: string
-  name: string
-  accounts: string[]
-}
-
-describe.only('example', () => {
-  // services
-  let db: Record<string, NodeType> = {}
-  const Nodes: Service<NodeType> = {
-    findOne: async () => null,
-    findMany: async () => null,
-  }
-  const Accounts: Service<Account> = {
-    create: async () => null,
-    findMany: async () => null,
-    findOne: async () => null,
-    remove: async () => null,
-    update: async () => null,
-  }
-  const Users: Service<User> = {
-    create: async () => null,
-    findMany: async () => null,
-    findOne: async ({ where }) => {
-      if(where.id)
-        return db[where.id] as User
-      console.log(where)
-      return null
-    },
-    remove: async () => null,
-    update: async () => null,
-  }
+describe('example', () => {
 
   let builder: SchemaBuilder<number>
 
   beforeAll(() => {
-    const user1: User = {
-      id: '1',
-      name: 'test',
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      deletedAt: null,
-      accounts: [],
-    }
-    db = {
-      1: user1,
-    }
+
+    reset()
     builder = createSchemaBuilder<number>()
   })
 
@@ -138,7 +89,6 @@ describe.only('example', () => {
     createListOf('Users', addNodeAttributes(builder.models.User.interface('Node')))
 
     const schema = builder.build(0)
-    console.log(printSchema(schema))
     expect(printSchema(builder.build(0))).toMatchSnapshot()
   })
 
@@ -170,12 +120,37 @@ describe.only('example', () => {
       }
     }`
 
-    console.log(printSchema(schema))
-    const { data, errors } = await graphql(schema, query, null)
-    if(errors) {
-      console.log(errors[0])
-      console.log(errors[0].locations)
-    }
-    console.log(data)
+    const { data } = await graphql(schema, query, null)
+    expect(data).toMatchSnapshot()
+  })
+
+  it('should be able to create an instance', async () => {
+    const schema = builder.build(0)
+
+    const query = `mutation {
+      createUser(data: {
+        name: "New User",
+      }) {
+        name
+      }
+    }`
+
+    const { data } = await graphql(schema, query, null)
+    expect(data).toHaveProperty('createUser')
+    expect(data.createUser).toHaveProperty('name')
+    expect(data.createUser.name).toEqual('New User')
+  })
+
+  it('should be able to delete instances', async () => {
+    const schema = builder.build(0)
+
+    const query = `mutation {
+      deleteUsers(where: { id: "1" }) {
+        name
+      }
+    }`
+
+    const { data } = await graphql(schema, query, null)
+    expect(db).not.toHaveProperty('1')
   })
 })

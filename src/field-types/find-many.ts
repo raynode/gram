@@ -11,8 +11,8 @@ export const findMany = memoizeContextModel<GraphQLFieldConfig<any, any>>(contex
   },
   type: contextModel.getListType() as GraphQLOutputType,
   resolve: (_, args, context) => contextModel.service.findMany({
-    order: null,
-    page: null,
-    where: args,
+    order: args[contextModel.names.arguments.order],
+    page: args[contextModel.names.arguments.page],
+    where: args[contextModel.names.arguments.where],
   }),
 }))
