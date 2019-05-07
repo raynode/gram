@@ -1,7 +1,6 @@
 
 import { GraphQLFieldConfigMap } from 'graphql'
-import { reduce } from 'lodash'
-import { ContextModel, ModelBuilder, Wrapped } from 'types'
+import { ModelBuilder, Wrapped } from 'types'
 
 import {
   create,
@@ -13,6 +12,8 @@ export const mutationFieldsReducer = <Context>(context: Wrapped<Context>) => (
   fields: any,
   model: ModelBuilder<Context, any>,
 ) => {
+  if(model.isInterface())
+    return fields
   const contextModel = model.build(context)
   if(contextModel.visibility.createMutation)
     fields[contextModel.names.fields.create] = create(contextModel)

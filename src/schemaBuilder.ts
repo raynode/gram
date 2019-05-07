@@ -1,46 +1,92 @@
 
 import {
   GraphQLFieldConfigMap,
+  GraphQLFieldResolver,
+  GraphQLID,
   GraphQLInputFieldConfigMap,
+  GraphQLInt,
+  GraphQLList,
+  GraphQLNonNull,
   GraphQLObjectType,
   GraphQLSchema,
+  GraphQLString,
   GraphQLType,
 } from 'graphql'
 import { forEach, reduce } from 'lodash'
 import { createModelBuilder } from 'modelBuilder'
-import { ContextMutator, ModelBuilder, SchemaBuilder, Service, Wrapped } from 'types'
+import {
+  ContextMutator,
+  ListType,
+  ModelBuilder,
+  NodeType,
+  PageData,
+  SchemaBuilder,
+  Service,
+  Wrapped,
+} from 'types'
 
 import { mutationFieldsReducer, queryFieldsReducer, subscriptionFieldsReducer } from 'field-reducers'
+import { SCHEMABUILDER } from 'types/constants'
+import { v4 as uuid } from 'uuid'
 
 const wrapContext = <Context>(context: Context): Wrapped<Context> => {
   const models = {}
   return {
+    id: uuid(),
     context,
     addModel: (name, model) => models[name] = model,
     getModel: name => models[name],
   }
 }
 
-type BaseTypes = 'page' | 'node'
+type BaseTypes = 'Page' | 'Node' | 'List'
 
 export const createSchemaBuilder = <Context>(): SchemaBuilder<Context> => {
-  const models: Record<string, ModelBuilder<Context, any>> = {}
-  const types: Record<BaseTypes, GraphQLType | ModelBuilder<Context, any>> = {
-    node: null,
-    page: null,
+
+  const addNodeAttrs = (model: ModelBuilder<Context, any>) => {
+    model.attr('id', GraphQLID)
+    model.attr('createdAt', GraphQLString)
+    model.attr('updatedAt', GraphQLString)
+    model.attr('deletedAt', GraphQLString)
+    return model
   }
+
+  const node = createModelBuilder<Context, NodeType>('Node', {}).setInterface()
+  const page = createModelBuilder<Context, PageData>('Page', {})
+  const list = createModelBuilder<Context, ListType<NodeType>>('List', {}).setInterface()
+
+  addNodeAttrs(node)
+
+  page.attr('page', GraphQLInt)
+  page.attr('limit', GraphQLInt)
+  page.attr('offset', GraphQLInt)
+
+  list.attr('page', page)
+  list.attr('nodes', node).isList()
+
+  const models: Record<string, ModelBuilder<Context, any>> = {
+    Node: node,
+    Page: page,
+    List: list,
+  }
+
   const builder: SchemaBuilder<Context> = {
+    type: SCHEMABUILDER,
     models,
-    model: <Type>(modelName, service: Service<Type> = null, contextFn: ContextMutator<Context, Type> = () => null) => {
-      const model = createModelBuilder<Context, Type>(modelName, service, contextFn)
+    model: <Type>(modelName: string, service: Service<Type>) => {
+      const model = createModelBuilder<Context, Type>(modelName, service || {})
       models[modelName] = model
-      return model
+      return addNodeAttrs(model.interface('Node'))
     },
-    interface: <Type>(interfaceName, service: Service<Type>, contextFn: ContextMutator<Context, Type> = () => null) =>
-      builder.model<Type>(interfaceName, service, contextFn).setInterface(),
+    interface: <Type>(interfaceName, service: Service<Type>) =>
+      builder.model<Type>(interfaceName, service).setInterface(),
     build: context => {
       const wrapped = wrapContext<Context>(context)
       forEach(models, model => model.setup(wrapped))
+
+      models.Node.build(wrapped)
+      models.Page.build(wrapped)
+      models.List.build(wrapped)
 
       const mutationFields: GraphQLFieldConfigMap<any, any> = reduce(models, mutationFieldsReducer(wrapped), {})
       const queryFields: GraphQLFieldConfigMap<any, any> = reduce(models, queryFieldsReducer(wrapped), {})
@@ -61,14 +107,7 @@ export const createSchemaBuilder = <Context>(): SchemaBuilder<Context> => {
         }),
       })
     },
-    setNodeType: nodeType => {
-      types.node = nodeType
-      return builder
-    },
-    setPageType: pageType => {
-      types.page = pageType
-      return builder
-    },
   }
+
   return builder
 }

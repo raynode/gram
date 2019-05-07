@@ -1,16 +1,24 @@
 
-import { graphql, GraphQLID, GraphQLInt, GraphQLList, GraphQLString, printSchema } from 'graphql'
+import {
+  graphql,
+  GraphQLFloat,
+  GraphQLID,
+  GraphQLInt,
+  GraphQLList,
+  GraphQLString,
+  printSchema,
+} from 'graphql'
 
 import { createSchemaBuilder } from 'schemaBuilder'
-import { ModelBuilder, SchemaBuilder, Service } from 'types'
+import { ModelBuilder, NodeType, SchemaBuilder, Service } from 'types'
 import { toList } from 'utils'
 
 import {
   Account,
   Accounts,
   db,
+  findMany,
   Nodes,
-  NodeType,
   Page,
   Paged,
   reset,
@@ -53,63 +61,35 @@ describe('example', () => {
     return node
   }
 
-  const addListAttributes = <ListType, ModelType>(
-    list: ModelBuilder<number, ListType>,
-    model: ModelBuilder<number, ModelType>,
-  ) => {
-    list.attr('page', builder.models.Page)
-    list.attr('nodes', model).isList()
-    return list
-  }
-
-  const createListOf = <Type>(name: string, model: ModelBuilder<number, Type>) => {
-    if(builder.models[name])
-      return builder.models[name]
-    const list = addListAttributes(builder.model<Type>(name).interface('List'), model)
-    model.listType(list)
-    return list
-  }
-
   it('should add User to the Schema', () => {
     const user = builder.model<User>('User', Users)
     user.attr('name', GraphQLString)
+    user.attr('friends', user).isList()
     const schema = builder.build(0)
     expect(printSchema(schema)).toMatchSnapshot()
   })
 
-  it('should accept an interface type', () => {
-    const node = addNodeAttributes(builder.interface<NodeType>('Node', Nodes))
-    const page = builder.model<NodeType>('Page')
-    const list = addListAttributes(builder.interface<NodeType>('List'), node)
-
-    page.attr('page', GraphQLInt)
-    page.attr('limit', GraphQLInt)
-    page.attr('offset', GraphQLInt)
-
-    createListOf('Users', addNodeAttributes(builder.models.User.interface('Node')))
-
-    const schema = builder.build(0)
-    expect(printSchema(builder.build(0))).toMatchSnapshot()
-  })
-
   it('should add account to the model', () => {
-    const account = addNodeAttributes(builder.model<Account>('Account', Accounts).interface('Node'))
-    const accounts = createListOf('Accounts', account)
+    const account = addNodeAttributes(builder.model<Account>('Account', Accounts))
 
     // will add input types for "STRING"
     account.attr('name', GraphQLString)
+    account.attr('amount', GraphQLFloat)
     // will add input types for "REFERENCE"
     account
       .attr('user', builder.models.User)
+      .resolve(account => Users.findOne({ where: { id: account.userId }, order: null }))
       .isNotNullable()
     // add accounts to the user model
     builder.models.User
-      .attr('accounts', accounts)
+      .attr('accounts', account)
+      .resolve(user => findMany({ userId: user.id }, null))
+      .isList()
 
     expect(printSchema(builder.build(0))).toMatchSnapshot()
   })
 
-  it('should be able to use the schema', async () => {
+  it('should be able read from the schema', async () => {
     const schema = builder.build(0)
 
     const query = `{
@@ -129,16 +109,31 @@ describe('example', () => {
 
     const query = `mutation {
       createUser(data: {
-        name: "New User",
+        name: "New Test-User",
       }) {
         name
       }
     }`
 
-    const { data } = await graphql(schema, query, null)
+    const { data, errors } = await graphql(schema, query, null)
     expect(data).toHaveProperty('createUser')
     expect(data.createUser).toHaveProperty('name')
-    expect(data.createUser.name).toEqual('New User')
+    expect(data.createUser.name).toEqual('New Test-User')
+  })
+
+  it('should find multiple things', async () => {
+    const schema = builder.build(0)
+
+    const query = `{
+      getUsers {
+        nodes {
+          name
+        }
+      }
+    }`
+
+    const { data } = await graphql(schema, query, null)
+    expect(data).toMatchSnapshot()
   })
 
   it('should be able to delete instances', async () => {
@@ -152,5 +147,55 @@ describe('example', () => {
 
     const { data } = await graphql(schema, query, null)
     expect(db).not.toHaveProperty('1')
+  })
+
+  it('should create an account for the user', async () => {
+    const schema = builder.build(0)
+
+    const { data: { getUser: { id }}} = await graphql(schema, `{
+      getUser(where: { name: "New Test-User" }) { id }
+    }`, null)
+
+    const query = `mutation($id: ID!) {
+      createAccount(data: {
+        name: "New Account"
+        user: { id: $id }
+      }) {
+        id
+        name
+        amount
+        user {
+          name
+        }
+      }
+    }`
+
+    const { data } = await graphql(schema, query, null, null, { id })
+    expect(data).toHaveProperty('createAccount')
+    expect(data.createAccount).toHaveProperty('id')
+    const { id: accountId, user } = data.createAccount
+    expect(db).toHaveProperty(accountId)
+    expect(user).toHaveProperty('name')
+    expect(user.name).toEqual((db[id] as User).name)
+  })
+
+  it('should find the new account in the user as well', async () => {
+    const schema = builder.build(0)
+
+    const { data, errors } = await graphql(schema, `{
+      getUser(where: { name: "New Test-User" }) {
+        name
+        accounts {
+          name
+        }
+      }
+    }`)
+
+    expect(data).toHaveProperty('getUser')
+    expect(data.getUser).toHaveProperty('name')
+    expect(data.getUser).toHaveProperty('accounts')
+    expect(data.getUser.name).toEqual('New Test-User')
+    expect(data.getUser.accounts).toHaveLength(1)
+    expect(data.getUser.accounts[0].name).toEqual('New Account')
   })
 })

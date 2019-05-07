@@ -3,7 +3,7 @@ import { capitalize, pluralize, singularize } from 'inflection'
 export type Arguments = 'data' | 'filter' | 'order' | 'page' | 'where'
 export type Events = 'create' | 'delete' | 'update'
 export type Fields = 'create' | 'delete' | 'findMany' | 'findOne' | 'update'
-export type Types = 'createType' | 'dataType' | 'filterType' | 'orderType' | 'pageType' | 'whereType'
+export type Types = 'createType' | 'dataType' | 'filterType' | 'listType' | 'orderType' | 'pageType' | 'whereType'
 
 export interface Names {
   arguments: Record<Arguments, string>
@@ -40,5 +40,6 @@ export const defaultNamingStrategy: NamingStrategy = name => ({
     orderType: `${singularize(name.toString())}SortOrder`,
     pageType: `${singularize(name.toString())}Page`,
     whereType: `${singularize(name.toString())}Where`,
+    listType: `${pluralize(name.toString())}`,
   },
 })

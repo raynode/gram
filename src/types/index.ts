@@ -2,6 +2,7 @@
 import {
   GraphQLFieldConfig,
   GraphQLFieldConfigMap,
+  GraphQLFieldResolver,
   GraphQLInputFieldConfigMap,
   GraphQLInputObjectType,
   GraphQLInterfaceType,
@@ -12,59 +13,63 @@ import {
 } from 'graphql'
 
 import { Names } from 'strategies/naming'
+import { ATTRIBUTEBUILDER, MODELBUILDER, SCHEMABUILDER } from 'types/constants'
 import { Service } from 'types/service'
 export * from 'types/service'
 
+export interface Builder { type: string }
+
 export type Fields = Thunk<GraphQLFieldConfigMap<any, any>>
 
-export type DataType = 'create' | 'filter' | 'data' | 'page' | 'where' | 'order'
+export type DataType = 'create' | 'filter' | 'data' | 'list' | 'page' | 'where' | 'order'
 
-export interface ContextModel<Type> {
-  addField: (name: string, field: GraphQLFieldConfig<any, any>) => void
+export type FieldTypes = 'GraphQL' | 'Model' | 'All'
+
+export interface ContextModel<Context, Type> {
+  addField: <AttributeType>(field: AttributeBuilder<Context, Type, AttributeType>) => void
   baseFilters: () => GraphQLInputFieldConfigMap
+  context: Wrapped<Context>
   dataFields: (type: DataType) => GraphQLInputFieldConfigMap | GraphQLFieldConfigMap<any, any>
-  getFields: () => GraphQLFieldConfigMap<any, any>
-  setInterface: () => void
-  isInterface: () => boolean
+  getFields: () => Array<AttributeBuilder<Context, Type, any>>
   getListType: () => GraphQLType
   getPubSub: () => any
   getType: () => GraphQLType
   id: string
+  isInterface: () => boolean
   name: string
   names: Names
   service: Service<Type>
+  setInterface: () => void
   visibility: ModelVisibility
 }
 
 export interface Wrapped<Context> {
-  getModel: <Type>(name: string) => ContextModel<Type>
-  addModel: <Type>(name: string, model: ContextModel<Type>) => void
+  id: string
+  getModel: <Type>(name: string) => ContextModel<Context, Type>
+  addModel: <Type>(name: string, model: ContextModel<Context, Type>) => void
   context: Context
 }
 
 export type ContextFn<Context, Result = boolean> = (context: Wrapped<Context>) => Result
-export type ContextMutator<Context, Type> = (model: ContextModel<Type>, context: Wrapped<Context>) => void
-export type ContextModelFieldFn<Type> = (contextModel: ContextModel<Type>) => Type
+export type ContextMutator<Context, Type> = (model: ContextModel<Context, Type>, context: Wrapped<Context>) => void
+export type ContextModelFieldFn<Type> = <Context>(contextModel: ContextModel<Context, Type>) => Type
 
-export type ModelType<Context> = GraphQLType | ModelBuilder<Context, any>
+export type ModelType<Context> = GraphQLType | ContextModel<Context, any>
 
-export interface SchemaBuilder<Context> {
-  // creates a new Model and adds it to the schema
-  // modelName = name of the Model in Graphql
-  // contextFn = is the model visible in this context (default = true)
-  model: <Type>(modelName: string, service?: Service<Type>, contextFn?: ContextMutator<Context, Type>) =>
+export interface SchemaBuilder<Context> extends Builder {
+  build: (context: Context) => GraphQLSchema
+  interface: <Type>(interfaceName: string, service?: Service<Type>) =>
     ModelBuilder<Context, Type>
-  interface: <Type>(interfaceName: string, service?: Service<Type>, contextFn?: ContextMutator<Context, Type>) =>
+  model: <Type>(modelName: string, service?: Service<Type>) =>
     ModelBuilder<Context, Type>
   models: Record<string, ModelBuilder<Context, any>>
-  build: (context: Context) => GraphQLSchema
-  setNodeType: (nodeType: GraphQLType | ModelBuilder<Context, any>) => this
-  setPageType: (pageType: GraphQLType | ModelBuilder<Context, any>) => this
+  type: typeof SCHEMABUILDER
 }
 
-export interface ModelBuilder<Context, Type> {
-  attr: (attributeName: string, type: ModelType<Context>) => AttributeBuilder<Context, Type>
-  build: (context: Wrapped<Context>) => ContextModel<Type>
+export interface ModelBuilder<Context, Type> extends Builder {
+  attr: <AttributeType>(attributeName: string, type: ModelType<Context> | ModelBuilder<Context, any>) =>
+    AttributeBuilder<Context, Type, AttributeType>
+  build: (context: Wrapped<Context>) => ContextModel<Context, Type>
   context: (contextMutation: ContextMutator<Context, Type>) => this
   getInterfaces: () => string[]
   getListType: () => GraphQLType | ModelBuilder<Context, any>
@@ -74,17 +79,20 @@ export interface ModelBuilder<Context, Type> {
   name: string
   setInterface: () => this
   setup: ContextFn<Context, void>
+  type: typeof MODELBUILDER
 }
 
-export interface AttributeBuilder<Context, Type> {
+export interface AttributeBuilder<Context, Type, AttributeType> extends Builder {
   name: string
-  type: ContextFn<Context, GraphQLType | ModelBuilder<Context, Type>>
+  field: ContextFn<Context, GraphQLType | ContextModel<Context, Type>>
   nullable: boolean
   listType: boolean
-  resolve: <Result>(resolver: (type: Type) => Result) => this
+  resolve: (resolver: GraphQLFieldResolver<Type, Context>) => this
   isList: (isList?: boolean) => this
   isNotNullable: (isNotNullable?: boolean) => this
+  // contextType: ContextFn<Context, ModelType<Context>>
   build: ContextFn<Context, GraphQLFieldConfig<any, any>>
+  type: typeof ATTRIBUTEBUILDER
 }
 
 export interface ModelVisibility {

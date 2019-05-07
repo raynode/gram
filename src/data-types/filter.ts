@@ -1,11 +1,10 @@
 
-import { GraphQLInputFieldConfigMap, isType } from 'graphql'
+import { isType } from 'graphql'
 import { filterStrategy } from 'strategies/filter'
-import { ContextModel } from 'types'
 import { memoizeContextModel, reduceContextFields } from 'utils'
 
 export const filter = memoizeContextModel(contextModel =>
-  reduceContextFields(contextModel, contextModel.baseFilters(), (where, field, name) => ({
+  reduceContextFields(contextModel, contextModel.baseFilters(), (where, attr, type, field) => ({
     ...where,
-    ...(isType(field.type) ? filterStrategy(field.type, name) : null),
+    ...(isType(field) ? filterStrategy(type, attr.name) : null),
   })))
