@@ -1,4 +1,7 @@
 language: node_js
+env:
+  global:
+    - CC_TEST_REPORTER_ID=00d7ff4339448cfeff088be57e44acc3266ef20d71a2435bf279fd6790ea95bb
 cache:
   directories:
     - $HOME/.npm
