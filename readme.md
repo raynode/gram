@@ -56,7 +56,7 @@ type Animal implements Node {
   age: Int
 }
 
-input AnimalFilter { ... }
+input AnimalFilter { … }
 
 input AnimalPage {
   limit: Int
@@ -68,11 +68,11 @@ type Animals implements List {
   nodes: [Animal!]!
 }
 
-enum AnimalSortOrder { ... }
+enum AnimalSortOrder { … }
 
-input AnimalWhere { ... }
+input AnimalWhere { … }
 
-input CreateAnimalData { ... }
+input CreateAnimalData { … }
 
 interface List {
   page: Page
@@ -109,7 +109,7 @@ type Subscription {
   onDeleteAnimals: [Animal!]!
 }
 
-input UpdateAnimalData { ... }
+input UpdateAnimalData { … }
 ```
 
 As you can see, some types and interfaces were added.
