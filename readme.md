@@ -1,7 +1,7 @@
 [![Node.js version](https://img.shields.io/badge/node->=%208.2.1-blue.svg)](https://nodejs.org/dist/latest-v8.x/docs/api/)
 [![NPM version](https://img.shields.io/badge/npm->=%205.4.0-blue.svg)](https://docs.npmjs.com/)
 [![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release)
-[![build with travis-ci](https://travis-ci.org/raynode/gram.svg?branch=master)](https://travis-ci.org/raynode/nx-logger)
+[![build with travis-ci](https://travis-ci.org/raynode/gram.svg?branch=master)](https://travis-ci.org/raynode/gram)
 [![tested with jest](https://img.shields.io/badge/tested_with-jest-99424f.svg)](https://facebook.github.io/jest/)
 [![Coverage Status](https://coveralls.io/repos/github/raynode/gram/badge.svg?branch=master)](https://coveralls.io/github/raynode/gram?branch=master)
 [![Maintainability](https://api.codeclimate.com/v1/badges/7d6705c7f83a8899fde8/maintainability)](https://codeclimate.com/github/raynode/gram/maintainability)
