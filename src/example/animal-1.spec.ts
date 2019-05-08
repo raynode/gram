@@ -39,6 +39,6 @@ describe('testing the example 1', () => {
     // age of the animal
     animal.attr('age', GraphQLInt)
 
-    console.log(printSchema(builder.build()))
+    expect(printSchema(builder.build())).toMatchSnapshot()
   })
 })
