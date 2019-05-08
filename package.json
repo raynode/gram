@@ -38,7 +38,7 @@
   "homepage": "https://github.com/raynode/gram/src/gram#readme",
   "dependencies": {
     "@types/inflection": "^1.5.28",
-    "@types/lodash": "^4.14.123",
+    "@types/lodash": "^4.14.124",
     "graphql": "^14.2.1",
     "graphql-subscriptions": "^1.1.0",
     "inflection": "^1.12.0",
