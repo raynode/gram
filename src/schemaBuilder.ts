@@ -41,7 +41,7 @@ const wrapContext = <Context>(context: Context): Wrapped<Context> => {
 
 type BaseTypes = 'Page' | 'Node' | 'List'
 
-export const createSchemaBuilder = <Context>(): SchemaBuilder<Context> => {
+export const createSchemaBuilder = <Context = any>(): SchemaBuilder<Context> => {
 
   const addNodeAttrs = (model: ModelBuilder<Context, any>) => {
     model.attr('id', GraphQLID)
@@ -80,7 +80,7 @@ export const createSchemaBuilder = <Context>(): SchemaBuilder<Context> => {
     },
     interface: <Type>(interfaceName, service: Service<Type>) =>
       builder.model<Type>(interfaceName, service).setInterface(),
-    build: context => {
+    build: (context = null) => {
       const wrapped = wrapContext<Context>(context)
       forEach(models, model => model.setup(wrapped))
 

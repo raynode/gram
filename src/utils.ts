@@ -25,7 +25,7 @@ export const reduceContextFields = <Context, Type extends Record<string, any>>(
   base: Type = null,
   reducer: (
     memo: Type,
-    attr: AttributeBuilder<Context, any>,
+    attr: AttributeBuilder<Context, Type, any>,
     type: GraphQLType,
     field: ModelType<Context>,
   ) => Type,

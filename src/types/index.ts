@@ -57,7 +57,7 @@ export type ContextModelFieldFn<Type> = <Context>(contextModel: ContextModel<Con
 export type ModelType<Context> = GraphQLType | ContextModel<Context, any>
 
 export interface SchemaBuilder<Context> extends Builder {
-  build: (context: Context) => GraphQLSchema
+  build: (context?: Context) => GraphQLSchema
   interface: <Type>(interfaceName: string, service?: Service<Type>) =>
     ModelBuilder<Context, Type>
   model: <Type>(modelName: string, service?: Service<Type>) =>
