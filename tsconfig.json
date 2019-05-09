@@ -1,14 +1,14 @@
 {
   "compilerOptions": {
     "baseUrl": "./src",
-    "module": "CommonJS",
+    "module": "commonjs",
     "moduleResolution": "node",
     "noImplicitAny": false,
     "outDir": "lib",
     "declaration": true,
     "sourceMap": true,
     "strictNullChecks": false,
-    "target": "es6",
+    "target": "ES2015",
     "lib": [
       "esnext",
       "es2015",

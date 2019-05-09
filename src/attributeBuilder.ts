@@ -1,4 +1,3 @@
-
 import {
   GraphQLFieldResolver,
   GraphQLNonNull,
@@ -13,9 +12,9 @@ import {
   ModelBuilder,
   ModelType,
   Wrapped,
-} from 'types'
-import { ATTRIBUTEBUILDER } from 'types/constants'
-import { toList } from 'utils'
+} from './types'
+import { ATTRIBUTEBUILDER } from './types/constants'
+import { toList } from './utils'
 
 export const buildType = <Context>(
   attr: AttributeBuilder<Context, any, any>,
@@ -23,10 +22,8 @@ export const buildType = <Context>(
 ): GraphQLOutputType => {
   const type = attr.field(context)
   const gqlType = isType(type) ? type : context.getModel(type.name).getType()
-  if(attr.listType)
-    return toList(gqlType) as GraphQLOutputType
-  if(!attr.nullable)
-    return GraphQLNonNull(gqlType)
+  if (attr.listType) return toList(gqlType) as GraphQLOutputType
+  if (!attr.nullable) return GraphQLNonNull(gqlType)
   return gqlType as GraphQLOutputType
 }
 

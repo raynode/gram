@@ -11,10 +11,14 @@ import {
   Thunk,
 } from 'graphql'
 
-import { Names } from 'strategies/naming'
-import { ATTRIBUTEBUILDER, MODELBUILDER, SCHEMABUILDER } from 'types/constants'
-import { Service } from 'types/service'
-export * from 'types/service'
+import { Names } from '../strategies/naming'
+import {
+  ATTRIBUTEBUILDER,
+  MODELBUILDER,
+  SCHEMABUILDER,
+} from '../types/constants'
+import { Service } from '../types/service'
+export * from '../types/service'
 
 export interface Builder {
   type: string

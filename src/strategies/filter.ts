@@ -1,4 +1,3 @@
-
 import {
   getNamedType,
   GraphQLBoolean,
@@ -15,33 +14,50 @@ import {
   isType,
 } from 'graphql'
 
-import { ContextModel } from 'types'
+import { ContextModel } from '../types'
 
-const hasParentType = (type: any): type is GraphQLNonNull<any> | GraphQLList<any> =>
+const hasParentType = (
+  type: any,
+): type is GraphQLNonNull<any> | GraphQLList<any> =>
   type && type.hasOwnProperty('ofType')
 
-const getParentType = (type: GraphQLType | GraphQLNonNull<any> | GraphQLList<any>): GraphQLType =>
-  hasParentType(type) ? getParentType(type.ofType) : type
+const getParentType = (
+  type: GraphQLType | GraphQLNonNull<any> | GraphQLList<any>,
+): GraphQLType => (hasParentType(type) ? getParentType(type.ofType) : type)
 
 // sadly no correct typescript-guards, as the GraphQL basic types are not real "Types"
-export interface GraphQLScalarTypeInstance<T extends string> extends GraphQLScalarType {
+export interface GraphQLScalarTypeInstance<T extends string>
+  extends GraphQLScalarType {
   name: T
 }
-export const isGraphQLString = (type: GraphQLScalarType): type is GraphQLScalarTypeInstance<'String'> =>
-  type.name === 'String'
-export const isGraphQLBoolean = (type: GraphQLScalarType): type is GraphQLScalarTypeInstance<'Boolean'> =>
-  type.name === 'Boolean'
-export const isGraphQLFloat = (type: GraphQLScalarType): type is GraphQLScalarTypeInstance<'Float'> =>
-  type.name === 'Float'
-export const isGraphQLInt = (type: GraphQLScalarType): type is GraphQLScalarTypeInstance<'Int'> => type.name === 'Int'
-export const isGraphQLID = (type: GraphQLScalarType): type is GraphQLScalarTypeInstance<'ID'> => type.name === 'ID'
+export const isGraphQLString = (
+  type: GraphQLScalarType,
+): type is GraphQLScalarTypeInstance<'String'> => type.name === 'String'
+export const isGraphQLBoolean = (
+  type: GraphQLScalarType,
+): type is GraphQLScalarTypeInstance<'Boolean'> => type.name === 'Boolean'
+export const isGraphQLFloat = (
+  type: GraphQLScalarType,
+): type is GraphQLScalarTypeInstance<'Float'> => type.name === 'Float'
+export const isGraphQLInt = (
+  type: GraphQLScalarType,
+): type is GraphQLScalarTypeInstance<'Int'> => type.name === 'Int'
+export const isGraphQLID = (
+  type: GraphQLScalarType,
+): type is GraphQLScalarTypeInstance<'ID'> => type.name === 'ID'
 
 export const filterStrategy = <Type extends GraphQLType = GraphQLType>(
   inputType: Type | ContextModel<any, any>,
   inputName?: string,
 ) => {
-  const type = getParentType(isType(inputType) ? inputType : inputType.getType())
-  const name = inputName ? inputName : (isType(inputType) ? `F${inputType.toString()}` : inputType.name)
+  const type = getParentType(
+    isType(inputType) ? inputType : inputType.getType(),
+  )
+  const name = inputName
+    ? inputName
+    : isType(inputType)
+    ? `F${inputType.toString()}`
+    : inputType.name
   const list = GraphQLList(GraphQLNonNull(type))
   if (isScalarType(type)) {
     if (isGraphQLID(type) || isGraphQLString(type))

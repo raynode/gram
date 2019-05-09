@@ -8,9 +8,9 @@ import {
   printSchema,
 } from 'graphql'
 
-import { createSchemaBuilder } from 'schemaBuilder'
-import { ModelBuilder, NodeType, SchemaBuilder, Service } from 'types'
 import { toList } from 'utils'
+import { createSchemaBuilder } from './schemaBuilder'
+import { ModelBuilder, NodeType, SchemaBuilder, Service } from './types'
 
 import {
   Account,

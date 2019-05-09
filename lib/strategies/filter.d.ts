@@ -1,5 +1,5 @@
 import { GraphQLList, GraphQLScalarType, GraphQLType } from 'graphql';
-import { ContextModel } from 'types';
+import { ContextModel } from '../types';
 export interface GraphQLScalarTypeInstance<T extends string> extends GraphQLScalarType {
     name: T;
 }

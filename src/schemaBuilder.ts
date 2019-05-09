@@ -12,7 +12,7 @@ import {
   GraphQLType,
 } from 'graphql'
 import { forEach, reduce } from 'lodash'
-import { createModelBuilder } from 'modelBuilder'
+import { createModelBuilder } from './modelBuilder'
 import {
   ContextModel,
   ContextMutator,
@@ -23,15 +23,15 @@ import {
   SchemaBuilder,
   Service,
   Wrapped,
-} from 'types'
+} from './types'
 
+import { v4 as uuid } from 'uuid'
 import {
   mutationFieldsReducer,
   queryFieldsReducer,
   subscriptionFieldsReducer,
-} from 'field-reducers'
-import { SCHEMABUILDER } from 'types/constants'
-import { v4 as uuid } from 'uuid'
+} from './field-reducers'
+import { SCHEMABUILDER } from './types/constants'
 
 const wrapContext = <Context>(context: Context | null): Wrapped<Context> => {
   const models: Record<string, ContextModel<Context, any>> = {}
