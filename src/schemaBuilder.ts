@@ -1,4 +1,3 @@
-
 import {
   GraphQLFieldConfigMap,
   GraphQLFieldResolver,
@@ -15,6 +14,7 @@ import {
 import { forEach, reduce } from 'lodash'
 import { createModelBuilder } from 'modelBuilder'
 import {
+  ContextModel,
   ContextMutator,
   ListType,
   ModelBuilder,
@@ -25,24 +25,29 @@ import {
   Wrapped,
 } from 'types'
 
-import { mutationFieldsReducer, queryFieldsReducer, subscriptionFieldsReducer } from 'field-reducers'
+import {
+  mutationFieldsReducer,
+  queryFieldsReducer,
+  subscriptionFieldsReducer,
+} from 'field-reducers'
 import { SCHEMABUILDER } from 'types/constants'
 import { v4 as uuid } from 'uuid'
 
-const wrapContext = <Context>(context: Context): Wrapped<Context> => {
-  const models = {}
+const wrapContext = <Context>(context: Context | null): Wrapped<Context> => {
+  const models: Record<string, ContextModel<Context, any>> = {}
   return {
     id: uuid(),
     context,
-    addModel: (name, model) => models[name] = model,
+    addModel: (name, model) => (models[name] = model),
     getModel: name => models[name],
   }
 }
 
 type BaseTypes = 'Page' | 'Node' | 'List'
 
-export const createSchemaBuilder = <Context = any>(): SchemaBuilder<Context> => {
-
+export const createSchemaBuilder = <Context = any>(): SchemaBuilder<
+  Context
+> => {
   const addNodeAttrs = (model: ModelBuilder<Context, any>) => {
     model.attr('id', GraphQLID)
     model.attr('createdAt', GraphQLString)
@@ -53,7 +58,10 @@ export const createSchemaBuilder = <Context = any>(): SchemaBuilder<Context> => 
 
   const node = createModelBuilder<Context, NodeType>('Node', {}).setInterface()
   const page = createModelBuilder<Context, PageData>('Page', {})
-  const list = createModelBuilder<Context, ListType<NodeType>>('List', {}).setInterface()
+  const list = createModelBuilder<Context, ListType<NodeType>>(
+    'List',
+    {},
+  ).setInterface()
 
   addNodeAttrs(node)
 
@@ -78,9 +86,9 @@ export const createSchemaBuilder = <Context = any>(): SchemaBuilder<Context> => 
       models[modelName] = model
       return addNodeAttrs(model.interface('Node'))
     },
-    interface: <Type>(interfaceName, service: Service<Type>) =>
+    interface: <Type>(interfaceName: string, service: Service<Type>) =>
       builder.model<Type>(interfaceName, service).setInterface(),
-    build: (context = null) => {
+    build: (context: Context | null = null) => {
       const wrapped = wrapContext<Context>(context)
       forEach(models, model => model.setup(wrapped))
 
@@ -88,9 +96,21 @@ export const createSchemaBuilder = <Context = any>(): SchemaBuilder<Context> => 
       models.Page.build(wrapped)
       models.List.build(wrapped)
 
-      const mutationFields: GraphQLFieldConfigMap<any, any> = reduce(models, mutationFieldsReducer(wrapped), {})
-      const queryFields: GraphQLFieldConfigMap<any, any> = reduce(models, queryFieldsReducer(wrapped), {})
-      const subscriptionFields: GraphQLFieldConfigMap<any, any> = reduce(models, subscriptionFieldsReducer(wrapped), {})
+      const mutationFields: GraphQLFieldConfigMap<any, any> = reduce(
+        models,
+        mutationFieldsReducer(wrapped),
+        {},
+      )
+      const queryFields: GraphQLFieldConfigMap<any, any> = reduce(
+        models,
+        queryFieldsReducer(wrapped),
+        {},
+      )
+      const subscriptionFields: GraphQLFieldConfigMap<any, any> = reduce(
+        models,
+        subscriptionFieldsReducer(wrapped),
+        {},
+      )
 
       return new GraphQLSchema({
         query: new GraphQLObjectType({

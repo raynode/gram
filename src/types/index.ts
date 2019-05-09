@@ -1,4 +1,3 @@
-
 import {
   GraphQLFieldConfig,
   GraphQLFieldConfigMap,
@@ -17,19 +16,32 @@ import { ATTRIBUTEBUILDER, MODELBUILDER, SCHEMABUILDER } from 'types/constants'
 import { Service } from 'types/service'
 export * from 'types/service'
 
-export interface Builder { type: string }
+export interface Builder {
+  type: string
+}
 
 export type Fields = Thunk<GraphQLFieldConfigMap<any, any>>
 
-export type DataType = 'create' | 'filter' | 'data' | 'list' | 'page' | 'where' | 'order'
+export type DataType =
+  | 'create'
+  | 'filter'
+  | 'data'
+  | 'list'
+  | 'page'
+  | 'where'
+  | 'order'
 
 export type FieldTypes = 'GraphQL' | 'Model' | 'All'
 
 export interface ContextModel<Context, Type> {
-  addField: <AttributeType>(field: AttributeBuilder<Context, Type, AttributeType>) => void
+  addField: <AttributeType>(
+    field: AttributeBuilder<Context, Type, AttributeType>,
+  ) => void
   baseFilters: () => GraphQLInputFieldConfigMap
   context: Wrapped<Context>
-  dataFields: (type: DataType) => GraphQLInputFieldConfigMap | GraphQLFieldConfigMap<any, any>
+  dataFields: (
+    type: DataType,
+  ) => GraphQLInputFieldConfigMap | GraphQLFieldConfigMap<any, any>
   getFields: () => Array<AttributeBuilder<Context, Type, any>>
   getListType: () => GraphQLType
   getPubSub: () => any
@@ -47,28 +59,41 @@ export interface Wrapped<Context> {
   id: string
   getModel: <Type>(name: string) => ContextModel<Context, Type>
   addModel: <Type>(name: string, model: ContextModel<Context, Type>) => void
-  context: Context
+  context: Context | null
 }
 
-export type ContextFn<Context, Result = boolean> = (context: Wrapped<Context>) => Result
-export type ContextMutator<Context, Type> = (model: ContextModel<Context, Type>, context: Wrapped<Context>) => void
-export type ContextModelFieldFn<Type> = <Context>(contextModel: ContextModel<Context, Type>) => Type
+export type ContextFn<Context, Result = boolean> = (
+  context: Wrapped<Context>,
+) => Result
+export type ContextMutator<Context, Type> = (
+  model: ContextModel<Context, Type>,
+  context: Wrapped<Context>,
+) => void
+export type ContextModelFieldFn<Type> = <Context>(
+  contextModel: ContextModel<Context, Type>,
+) => Type
 
 export type ModelType<Context> = GraphQLType | ContextModel<Context, any>
 
 export interface SchemaBuilder<Context> extends Builder {
   build: (context?: Context) => GraphQLSchema
-  interface: <Type>(interfaceName: string, service?: Service<Type>) =>
-    ModelBuilder<Context, Type>
-  model: <Type>(modelName: string, service?: Service<Type>) =>
-    ModelBuilder<Context, Type>
+  interface: <Type>(
+    interfaceName: string,
+    service?: Service<Type>,
+  ) => ModelBuilder<Context, Type>
+  model: <Type>(
+    modelName: string,
+    service?: Service<Type>,
+  ) => ModelBuilder<Context, Type>
   models: Record<string, ModelBuilder<Context, any>>
   type: typeof SCHEMABUILDER
 }
 
 export interface ModelBuilder<Context, Type> extends Builder {
-  attr: <AttributeType>(attributeName: string, type: ModelType<Context> | ModelBuilder<Context, any>) =>
-    AttributeBuilder<Context, Type, AttributeType>
+  attr: <AttributeType>(
+    attributeName: string,
+    type: ModelType<Context> | ModelBuilder<Context, any>,
+  ) => AttributeBuilder<Context, Type, AttributeType>
   build: (context: Wrapped<Context>) => ContextModel<Context, Type>
   context: (contextMutation: ContextMutator<Context, Type>) => this
   getInterfaces: () => string[]
@@ -82,7 +107,8 @@ export interface ModelBuilder<Context, Type> extends Builder {
   type: typeof MODELBUILDER
 }
 
-export interface AttributeBuilder<Context, Type, AttributeType> extends Builder {
+export interface AttributeBuilder<Context, Type, AttributeType>
+  extends Builder {
   name: string
   field: ContextFn<Context, GraphQLType | ContextModel<Context, Type>>
   nullable: boolean
