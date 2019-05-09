@@ -1,0 +1,42 @@
+
+Add context function for attributes
+Add context function for models
+Add context function for schema
+
+- Goal is to have every part of the system be configurable by context
+
+Create Visibility-Type: ENABLED, DISABLED & REQUIRED
+Add config option to Attributes which enables or disables attributes by context.
+
+```
+model.attr('somevalue', GraphQLString)
+  .context(context => this.config({
+    create: REQUIRED, // is required during creation
+    update: DISABLED, // cannot be set during updates
+    where: DISABLED, // will not be used in where & filter input
+    order: ENABLED, // can be ordered by
+    …
+  }))
+```
+
+Add config option to Models which enables or disabled model functionalities.
+
+```
+model.context(context => {
+  this.config({
+    findMany: DISABLED,
+    findOne: ENABLED,
+    findOneArgs: {
+      where: ENABLED, // default is REQUIRED (needed for User.findOne-by AuthToken)
+      order: DISABLED,
+    }
+    create: DISABLED,
+    update: ENABLED,
+    updateArgs: {
+      …
+    },
+    delete: DISABLED,
+  })
+})
+```
+
