@@ -422,7 +422,20 @@ Object {
 }
 `;
 
-exports[`example should find multiple things 1`] = `undefined`;
+exports[`example should find multiple things 1`] = `
+Object {
+  "getUsers": Object {
+    "nodes": Array [
+      Object {
+        "name": "test",
+      },
+      Object {
+        "name": "New Test-User",
+      },
+    ],
+  },
+}
+`;
 
 exports[`schemaBuilder should render an empty Schema 1`] = `
 "type Mutation

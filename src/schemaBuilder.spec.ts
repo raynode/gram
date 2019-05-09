@@ -1,4 +1,3 @@
-
 import {
   graphql,
   GraphQLFloat,
@@ -44,11 +43,9 @@ describe('schemaBuilder', () => {
 })
 
 describe('example', () => {
-
   let builder: SchemaBuilder<number>
 
   beforeAll(() => {
-
     reset()
     builder = createSchemaBuilder<number>()
   })
@@ -70,7 +67,9 @@ describe('example', () => {
   })
 
   it('should add account to the model', () => {
-    const account = addNodeAttributes(builder.model<Account>('Account', Accounts))
+    const account = addNodeAttributes(
+      builder.model<Account>('Account', Accounts),
+    )
 
     // will add input types for "STRING"
     account.attr('name', GraphQLString)
@@ -78,11 +77,12 @@ describe('example', () => {
     // will add input types for "REFERENCE"
     account
       .attr('user', builder.models.User)
-      .resolve(account => Users.findOne({ where: { id: account.userId }, order: null }))
+      .resolve(account =>
+        Users.findOne({ where: { id: account.userId }, order: null }),
+      )
       .isNotNullable()
     // add accounts to the user model
-    builder.models.User
-      .attr('accounts', account)
+    builder.models.User.attr('accounts', account)
       .resolve(user => findMany({ userId: user.id }, null))
       .isList()
 
@@ -124,8 +124,9 @@ describe('example', () => {
   it('should find multiple things', async () => {
     const schema = builder.build(0)
 
+    // where is required by may be an empty thing
     const query = `{
-      getUsers {
+      getUsers(where: {}) {
         nodes {
           name
         }
@@ -152,9 +153,21 @@ describe('example', () => {
   it('should create an account for the user', async () => {
     const schema = builder.build(0)
 
-    const { data: { getUser: { id }}} = await graphql(schema, `{
-      getUser(where: { name: "New Test-User" }) { id }
-    }`, null)
+    const {
+      data: {
+        getUser: { id },
+      },
+    } = await graphql(
+      schema,
+      `
+        {
+          getUser(where: { name: "New Test-User" }) {
+            id
+          }
+        }
+      `,
+      null,
+    )
 
     const query = `mutation($id: ID!) {
       createAccount(data: {
@@ -182,14 +195,19 @@ describe('example', () => {
   it('should find the new account in the user as well', async () => {
     const schema = builder.build(0)
 
-    const { data, errors } = await graphql(schema, `{
-      getUser(where: { name: "New Test-User" }) {
-        name
-        accounts {
-          name
+    const { data, errors } = await graphql(
+      schema,
+      `
+        {
+          getUser(where: { name: "New Test-User" }) {
+            name
+            accounts {
+              name
+            }
+          }
         }
-      }
-    }`)
+      `,
+    )
 
     expect(data).toHaveProperty('getUser')
     expect(data.getUser).toHaveProperty('name')
