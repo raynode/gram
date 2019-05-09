@@ -1,4 +1,3 @@
-
-export * from 'field-reducers/mutation'
-export * from 'field-reducers/query'
-export * from 'field-reducers/subscription'
+export * from './mutation'
+export * from './query'
+export * from './subscription'
