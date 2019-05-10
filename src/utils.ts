@@ -3,16 +3,40 @@ import {
   GraphQLList,
   GraphQLNonNull,
   GraphQLType,
+  isType,
 } from 'graphql'
 import { memoize } from 'lodash'
 
 import { buildType } from './attributeBuilder'
-import { AttributeBuilder, ContextModel, ModelType, PageData } from './types'
+import {
+  AttributeBuilder,
+  ContextFn,
+  ContextModel,
+  ModelBuilder,
+  ModelType,
+  PageData,
+  Wrapped,
+} from './types'
 
 export const record = (service: Record<string, any>) => ({
   exists: (key: string) =>
     service.hasOwnProperty(key) && typeof service[key] === 'function',
 })
+
+export type ToContextFnResult<Context> = ContextFn<
+  Context,
+  GraphQLType | ContextModel<Context, any>
+>
+export const toContextFn = <Context>(
+  type:
+    | ModelType<Context>
+    | ModelBuilder<Context, any>
+    | ContextFn<Context, GraphQLType>,
+): ToContextFnResult<Context> => {
+  if (typeof type === 'function') return type
+  if (isType(type)) return () => type
+  return context => context.getModel(type.name)
+}
 
 export const toList = <Type extends GraphQLType = GraphQLType>(type: Type) =>
   GraphQLNonNull(GraphQLList(GraphQLNonNull(type))) as Type

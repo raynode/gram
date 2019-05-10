@@ -1,4 +1,4 @@
-import { GraphQLID, GraphQLString, GraphQLType, isType } from 'graphql'
+import { GraphQLType } from 'graphql'
 import { forEach, memoize } from 'lodash'
 
 import { createAttributeBuilder } from './attributeBuilder'
@@ -6,7 +6,6 @@ import { createContextModel } from './createContextModel'
 import {
   AttributeBuilder,
   ContextFn,
-  ContextModel,
   ContextMutator,
   ModelBuilder,
   ModelType,
@@ -14,7 +13,7 @@ import {
   Service,
 } from './types'
 import { MODELBUILDER } from './types/constants'
-import { record } from './utils'
+import { record, toContextFn } from './utils'
 
 const serviceToVisibility = (service: Service<any>): ModelVisibility => {
   const { exists } = record(service)
@@ -74,20 +73,11 @@ export const createModelBuilder = <Context, Type>(
         throw new Error(
           `${modelName}.attr(${attributeName}) needs to provide either a GraphQLType or a ModelBuilder`,
         )
-      const contextFn: ContextFn<
-        Context,
-        GraphQLType | ContextModel<Context, any>
-      > =
-        typeof type === 'function'
-          ? type
-          : isType(type)
-          ? () => type
-          : context => context.getModel(type.name)
       return (attributes[attributeName] = createAttributeBuilder<
         Context,
         AttributeType,
         Type
-      >(attributeName, contextFn))
+      >(attributeName, toContextFn<Context>(type)))
     },
     setup: context => {
       const contextModel = createContextModel(
