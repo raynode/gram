@@ -9,6 +9,11 @@ import { memoize } from 'lodash'
 import { buildType } from './attributeBuilder'
 import { AttributeBuilder, ContextModel, ModelType, PageData } from './types'
 
+export const record = (service: Record<string, any>) => ({
+  exists: (key: string) =>
+    service.hasOwnProperty(key) && typeof service[key] === 'function',
+})
+
 export const toList = <Type extends GraphQLType = GraphQLType>(type: Type) =>
   GraphQLNonNull(GraphQLList(GraphQLNonNull(type))) as Type
 

@@ -12,29 +12,23 @@ import {
   ModelType,
   ModelVisibility,
   Service,
-  Wrapped,
 } from './types'
 import { MODELBUILDER } from './types/constants'
+import { record } from './utils'
 
-const serviceToVisibility = (service: Service<any>): ModelVisibility => ({
-  createMutation:
-    service.hasOwnProperty('create') && typeof service.create === 'function',
-  createSubscription:
-    service.hasOwnProperty('create') && typeof service.create === 'function',
-  deleteMutation:
-    service.hasOwnProperty('remove') && typeof service.remove === 'function',
-  deleteSubscription:
-    service.hasOwnProperty('remove') && typeof service.remove === 'function',
-  findManyQuery:
-    service.hasOwnProperty('findMany') &&
-    typeof service.findMany === 'function',
-  findOneQuery:
-    service.hasOwnProperty('findOne') && typeof service.findOne === 'function',
-  updateMutation:
-    service.hasOwnProperty('update') && typeof service.update === 'function',
-  updateSubscription:
-    service.hasOwnProperty('update') && typeof service.update === 'function',
-})
+const serviceToVisibility = (service: Service<any>): ModelVisibility => {
+  const { exists } = record(service)
+  return {
+    createMutation: exists('create'),
+    createSubscription: exists('create'),
+    deleteMutation: exists('remove'),
+    deleteSubscription: exists('remove'),
+    findManyQuery: exists('findMany'),
+    findOneQuery: exists('findOne'),
+    updateMutation: exists('update'),
+    updateSubscription: exists('update'),
+  }
+}
 
 export const createModelBuilder = <Context, Type>(
   modelName: string,
