@@ -37,7 +37,7 @@
       <div class='fl pad1y space-right2'>
         <span class="strong">0% </span>
         <span class="quiet">Lines</span>
-        <span class='fraction'>0/8</span>
+        <span class='fraction'>0/9</span>
       </div>
     </div>
     <p class="quiet">
@@ -57,27 +57,72 @@
 <a name='L9'></a><a href='#L9'>9</a>
 <a name='L10'></a><a href='#L10'>10</a>
 <a name='L11'></a><a href='#L11'>11</a>
-<a name='L12'></a><a href='#L12'>12</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L12'></a><a href='#L12'>12</a>
+<a name='L13'></a><a href='#L13'>13</a>
+<a name='L14'></a><a href='#L14'>14</a>
+<a name='L15'></a><a href='#L15'>15</a>
+<a name='L16'></a><a href='#L16'>16</a>
+<a name='L17'></a><a href='#L17'>17</a>
+<a name='L18'></a><a href='#L18'>18</a>
+<a name='L19'></a><a href='#L19'>19</a>
+<a name='L20'></a><a href='#L20'>20</a>
+<a name='L21'></a><a href='#L21'>21</a>
+<a name='L22'></a><a href='#L22'>22</a>
+<a name='L23'></a><a href='#L23'>23</a>
+<a name='L24'></a><a href='#L24'>24</a>
+<a name='L25'></a><a href='#L25'>25</a>
+<a name='L26'></a><a href='#L26'>26</a>
+<a name='L27'></a><a href='#L27'>27</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">&nbsp;
-import { AttributeBuilder, Builder, ModelBuilder, SchemaBuilder } from 'types'
-<span class="cstat-no" title="statement not covered" >import { ATTRIBUTEBUILDER, MODELBUILDER, SCHEMABUILDER } from 'types/constants'</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import {
+  AttributeBuilder,
+  Builder,
+  ModelBuilder,
+  SchemaBuilder,
+} from '../types'
+<span class="cstat-no" title="statement not covered" >import {</span>
+  ATTRIBUTEBUILDER,
+  MODELBUILDER,
+  SCHEMABUILDER,
+} from '../types/constants'
 &nbsp;
-export const <span class="cstat-no" title="statement not covered" >isBuilder = <span class="fstat-no" title="function not covered" >(v</span>al: any): val is Builder =&gt; <span class="cstat-no" title="statement not covered" >val &amp;&amp; typeof val.type === 'string'</span></span>
-export const <span class="cstat-no" title="statement not covered" >isAttributeBuilder = <span class="fstat-no" title="function not covered" >&lt;Context, Type, AttributeType&gt;</span></span>
-  (val: any): val is AttributeBuilder&lt;Context, Type, AttributeType&gt; =&gt; <span class="cstat-no" title="statement not covered" >isBuilder(val) &amp;&amp; val.type === ATTRIBUTEBUILDER</span>
-export const <span class="cstat-no" title="statement not covered" >isModelBuilder = <span class="fstat-no" title="function not covered" >&lt;Context, Type&gt;(v</span>al: any): val is ModelBuilder&lt;Context, Type&gt; =&gt;</span>
+export const <span class="cstat-no" title="statement not covered" >isBuilder = <span class="fstat-no" title="function not covered" >(v</span>al: any): val is Builder =&gt;</span>
+<span class="cstat-no" title="statement not covered" >  val &amp;&amp; typeof val.type === 'string'</span>
+export const <span class="cstat-no" title="statement not covered" >isAttributeBuilder = <span class="fstat-no" title="function not covered" >&lt;Context, Type, AttributeType&gt;(</span></span>
+  val: any,
+): val is AttributeBuilder&lt;Context, Type, AttributeType&gt; =&gt;
+<span class="cstat-no" title="statement not covered" >  isBuilder(val) &amp;&amp; val.type === ATTRIBUTEBUILDER</span>
+export const <span class="cstat-no" title="statement not covered" >isModelBuilder = <span class="fstat-no" title="function not covered" >&lt;Context, Type&gt;(</span></span>
+  val: any,
+): val is ModelBuilder&lt;Context, Type&gt; =&gt;
 <span class="cstat-no" title="statement not covered" >  isBuilder(val) &amp;&amp; val.type === MODELBUILDER</span>
-export const <span class="cstat-no" title="statement not covered" >isSchemaBuilder = <span class="fstat-no" title="function not covered" >&lt;Context&gt;(v</span>al: any): val is SchemaBuilder&lt;Context&gt; =&gt;</span>
+export const <span class="cstat-no" title="statement not covered" >isSchemaBuilder = <span class="fstat-no" title="function not covered" >&lt;Context&gt;(</span></span>
+  val: any,
+): val is SchemaBuilder&lt;Context&gt; =&gt;
 <span class="cstat-no" title="statement not covered" >  isBuilder(val) &amp;&amp; val.type === SCHEMABUILDER</span>
 &nbsp;</pre></td></tr>
 </table></pre>
@@ -85,7 +130,7 @@ export const <span class="cstat-no" title="statement not covered" >isSchemaBuild
 </div><!-- /wrapper -->
 <div class='footer quiet pad2 space-top1 center small'>
   Code coverage
-  generated by <a href="https://istanbul.js.org/" target="_blank">istanbul</a> at Wed May 08 2019 13:30:56 GMT+0200 (Central European Summer Time)
+  generated by <a href="https://istanbul.js.org/" target="_blank">istanbul</a> at Fri May 10 2019 16:57:49 GMT+0200 (Central European Summer Time)
 </div>
 </div>
 <script src="../../prettify.js"></script>
