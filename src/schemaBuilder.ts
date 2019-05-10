@@ -16,6 +16,7 @@ import { createModelBuilder } from './modelBuilder'
 import {
   ContextModel,
   ContextMutator,
+  GenericGraphQLType,
   ListType,
   ModelBuilder,
   NodeType,
@@ -33,13 +34,19 @@ import {
 } from './field-reducers'
 import { SCHEMABUILDER } from './types/constants'
 
-const wrapContext = <Context>(context: Context | null): Wrapped<Context> => {
+import { DateType, JSONType, UploadType } from './generic-types'
+
+const wrapContext = <Context>(
+  context: Context | null,
+  generics: Record<string, GraphQLType>,
+): Wrapped<Context> => {
   const models: Record<string, ContextModel<Context, any>> = {}
   return {
     id: uuid(),
     context,
     addModel: (name, model) => (models[name] = model),
     getModel: name => models[name],
+    getGenericType: name => generics[name],
   }
 }
 
@@ -78,6 +85,12 @@ export const createSchemaBuilder = <Context = any>(): SchemaBuilder<
     List: list,
   }
 
+  const generics: Record<GenericGraphQLType, GraphQLType> = {
+    Date: DateType,
+    JSON: JSONType,
+    Upload: UploadType,
+  }
+
   const builder: SchemaBuilder<Context> = {
     type: SCHEMABUILDER,
     models,
@@ -89,7 +102,7 @@ export const createSchemaBuilder = <Context = any>(): SchemaBuilder<
     interface: <Type>(interfaceName: string, service: Service<Type>) =>
       builder.model<Type>(interfaceName, service).setInterface(),
     build: (context: Context | null = null) => {
-      const wrapped = wrapContext<Context>(context)
+      const wrapped = wrapContext<Context>(context, generics)
       forEach(models, model => model.setup(wrapped))
 
       models.Node.build(wrapped)
@@ -127,6 +140,11 @@ export const createSchemaBuilder = <Context = any>(): SchemaBuilder<
         }),
       })
     },
+    setGenericType: (key, type) => {
+      generics[key] = type
+      return type
+    },
+    getGenericType: key => generics[key],
   }
 
   return builder

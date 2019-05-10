@@ -5,8 +5,11 @@ import { createAttributeBuilder } from './attributeBuilder'
 import { createContextModel } from './createContextModel'
 import {
   AttributeBuilder,
+  ContextFn,
+  ContextModel,
   ContextMutator,
   ModelBuilder,
+  ModelType,
   ModelVisibility,
   Service,
   Wrapped,
@@ -66,22 +69,31 @@ export const createModelBuilder = <Context, Type>(
       return builder
     },
     isInterface: () => isInterface,
-    attr: <AttributeType>(attributeName, type) => {
+    attr: <AttributeType>(
+      attributeName: string,
+      type:
+        | ModelType<Context>
+        | ModelBuilder<Context, any>
+        | ContextFn<Context, GraphQLType>,
+    ) => {
       if (!type)
         throw new Error(
           `${modelName}.attr(${attributeName}) needs to provide either a GraphQLType or a ModelBuilder`,
         )
-      return (attributes[attributeName] = isType(type)
-        ? // add attribute
-          createAttributeBuilder<Context, AttributeType, Type>(
-            attributeName,
-            () => type,
-          )
-        : // add association
-          createAttributeBuilder<Context, AttributeType, Type>(
-            attributeName,
-            context => context.getModel(type.name),
-          ))
+      const contextFn: ContextFn<
+        Context,
+        GraphQLType | ContextModel<Context, any>
+      > =
+        typeof type === 'function'
+          ? type
+          : isType(type)
+          ? () => type
+          : context => context.getModel(type.name)
+      return (attributes[attributeName] = createAttributeBuilder<
+        Context,
+        AttributeType,
+        Type
+      >(attributeName, contextFn))
     },
     setup: context => {
       const contextModel = createContextModel(
