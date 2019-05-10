@@ -1,11 +1,13 @@
 import {
   GraphQLFieldConfig,
+  GraphQLFieldConfigMap,
+  GraphQLInputFieldConfigMap,
   GraphQLList,
   GraphQLNonNull,
   GraphQLType,
   isType,
 } from 'graphql'
-import { memoize } from 'lodash'
+import { identity, map, memoize, pickBy, reduce } from 'lodash'
 
 import { buildType } from './attributeBuilder'
 import {
@@ -22,6 +24,43 @@ export const record = (service: Record<string, any>) => ({
   exists: (key: string) =>
     service.hasOwnProperty(key) && typeof service[key] === 'function',
 })
+
+export const clearRecord = (record: Record<string, any>) =>
+  pickBy(record, identity)
+
+export type FieldReducerFn<Context> = (
+  fields: GraphQLFieldConfigMap<any, any>,
+  model: ModelBuilder<Context, any>,
+) => GraphQLFieldConfigMap<any, any>
+
+export const fieldsReducer = <Context>(
+  reducer: (
+    contextModel: ContextModel<Context, any>,
+  ) => GraphQLFieldConfigMap<any, any> | GraphQLInputFieldConfigMap,
+) => (context: Wrapped<Context>): FieldReducerFn<Context> => (fields, model) =>
+  model.isInterface()
+    ? fields
+    : { ...fields, ...clearRecord(reducer(model.build(context))) }
+
+// this Type construct will ensure that the returned object will have the same keys as
+// the input object. It will also convert the properties from ModelBuilder to FieldReducer
+export const reduceFields = <
+  Context,
+  Reducers,
+  Models,
+  ReducerKeys extends keyof Reducers
+>(
+  models: Record<string, ModelBuilder<Context, any>>,
+  reducers: Record<ReducerKeys, FieldReducerFn<Context>>,
+): Record<ReducerKeys, GraphQLFieldConfigMap<any, any>> =>
+  reduce(
+    reducers,
+    (fields, reducer, name) => ({
+      ...fields,
+      [name]: reduce(models, reducer, {}),
+    }),
+    {} as any,
+  )
 
 export type ToContextFnResult<Context> = ContextFn<
   Context,
@@ -74,7 +113,7 @@ export const reduceContextFields = <Context, Type extends Record<string, any>>(
       base || {},
     )
 
-export const createPageType = <Type>(pageData: PageData, nodes: Type[]) => ({
-  page: pageData,
+export const createPageType = <Type>(page: PageData, nodes: Type[]) => ({
+  page,
   nodes,
 })

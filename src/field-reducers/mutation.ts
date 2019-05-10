@@ -1,19 +1,11 @@
-import { GraphQLFieldConfigMap } from 'graphql'
-import { ModelBuilder, Wrapped } from '../types'
-
 import { create, remove, update } from '../field-types'
+import { fieldsReducer } from '../utils'
 
-export const mutationFieldsReducer = <Context>(context: Wrapped<Context>) => (
-  fields: any,
-  model: ModelBuilder<Context, any>,
-) => {
-  if (model.isInterface()) return fields
-  const contextModel = model.build(context)
-  if (contextModel.visibility.createMutation)
-    fields[contextModel.names.fields.create] = create(contextModel)
-  if (contextModel.visibility.updateMutation)
-    fields[contextModel.names.fields.update] = update(contextModel)
-  if (contextModel.visibility.deleteMutation)
-    fields[contextModel.names.fields.delete] = remove(contextModel)
-  return fields as GraphQLFieldConfigMap<any, any>
-}
+export const mutationFieldsReducer = fieldsReducer(contextModel => ({
+  [contextModel.names.fields.create]:
+    contextModel.visibility.createMutation && create(contextModel),
+  [contextModel.names.fields.update]:
+    contextModel.visibility.updateMutation && update(contextModel),
+  [contextModel.names.fields.delete]:
+    contextModel.visibility.deleteMutation && remove(contextModel),
+}))

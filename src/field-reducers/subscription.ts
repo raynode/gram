@@ -1,18 +1,11 @@
-import { GraphQLFieldConfigMap } from 'graphql'
-import { ModelBuilder, Wrapped } from '../types'
-
 import { create, remove, update } from '../event-types'
+import { fieldsReducer } from '../utils'
 
-export const subscriptionFieldsReducer = <Context>(
-  context: Wrapped<Context>,
-) => (fields: any, model: ModelBuilder<Context, any>) => {
-  if (model.isInterface()) return fields
-  const contextModel = model.build(context)
-  if (contextModel.visibility.createSubscription)
-    fields[contextModel.names.events.create] = create(contextModel)
-  if (contextModel.visibility.updateSubscription)
-    fields[contextModel.names.events.update] = update(contextModel)
-  if (contextModel.visibility.deleteSubscription)
-    fields[contextModel.names.events.delete] = remove(contextModel)
-  return fields as GraphQLFieldConfigMap<any, any>
-}
+export const subscriptionFieldsReducer = fieldsReducer(contextModel => ({
+  [contextModel.names.events.create]:
+    contextModel.visibility.createSubscription && create(contextModel),
+  [contextModel.names.events.update]:
+    contextModel.visibility.updateSubscription && update(contextModel),
+  [contextModel.names.events.delete]:
+    contextModel.visibility.deleteSubscription && remove(contextModel),
+}))

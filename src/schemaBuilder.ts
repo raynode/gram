@@ -34,6 +34,7 @@ import {
 } from './field-reducers'
 import { SCHEMABUILDER } from './types/constants'
 
+import { reduceFields } from 'utils'
 import { DateType, JSONType, UploadType } from './generic-types'
 
 const wrapContext = <Context>(
@@ -107,34 +108,24 @@ export const createSchemaBuilder = <Context = any>(): SchemaBuilder<
       models.Page.build(wrapped)
       models.List.build(wrapped)
 
-      const mutationFields: GraphQLFieldConfigMap<any, any> = reduce(
-        models,
-        mutationFieldsReducer(wrapped),
-        {},
-      )
-      const queryFields: GraphQLFieldConfigMap<any, any> = reduce(
-        models,
-        queryFieldsReducer(wrapped),
-        {},
-      )
-      const subscriptionFields: GraphQLFieldConfigMap<any, any> = reduce(
-        models,
-        subscriptionFieldsReducer(wrapped),
-        {},
-      )
+      const fields = reduceFields(models, {
+        query: queryFieldsReducer(wrapped),
+        mutation: mutationFieldsReducer(wrapped),
+        subscription: subscriptionFieldsReducer(wrapped),
+      })
 
       return new GraphQLSchema({
         query: new GraphQLObjectType({
           name: 'Query',
-          fields: queryFields,
+          fields: fields.query,
         }),
         mutation: new GraphQLObjectType({
           name: 'Mutation',
-          fields: mutationFields,
+          fields: fields.mutation,
         }),
         subscription: new GraphQLObjectType({
           name: 'Subscription',
-          fields: subscriptionFields,
+          fields: fields.subscription,
         }),
       })
     },
