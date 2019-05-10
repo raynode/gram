@@ -9,6 +9,7 @@ export interface Builder {
 export declare type Fields = Thunk<GraphQLFieldConfigMap<any, any>>;
 export declare type DataType = 'create' | 'filter' | 'data' | 'list' | 'page' | 'where' | 'order';
 export declare type FieldTypes = 'GraphQL' | 'Model' | 'All';
+export declare type GenericGraphQLType = 'Date' | 'Upload' | 'JSON';
 export interface ContextModel<Context, Type> {
     addField: <AttributeType>(field: AttributeBuilder<Context, Type, AttributeType>) => void;
     baseFilters: () => GraphQLInputFieldConfigMap;
@@ -31,6 +32,7 @@ export interface Wrapped<Context> {
     getModel: <Type>(name: string) => ContextModel<Context, Type>;
     addModel: <Type>(name: string, model: ContextModel<Context, Type>) => void;
     context: Context | null;
+    getGenericType: (key: string) => GraphQLType;
 }
 export declare type ContextFn<Context, Result = boolean> = (context: Wrapped<Context>) => Result;
 export declare type ContextMutator<Context, Type> = (model: ContextModel<Context, Type>, context: Wrapped<Context>) => void;
@@ -42,9 +44,11 @@ export interface SchemaBuilder<Context> extends Builder {
     model: <Type>(modelName: string, service?: Service<Type>) => ModelBuilder<Context, Type>;
     models: Record<string, ModelBuilder<Context, any>>;
     type: typeof SCHEMABUILDER;
+    setGenericType: <Type extends GraphQLType>(key: GenericGraphQLType, type: Type) => this;
+    getGenericType: (key: GenericGraphQLType) => GraphQLType;
 }
 export interface ModelBuilder<Context, Type> extends Builder {
-    attr: <AttributeType>(attributeName: string, type: ModelType<Context> | ModelBuilder<Context, any>) => AttributeBuilder<Context, Type, AttributeType>;
+    attr: <AttributeType>(attributeName: string, type: ModelType<Context> | ModelBuilder<Context, any> | ContextFn<Context, GraphQLType>) => AttributeBuilder<Context, Type, AttributeType>;
     build: (context: Wrapped<Context>) => ContextModel<Context, Type>;
     context: (contextMutation: ContextMutator<Context, Type>) => this;
     getInterfaces: () => string[];
