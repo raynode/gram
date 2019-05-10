@@ -1,11 +1,6 @@
-import { GraphQLInputFieldConfig, GraphQLNonNull } from 'graphql'
-import { ContextModelFieldFn } from '../types'
+import { createContextModelFieldFn } from '../utils'
 
-export const create: ContextModelFieldFn<
-  GraphQLInputFieldConfig
-> = contextModel => ({
-  subscribe: () =>
-    contextModel.getPubSub().asyncIterator(contextModel.names.events.create),
-  resolve: ({ node }) => node,
-  type: GraphQLNonNull(contextModel.getType()),
-})
+export const create = createContextModelFieldFn(contextModel => ({
+  iterator: contextModel.names.events.delete,
+  condition: 'nonnull',
+}))

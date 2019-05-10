@@ -2,6 +2,7 @@ import {
   GraphQLFieldConfig,
   GraphQLFieldConfigMap,
   GraphQLInputFieldConfigMap,
+  GraphQLInputType,
   GraphQLList,
   GraphQLNonNull,
   GraphQLType,
@@ -77,13 +78,30 @@ export const toContextFn = <Context>(
   return context => context.getModel(type.name)
 }
 
+export type TypeCondition = 'nonnull' | 'list' | 'none'
+
 export const toList = <Type extends GraphQLType = GraphQLType>(type: Type) =>
   GraphQLNonNull(GraphQLList(GraphQLNonNull(type))) as Type
+
+export const conditionalList = <Type extends GraphQLType>(
+  type: Type,
+  isList: boolean,
+) => (isList ? toList(type) : type)
 
 export const conditionalNonNull = <Type extends GraphQLType>(
   type: Type,
   nonNull: boolean,
 ) => (nonNull ? GraphQLNonNull(type) : type)
+
+export const conditionalType = <Type extends GraphQLType>(
+  type: Type,
+  condition: TypeCondition,
+) =>
+  condition === 'list'
+    ? toList(type)
+    : condition === 'nonnull'
+    ? GraphQLNonNull(type)
+    : type
 
 export const memoizeContextModel = <Context, Result, Type = any>(
   fn: (contextModel: ContextModel<Context, Type>) => Result,
@@ -117,3 +135,20 @@ export const createPageType = <Type>(page: PageData, nodes: Type[]) => ({
   page,
   nodes,
 })
+
+interface ContextModelFieldFnConfig {
+  iterator: string
+  condition: TypeCondition
+}
+export const createContextModelFieldFn = <Context>(
+  configFn: (
+    contextModel: ContextModel<Context, any>,
+  ) => ContextModelFieldFnConfig,
+) => (contextModel: ContextModel<Context, any>) => {
+  const { iterator, condition = 'none' } = configFn(contextModel)
+  return {
+    subscribe: () => contextModel.getPubSub().asyncIterator(iterator),
+    resolve: ({ node }) => node,
+    type: conditionalType(contextModel.getType() as GraphQLInputType, condition),
+  }
+}
