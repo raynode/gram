@@ -96,7 +96,7 @@ export interface SchemaBuilder<Context> extends Builder {
   setGenericType: <Type extends GraphQLType>(
     key: GenericGraphQLType,
     type: Type,
-  ) => Type
+  ) => this
   getGenericType: (key: GenericGraphQLType) => GraphQLType
 }
 

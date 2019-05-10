@@ -50,8 +50,6 @@ const wrapContext = <Context>(
   }
 }
 
-type BaseTypes = 'Page' | 'Node' | 'List'
-
 export const createSchemaBuilder = <Context = any>(): SchemaBuilder<
   Context
 > => {
@@ -142,7 +140,7 @@ export const createSchemaBuilder = <Context = any>(): SchemaBuilder<
     },
     setGenericType: (key, type) => {
       generics[key] = type
-      return type
+      return builder
     },
     getGenericType: key => generics[key],
   }
