@@ -3,9 +3,9 @@
 exports[`testing the example 1 should build the example code 1`] = `
 "type Animal implements Node {
   id: ID
-  createdAt: String
-  updatedAt: String
-  deletedAt: String
+  createdAt: Date
+  updatedAt: Date
+  deletedAt: Date
   type: String!
   name: String
   tame: Boolean
@@ -20,18 +20,6 @@ input AnimalFilter {
   id_not: ID
   id_in: [ID!]
   id_not_in: [ID!]
-  createdAt: String
-  createdAt_not: String
-  createdAt_in: [String!]
-  createdAt_not_in: [String!]
-  updatedAt: String
-  updatedAt_not: String
-  updatedAt_in: [String!]
-  updatedAt_not_in: [String!]
-  deletedAt: String
-  deletedAt_not: String
-  deletedAt_in: [String!]
-  deletedAt_not_in: [String!]
   type: String
   type_not: String
   type_in: [String!]
@@ -84,18 +72,6 @@ input AnimalWhere {
   id_not: ID
   id_in: [ID!]
   id_not_in: [ID!]
-  createdAt: String
-  createdAt_not: String
-  createdAt_in: [String!]
-  createdAt_not_in: [String!]
-  updatedAt: String
-  updatedAt_not: String
-  updatedAt_in: [String!]
-  updatedAt_not_in: [String!]
-  deletedAt: String
-  deletedAt_not: String
-  deletedAt_in: [String!]
-  deletedAt_not_in: [String!]
   type: String
   type_not: String
   type_in: [String!]
@@ -113,14 +89,19 @@ input AnimalWhere {
 
 input CreateAnimalData {
   id: ID
-  createdAt: String
-  updatedAt: String
-  deletedAt: String
+  createdAt: Date
+  updatedAt: Date
+  deletedAt: Date
   type: String!
   name: String
   tame: Boolean
   age: Int
 }
+
+\\"\\"\\"
+A special custom Scalar type for Dates that converts to a ISO formatted string 
+\\"\\"\\"
+scalar Date
 
 interface List {
   page: Page
@@ -135,9 +116,9 @@ type Mutation {
 
 interface Node {
   id: ID
-  createdAt: String
-  updatedAt: String
-  deletedAt: String
+  createdAt: Date
+  updatedAt: Date
+  deletedAt: Date
 }
 
 type Page {
@@ -159,9 +140,9 @@ type Subscription {
 
 input UpdateAnimalData {
   id: ID
-  createdAt: String
-  updatedAt: String
-  deletedAt: String
+  createdAt: Date
+  updatedAt: Date
+  deletedAt: Date
   type: String!
   name: String
   tame: Boolean

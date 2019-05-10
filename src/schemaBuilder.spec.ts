@@ -50,14 +50,6 @@ describe('example', () => {
     builder = createSchemaBuilder<number>()
   })
 
-  const addNodeAttributes = <Type>(node: ModelBuilder<number, Type>) => {
-    node.attr('id', GraphQLID)
-    node.attr('createdAt', GraphQLString)
-    node.attr('updatedAt', GraphQLString)
-    node.attr('deletedAt', GraphQLString)
-    return node
-  }
-
   it('should add User to the Schema', () => {
     const user = builder.model<User>('User', Users)
     user.attr('name', GraphQLString)
@@ -67,9 +59,7 @@ describe('example', () => {
   })
 
   it('should add account to the model', () => {
-    const account = addNodeAttributes(
-      builder.model<Account>('Account', Accounts),
-    )
+    const account = builder.model<Account>('Account', Accounts)
 
     // will add input types for "STRING"
     account.attr('name', GraphQLString)

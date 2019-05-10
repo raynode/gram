@@ -57,9 +57,9 @@ export const createSchemaBuilder = <Context = any>(): SchemaBuilder<
 > => {
   const addNodeAttrs = (model: ModelBuilder<Context, any>) => {
     model.attr('id', GraphQLID)
-    model.attr('createdAt', GraphQLString)
-    model.attr('updatedAt', GraphQLString)
-    model.attr('deletedAt', GraphQLString)
+    model.attr('createdAt', context => context.getGenericType('Date'))
+    model.attr('updatedAt', context => context.getGenericType('Date'))
+    model.attr('deletedAt', context => context.getGenericType('Date'))
     return model
   }
 
