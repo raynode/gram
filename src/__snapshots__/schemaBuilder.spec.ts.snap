@@ -376,10 +376,6 @@ Object {
 `;
 
 exports[`schemaBuilder should render an empty Schema 1`] = `
-"type Mutation
-
-type Query
-
-type Subscription
+"type Query
 "
 `;
