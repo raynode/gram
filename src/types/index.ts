@@ -36,7 +36,11 @@ export type DataType =
   | 'order'
 
 export type FieldTypes = 'GraphQL' | 'Model' | 'All'
-export type GenericGraphQLType = 'Date' | 'Upload' | 'JSON'
+export type GenericGraphQLType = 'Date' | 'JSON'
+export type FieldDefinition = Record<
+  'query' | 'mutation' | 'subscription',
+  GraphQLFieldConfigMap<any, any>
+>
 
 export interface ContextModel<Context, Type> {
   addField: <AttributeType>(
@@ -68,6 +72,10 @@ export interface Wrapped<Context> {
   getGenericType: (key: string) => GraphQLType
 }
 
+export type ContextModelFn<Result> = <Context>(
+  contextModel: ContextModel<Context, any>,
+) => Result
+
 export type ContextFn<Context, Result = boolean> = (
   context: Wrapped<Context>,
 ) => Result
@@ -82,7 +90,7 @@ export type ContextModelFieldFn<Type> = <Context>(
 export type ModelType<Context> = GraphQLType | ContextModel<Context, any>
 
 export interface SchemaBuilder<Context> extends Builder {
-  build: (context?: Context) => GraphQLSchema
+  build: (context: Context | FieldDefinition) => GraphQLSchema
   interface: <Type>(
     interfaceName: string,
     service?: Service<Type>,
@@ -91,6 +99,7 @@ export interface SchemaBuilder<Context> extends Builder {
     modelName: string,
     service?: Service<Type>,
   ) => ModelBuilder<Context, Type>
+  fields: (context: Context | null) => FieldDefinition
   models: Record<string, ModelBuilder<Context, any>>
   type: typeof SCHEMABUILDER
   setGenericType: <Type extends GraphQLType>(

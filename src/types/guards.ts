@@ -1,6 +1,8 @@
+import { isType, isTypeDefinitionNode } from 'graphql'
 import {
   AttributeBuilder,
   Builder,
+  FieldDefinition,
   ModelBuilder,
   SchemaBuilder,
 } from '../types'
@@ -24,3 +26,12 @@ export const isSchemaBuilder = <Context>(
   val: any,
 ): val is SchemaBuilder<Context> =>
   isBuilder(val) && val.type === SCHEMABUILDER
+
+export const isFieldDefinition = (val: any): val is FieldDefinition => {
+  if (!val || typeof val !== 'object') return false
+  return Object.keys(val).reduce(
+    (result, key) =>
+      result && typeof val[key] === 'object' && isType(val[key].type),
+    true,
+  )
+}

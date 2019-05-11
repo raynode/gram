@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1557500270095" clover="3.2.0">
-  <project timestamp="1557500270096" name="All files">
-    <metrics statements="420" coveredstatements="358" conditionals="124" coveredconditionals="87" methods="152" coveredmethods="111" elements="696" coveredelements="556" complexity="0" loc="420" ncloc="420" packages="9" files="42" classes="42"/>
+<coverage generated="1557555547202" clover="3.2.0">
+  <project timestamp="1557555547202" name="All files">
+    <metrics statements="395" coveredstatements="345" conditionals="136" coveredconditionals="89" methods="154" coveredmethods="118" elements="685" coveredelements="552" complexity="0" loc="395" ncloc="395" packages="9" files="41" classes="41"/>
     <package name="src">
-      <metrics statements="170" coveredstatements="158" conditionals="38" coveredconditionals="32" methods="65" coveredmethods="57"/>
+      <metrics statements="195" coveredstatements="180" conditionals="49" coveredconditionals="38" methods="82" coveredmethods="71"/>
       <file name="attributeBuilder.ts" path="/Users/nox/projects/@raynode/utils/gram/src/attributeBuilder.ts">
         <metrics statements="19" coveredstatements="19" conditionals="8" coveredconditionals="8" methods="6" coveredmethods="6"/>
         <line num="1" count="2" type="stmt"/>
@@ -119,78 +119,103 @@
         <line num="115" count="15" type="stmt"/>
       </file>
       <file name="schemaBuilder.ts" path="/Users/nox/projects/@raynode/utils/gram/src/schemaBuilder.ts">
-        <metrics statements="49" coveredstatements="45" conditionals="3" coveredconditionals="2" methods="15" coveredmethods="12"/>
+        <metrics statements="53" coveredstatements="49" conditionals="5" coveredconditionals="3" methods="17" coveredmethods="14"/>
         <line num="1" count="2" type="stmt"/>
         <line num="14" count="2" type="stmt"/>
         <line num="15" count="2" type="stmt"/>
         <line num="29" count="2" type="stmt"/>
-        <line num="30" count="2" type="stmt"/>
-        <line num="35" count="2" type="stmt"/>
+        <line num="31" count="2" type="stmt"/>
+        <line num="32" count="2" type="stmt"/>
         <line num="37" count="2" type="stmt"/>
         <line num="39" count="2" type="stmt"/>
-        <line num="43" count="10" type="stmt"/>
-        <line num="44" count="10" type="stmt"/>
-        <line num="47" count="46" type="stmt"/>
-        <line num="48" count="438" type="stmt"/>
-        <line num="49" count="459" type="stmt"/>
-        <line num="53" count="2" type="stmt"/>
-        <line num="56" count="4" type="stmt"/>
-        <line num="57" count="7" type="stmt"/>
-        <line num="58" count="153" type="stmt"/>
-        <line num="59" count="153" type="stmt"/>
-        <line num="60" count="153" type="stmt"/>
-        <line num="61" count="7" type="stmt"/>
-        <line num="64" count="4" type="stmt"/>
-        <line num="65" count="4" type="stmt"/>
-        <line num="66" count="4" type="stmt"/>
-        <line num="71" count="4" type="stmt"/>
-        <line num="73" count="4" type="stmt"/>
+        <line num="40" count="2" type="stmt"/>
+        <line num="42" count="2" type="stmt"/>
+        <line num="46" count="10" type="stmt"/>
+        <line num="47" count="10" type="stmt"/>
+        <line num="50" count="46" type="stmt"/>
+        <line num="51" count="438" type="stmt"/>
+        <line num="52" count="459" type="stmt"/>
+        <line num="56" count="2" type="stmt"/>
+        <line num="59" count="4" type="stmt"/>
+        <line num="60" count="7" type="stmt"/>
+        <line num="61" count="153" type="stmt"/>
+        <line num="62" count="153" type="stmt"/>
+        <line num="63" count="153" type="stmt"/>
+        <line num="64" count="7" type="stmt"/>
+        <line num="67" count="4" type="stmt"/>
+        <line num="68" count="4" type="stmt"/>
+        <line num="69" count="4" type="stmt"/>
         <line num="74" count="4" type="stmt"/>
-        <line num="75" count="4" type="stmt"/>
+        <line num="76" count="4" type="stmt"/>
         <line num="77" count="4" type="stmt"/>
         <line num="78" count="4" type="stmt"/>
         <line num="80" count="4" type="stmt"/>
-        <line num="86" count="4" type="stmt"/>
-        <line num="92" count="4" type="stmt"/>
-        <line num="96" count="3" type="cond" truecount="1" falsecount="1"/>
-        <line num="97" count="3" type="stmt"/>
-        <line num="98" count="3" type="stmt"/>
-        <line num="101" count="0" type="stmt"/>
-        <line num="103" count="10" type="stmt"/>
-        <line num="104" count="46" type="stmt"/>
-        <line num="106" count="10" type="stmt"/>
-        <line num="107" count="10" type="stmt"/>
-        <line num="108" count="10" type="stmt"/>
-        <line num="110" count="10" type="stmt"/>
-        <line num="115" count="10" type="stmt"/>
-        <line num="120" count="10" type="stmt"/>
-        <line num="126" count="10" type="stmt"/>
+        <line num="81" count="4" type="stmt"/>
+        <line num="83" count="4" type="stmt"/>
+        <line num="89" count="4" type="stmt"/>
+        <line num="94" count="4" type="stmt"/>
+        <line num="95" count="10" type="stmt"/>
+        <line num="96" count="46" type="stmt"/>
+        <line num="98" count="10" type="stmt"/>
+        <line num="99" count="10" type="stmt"/>
+        <line num="100" count="10" type="stmt"/>
+        <line num="102" count="10" type="stmt"/>
+        <line num="105" count="4" type="stmt"/>
+        <line num="109" count="3" type="cond" truecount="1" falsecount="1"/>
+        <line num="110" count="3" type="stmt"/>
+        <line num="111" count="3" type="stmt"/>
+        <line num="114" count="0" type="stmt"/>
+        <line num="116" count="10" type="cond" truecount="1" falsecount="1"/>
+        <line num="117" count="10" type="stmt"/>
+        <line num="133" count="10" type="stmt"/>
+        <line num="134" count="10" type="stmt"/>
+        <line num="141" count="0" type="stmt"/>
         <line num="142" count="0" type="stmt"/>
-        <line num="143" count="0" type="stmt"/>
-        <line num="145" count="0" type="stmt"/>
-        <line num="148" count="4" type="stmt"/>
+        <line num="144" count="0" type="stmt"/>
+        <line num="147" count="4" type="stmt"/>
       </file>
       <file name="utils.ts" path="/Users/nox/projects/@raynode/utils/gram/src/utils.ts">
-        <metrics statements="19" coveredstatements="19" conditionals="11" coveredconditionals="9" methods="12" coveredmethods="12"/>
+        <metrics statements="40" coveredstatements="37" conditionals="20" coveredconditionals="14" methods="27" coveredmethods="24"/>
         <line num="1" count="2" type="stmt"/>
-        <line num="8" count="2" type="stmt"/>
-        <line num="10" count="2" type="stmt"/>
-        <line num="21" count="15" type="stmt"/>
-        <line num="23" count="120" type="cond" truecount="2" falsecount="0"/>
-        <line num="30" count="2" type="stmt"/>
-        <line num="36" count="58" type="cond" truecount="2" falsecount="0"/>
-        <line num="37" count="414" type="cond" truecount="2" falsecount="0"/>
-        <line num="38" count="216" type="stmt"/>
-        <line num="41" count="2" type="stmt"/>
-        <line num="42" count="164" type="stmt"/>
-        <line num="44" count="2" type="stmt"/>
-        <line num="47" count="22" type="cond" truecount="2" falsecount="0"/>
-        <line num="49" count="2" type="stmt"/>
-        <line num="52" count="428" type="stmt"/>
-        <line num="54" count="2" type="stmt"/>
-        <line num="64" count="64" type="stmt"/>
-        <line num="68" count="448" type="stmt"/>
-        <line num="77" count="2" type="stmt"/>
+        <line num="12" count="2" type="stmt"/>
+        <line num="14" count="2" type="stmt"/>
+        <line num="27" count="15" type="stmt"/>
+        <line num="29" count="120" type="cond" truecount="2" falsecount="0"/>
+        <line num="32" count="2" type="stmt"/>
+        <line num="33" count="78" type="stmt"/>
+        <line num="40" count="2" type="stmt"/>
+        <line num="44" count="30" type="stmt"/>
+        <line num="45" count="138" type="stmt"/>
+        <line num="51" count="2" type="stmt"/>
+        <line num="60" count="10" type="stmt"/>
+        <line num="62" count="30" type="stmt"/>
+        <line num="73" count="2" type="stmt"/>
+        <line num="79" count="58" type="cond" truecount="2" falsecount="0"/>
+        <line num="80" count="414" type="cond" truecount="2" falsecount="0"/>
+        <line num="81" count="216" type="stmt"/>
+        <line num="86" count="2" type="stmt"/>
+        <line num="87" count="164" type="stmt"/>
+        <line num="89" count="2" type="stmt"/>
+        <line num="92" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="94" count="2" type="stmt"/>
+        <line num="97" count="22" type="cond" truecount="2" falsecount="0"/>
+        <line num="99" count="2" type="stmt"/>
+        <line num="103" count="48" type="stmt"/>
+        <line num="109" count="2" type="stmt"/>
+        <line num="112" count="428" type="stmt"/>
+        <line num="114" count="2" type="stmt"/>
+        <line num="124" count="64" type="stmt"/>
+        <line num="128" count="448" type="stmt"/>
+        <line num="137" count="2" type="stmt"/>
+        <line num="146" count="2" type="stmt"/>
+        <line num="150" count="6" type="stmt"/>
+        <line num="151" count="48" type="cond" truecount="0" falsecount="1"/>
+        <line num="152" count="48" type="stmt"/>
+        <line num="153" count="0" type="stmt"/>
+        <line num="154" count="0" type="stmt"/>
+        <line num="159" count="10" type="stmt"/>
+        <line num="160" count="80" type="stmt"/>
+        <line num="162" count="80" type="stmt"/>
       </file>
     </package>
     <package name="src.data-types">
@@ -251,14 +276,11 @@
       </file>
     </package>
     <package name="src.event-types">
-      <metrics statements="18" coveredstatements="12" conditionals="0" coveredconditionals="0" methods="9" coveredmethods="3"/>
+      <metrics statements="9" coveredstatements="9" conditionals="0" coveredconditionals="0" methods="3" coveredmethods="3"/>
       <file name="create.ts" path="/Users/nox/projects/@raynode/utils/gram/src/event-types/create.ts">
-        <metrics statements="5" coveredstatements="3" conditionals="0" coveredconditionals="0" methods="3" coveredmethods="1"/>
+        <metrics statements="2" coveredstatements="2" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="1"/>
         <line num="1" count="2" type="stmt"/>
-        <line num="4" count="2" type="stmt"/>
-        <line num="6" count="16" type="stmt"/>
-        <line num="8" count="0" type="stmt"/>
-        <line num="9" count="0" type="stmt"/>
+        <line num="3" count="16" type="stmt"/>
       </file>
       <file name="index.ts" path="/Users/nox/projects/@raynode/utils/gram/src/event-types/index.ts">
         <metrics statements="3" coveredstatements="3" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
@@ -267,24 +289,18 @@
         <line num="3" count="2" type="stmt"/>
       </file>
       <file name="remove.ts" path="/Users/nox/projects/@raynode/utils/gram/src/event-types/remove.ts">
-        <metrics statements="5" coveredstatements="3" conditionals="0" coveredconditionals="0" methods="3" coveredmethods="1"/>
-        <line num="3" count="2" type="stmt"/>
-        <line num="5" count="2" type="stmt"/>
-        <line num="7" count="16" type="stmt"/>
-        <line num="9" count="0" type="stmt"/>
-        <line num="10" count="0" type="stmt"/>
+        <metrics statements="2" coveredstatements="2" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="1"/>
+        <line num="1" count="2" type="stmt"/>
+        <line num="3" count="16" type="stmt"/>
       </file>
       <file name="update.ts" path="/Users/nox/projects/@raynode/utils/gram/src/event-types/update.ts">
-        <metrics statements="5" coveredstatements="3" conditionals="0" coveredconditionals="0" methods="3" coveredmethods="1"/>
-        <line num="3" count="2" type="stmt"/>
-        <line num="5" count="2" type="stmt"/>
-        <line num="7" count="16" type="stmt"/>
-        <line num="9" count="0" type="stmt"/>
-        <line num="10" count="0" type="stmt"/>
+        <metrics statements="2" coveredstatements="2" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="1"/>
+        <line num="1" count="2" type="stmt"/>
+        <line num="3" count="16" type="stmt"/>
       </file>
     </package>
     <package name="src.field-reducers">
-      <metrics statements="35" coveredstatements="35" conditionals="22" coveredconditionals="22" methods="6" coveredmethods="6"/>
+      <metrics statements="12" coveredstatements="12" conditionals="16" coveredconditionals="16" methods="3" coveredmethods="3"/>
       <file name="index.ts" path="/Users/nox/projects/@raynode/utils/gram/src/field-reducers/index.ts">
         <metrics statements="3" coveredstatements="3" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
         <line num="1" count="2" type="stmt"/>
@@ -292,45 +308,22 @@
         <line num="3" count="2" type="stmt"/>
       </file>
       <file name="mutation.ts" path="/Users/nox/projects/@raynode/utils/gram/src/field-reducers/mutation.ts">
-        <metrics statements="11" coveredstatements="11" conditionals="8" coveredconditionals="8" methods="2" coveredmethods="2"/>
-        <line num="4" count="2" type="stmt"/>
-        <line num="6" count="10" type="stmt"/>
-        <line num="10" count="46" type="cond" truecount="2" falsecount="0"/>
-        <line num="11" count="26" type="stmt"/>
-        <line num="12" count="26" type="cond" truecount="2" falsecount="0"/>
-        <line num="13" count="16" type="stmt"/>
-        <line num="14" count="26" type="cond" truecount="2" falsecount="0"/>
-        <line num="15" count="16" type="stmt"/>
-        <line num="16" count="26" type="cond" truecount="2" falsecount="0"/>
-        <line num="17" count="16" type="stmt"/>
-        <line num="18" count="26" type="stmt"/>
+        <metrics statements="3" coveredstatements="3" conditionals="6" coveredconditionals="6" methods="1" coveredmethods="1"/>
+        <line num="1" count="2" type="stmt"/>
+        <line num="2" count="2" type="stmt"/>
+        <line num="4" count="26" type="stmt"/>
       </file>
       <file name="query.ts" path="/Users/nox/projects/@raynode/utils/gram/src/field-reducers/query.ts">
-        <metrics statements="9" coveredstatements="9" conditionals="6" coveredconditionals="6" methods="2" coveredmethods="2"/>
-        <line num="4" count="2" type="stmt"/>
-        <line num="6" count="10" type="stmt"/>
-        <line num="10" count="46" type="cond" truecount="2" falsecount="0"/>
-        <line num="11" count="26" type="stmt"/>
-        <line num="12" count="26" type="cond" truecount="2" falsecount="0"/>
-        <line num="13" count="16" type="stmt"/>
-        <line num="14" count="26" type="cond" truecount="2" falsecount="0"/>
-        <line num="15" count="16" type="stmt"/>
-        <line num="16" count="26" type="stmt"/>
+        <metrics statements="3" coveredstatements="3" conditionals="4" coveredconditionals="4" methods="1" coveredmethods="1"/>
+        <line num="1" count="2" type="stmt"/>
+        <line num="2" count="2" type="stmt"/>
+        <line num="4" count="26" type="stmt"/>
       </file>
       <file name="subscription.ts" path="/Users/nox/projects/@raynode/utils/gram/src/field-reducers/subscription.ts">
-        <metrics statements="12" coveredstatements="12" conditionals="8" coveredconditionals="8" methods="2" coveredmethods="2"/>
-        <line num="4" count="2" type="stmt"/>
-        <line num="6" count="2" type="stmt"/>
-        <line num="8" count="10" type="stmt"/>
-        <line num="9" count="46" type="cond" truecount="2" falsecount="0"/>
-        <line num="10" count="26" type="stmt"/>
-        <line num="11" count="26" type="cond" truecount="2" falsecount="0"/>
-        <line num="12" count="16" type="stmt"/>
-        <line num="13" count="26" type="cond" truecount="2" falsecount="0"/>
-        <line num="14" count="16" type="stmt"/>
-        <line num="15" count="26" type="cond" truecount="2" falsecount="0"/>
-        <line num="16" count="16" type="stmt"/>
-        <line num="17" count="26" type="stmt"/>
+        <metrics statements="3" coveredstatements="3" conditionals="6" coveredconditionals="6" methods="1" coveredmethods="1"/>
+        <line num="1" count="2" type="stmt"/>
+        <line num="2" count="2" type="stmt"/>
+        <line num="4" count="26" type="stmt"/>
       </file>
     </package>
     <package name="src.field-types">
@@ -385,7 +378,7 @@
       </file>
     </package>
     <package name="src.generic-types">
-      <metrics statements="46" coveredstatements="14" conditionals="14" coveredconditionals="0" methods="21" coveredmethods="0"/>
+      <metrics statements="37" coveredstatements="11" conditionals="14" coveredconditionals="0" methods="18" coveredmethods="0"/>
       <file name="date-type.ts" path="/Users/nox/projects/@raynode/utils/gram/src/generic-types/date-type.ts">
         <metrics statements="16" coveredstatements="4" conditionals="10" coveredconditionals="0" methods="5" coveredmethods="0"/>
         <line num="1" count="2" type="stmt"/>
@@ -406,10 +399,9 @@
         <line num="41" count="0" type="stmt"/>
       </file>
       <file name="index.ts" path="/Users/nox/projects/@raynode/utils/gram/src/generic-types/index.ts">
-        <metrics statements="3" coveredstatements="3" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+        <metrics statements="2" coveredstatements="2" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
         <line num="1" count="2" type="stmt"/>
         <line num="2" count="2" type="stmt"/>
-        <line num="3" count="2" type="stmt"/>
       </file>
       <file name="json-type.ts" path="/Users/nox/projects/@raynode/utils/gram/src/generic-types/json-type.ts">
         <metrics statements="19" coveredstatements="5" conditionals="4" coveredconditionals="0" methods="13" coveredmethods="0"/>
@@ -433,43 +425,23 @@
         <line num="52" count="0" type="stmt"/>
         <line num="53" count="0" type="cond" truecount="0" falsecount="2"/>
       </file>
-      <file name="upload-type.ts" path="/Users/nox/projects/@raynode/utils/gram/src/generic-types/upload-type.ts">
-        <metrics statements="8" coveredstatements="2" conditionals="0" coveredconditionals="0" methods="3" coveredmethods="0"/>
-        <line num="1" count="2" type="stmt"/>
-        <line num="3" count="2" type="stmt"/>
-        <line num="8" count="0" type="stmt"/>
-        <line num="9" count="0" type="stmt"/>
-        <line num="13" count="0" type="stmt"/>
-        <line num="14" count="0" type="stmt"/>
-        <line num="18" count="0" type="stmt"/>
-        <line num="19" count="0" type="stmt"/>
-      </file>
     </package>
     <package name="src.input-types">
-      <metrics statements="46" coveredstatements="45" conditionals="4" coveredconditionals="1" methods="18" coveredmethods="17"/>
+      <metrics statements="31" coveredstatements="30" conditionals="4" coveredconditionals="1" methods="13" coveredmethods="12"/>
       <file name="create.ts" path="/Users/nox/projects/@raynode/utils/gram/src/input-types/create.ts">
-        <metrics statements="5" coveredstatements="5" conditionals="0" coveredconditionals="0" methods="2" coveredmethods="2"/>
+        <metrics statements="2" coveredstatements="2" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="1"/>
         <line num="1" count="2" type="stmt"/>
-        <line num="3" count="2" type="stmt"/>
-        <line num="5" count="2" type="stmt"/>
-        <line num="7" count="16" type="stmt"/>
-        <line num="10" count="16" type="stmt"/>
+        <line num="3" count="16" type="stmt"/>
       </file>
       <file name="data.ts" path="/Users/nox/projects/@raynode/utils/gram/src/input-types/data.ts">
-        <metrics statements="5" coveredstatements="5" conditionals="0" coveredconditionals="0" methods="2" coveredmethods="2"/>
+        <metrics statements="2" coveredstatements="2" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="1"/>
         <line num="1" count="2" type="stmt"/>
-        <line num="2" count="2" type="stmt"/>
-        <line num="4" count="2" type="stmt"/>
-        <line num="6" count="16" type="stmt"/>
-        <line num="9" count="16" type="stmt"/>
+        <line num="3" count="16" type="stmt"/>
       </file>
       <file name="filter.ts" path="/Users/nox/projects/@raynode/utils/gram/src/input-types/filter.ts">
-        <metrics statements="5" coveredstatements="5" conditionals="0" coveredconditionals="0" methods="2" coveredmethods="2"/>
+        <metrics statements="2" coveredstatements="2" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="1"/>
         <line num="1" count="2" type="stmt"/>
-        <line num="2" count="2" type="stmt"/>
-        <line num="4" count="2" type="stmt"/>
-        <line num="6" count="16" type="stmt"/>
-        <line num="9" count="16" type="stmt"/>
+        <line num="3" count="16" type="stmt"/>
       </file>
       <file name="index.ts" path="/Users/nox/projects/@raynode/utils/gram/src/input-types/index.ts">
         <metrics statements="6" coveredstatements="6" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
@@ -499,20 +471,14 @@
         <line num="35" count="16" type="stmt"/>
       </file>
       <file name="page.ts" path="/Users/nox/projects/@raynode/utils/gram/src/input-types/page.ts">
-        <metrics statements="5" coveredstatements="5" conditionals="0" coveredconditionals="0" methods="2" coveredmethods="2"/>
+        <metrics statements="2" coveredstatements="2" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="1"/>
         <line num="1" count="2" type="stmt"/>
-        <line num="2" count="2" type="stmt"/>
-        <line num="4" count="2" type="stmt"/>
-        <line num="6" count="16" type="stmt"/>
-        <line num="9" count="16" type="stmt"/>
+        <line num="3" count="16" type="stmt"/>
       </file>
       <file name="where.ts" path="/Users/nox/projects/@raynode/utils/gram/src/input-types/where.ts">
-        <metrics statements="5" coveredstatements="5" conditionals="0" coveredconditionals="0" methods="2" coveredmethods="2"/>
+        <metrics statements="2" coveredstatements="2" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="1"/>
         <line num="1" count="2" type="stmt"/>
-        <line num="2" count="2" type="stmt"/>
-        <line num="4" count="2" type="stmt"/>
-        <line num="6" count="16" type="stmt"/>
-        <line num="9" count="16" type="stmt"/>
+        <line num="3" count="16" type="stmt"/>
       </file>
     </package>
     <package name="src.strategies">
@@ -555,7 +521,7 @@
       </file>
     </package>
     <package name="src.types">
-      <metrics statements="12" coveredstatements="3" conditionals="8" coveredconditionals="0" methods="4" coveredmethods="0"/>
+      <metrics statements="18" coveredstatements="12" conditionals="15" coveredconditionals="2" methods="6" coveredmethods="1"/>
       <file name="constants.ts" path="/Users/nox/projects/@raynode/utils/gram/src/types/constants.ts">
         <metrics statements="3" coveredstatements="3" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
         <line num="2" count="2" type="stmt"/>
@@ -563,16 +529,22 @@
         <line num="4" count="2" type="stmt"/>
       </file>
       <file name="guards.ts" path="/Users/nox/projects/@raynode/utils/gram/src/types/guards.ts">
-        <metrics statements="9" coveredstatements="0" conditionals="8" coveredconditionals="0" methods="4" coveredmethods="0"/>
-        <line num="7" count="0" type="stmt"/>
-        <line num="13" count="0" type="stmt"/>
-        <line num="14" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="15" count="0" type="stmt"/>
-        <line num="18" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="19" count="0" type="stmt"/>
-        <line num="22" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="23" count="0" type="stmt"/>
-        <line num="26" count="0" type="cond" truecount="0" falsecount="2"/>
+        <metrics statements="15" coveredstatements="9" conditionals="15" coveredconditionals="2" methods="6" coveredmethods="1"/>
+        <line num="1" count="2" type="stmt"/>
+        <line num="9" count="2" type="stmt"/>
+        <line num="15" count="2" type="stmt"/>
+        <line num="16" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="17" count="2" type="stmt"/>
+        <line num="20" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="21" count="2" type="stmt"/>
+        <line num="24" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="25" count="2" type="stmt"/>
+        <line num="28" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="30" count="2" type="stmt"/>
+        <line num="31" count="10" type="cond" truecount="2" falsecount="2"/>
+        <line num="32" count="10" type="stmt"/>
+        <line num="33" count="0" type="stmt"/>
+        <line num="34" count="0" type="cond" truecount="0" falsecount="3"/>
       </file>
     </package>
   </project>

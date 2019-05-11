@@ -1,11 +1,6 @@
-import { GraphQLInputFieldConfigMap, GraphQLInputObjectType } from 'graphql'
-import { memoizeContextModel } from '../utils'
+import { createInputType } from '../utils'
 
-export const page = memoizeContextModel(
-  contextModel =>
-    new GraphQLInputObjectType({
-      name: contextModel.names.types.pageType,
-      fields: () =>
-        contextModel.dataFields('page') as GraphQLInputFieldConfigMap,
-    }),
+export const page = createInputType(
+  'page',
+  contextModel => contextModel.names.types.pageType,
 )

@@ -9,7 +9,8 @@ export interface Builder {
 export declare type Fields = Thunk<GraphQLFieldConfigMap<any, any>>;
 export declare type DataType = 'create' | 'filter' | 'data' | 'list' | 'page' | 'where' | 'order';
 export declare type FieldTypes = 'GraphQL' | 'Model' | 'All';
-export declare type GenericGraphQLType = 'Date' | 'Upload' | 'JSON';
+export declare type GenericGraphQLType = 'Date' | 'JSON';
+export declare type FieldDefinition = Record<'query' | 'mutation' | 'subscription', GraphQLFieldConfigMap<any, any>>;
 export interface ContextModel<Context, Type> {
     addField: <AttributeType>(field: AttributeBuilder<Context, Type, AttributeType>) => void;
     baseFilters: () => GraphQLInputFieldConfigMap;
@@ -34,14 +35,16 @@ export interface Wrapped<Context> {
     context: Context | null;
     getGenericType: (key: string) => GraphQLType;
 }
+export declare type ContextModelFn<Result> = <Context>(contextModel: ContextModel<Context, any>) => Result;
 export declare type ContextFn<Context, Result = boolean> = (context: Wrapped<Context>) => Result;
 export declare type ContextMutator<Context, Type> = (model: ContextModel<Context, Type>, context: Wrapped<Context>) => void;
 export declare type ContextModelFieldFn<Type> = <Context>(contextModel: ContextModel<Context, Type>) => Type;
 export declare type ModelType<Context> = GraphQLType | ContextModel<Context, any>;
 export interface SchemaBuilder<Context> extends Builder {
-    build: (context?: Context) => GraphQLSchema;
+    build: (context: Context | FieldDefinition) => GraphQLSchema;
     interface: <Type>(interfaceName: string, service?: Service<Type>) => ModelBuilder<Context, Type>;
     model: <Type>(modelName: string, service?: Service<Type>) => ModelBuilder<Context, Type>;
+    fields: (context: Context | null) => FieldDefinition;
     models: Record<string, ModelBuilder<Context, any>>;
     type: typeof SCHEMABUILDER;
     setGenericType: <Type extends GraphQLType>(key: GenericGraphQLType, type: Type) => this;

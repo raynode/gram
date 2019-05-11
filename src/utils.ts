@@ -2,6 +2,7 @@ import {
   GraphQLFieldConfig,
   GraphQLFieldConfigMap,
   GraphQLInputFieldConfigMap,
+  GraphQLInputObjectType,
   GraphQLInputType,
   GraphQLList,
   GraphQLNonNull,
@@ -15,6 +16,8 @@ import {
   AttributeBuilder,
   ContextFn,
   ContextModel,
+  ContextModelFn,
+  DataType,
   ModelBuilder,
   ModelType,
   PageData,
@@ -152,3 +155,16 @@ export const createContextModelFieldFn = <Context>(
     type: conditionalType(contextModel.getType() as GraphQLInputType, condition),
   }
 }
+
+export const createInputType = <Context>(
+  field: DataType,
+  nameFn: ContextModelFn<string>,
+) =>
+  memoizeContextModel(
+    contextModel =>
+      new GraphQLInputObjectType({
+        name: nameFn(contextModel),
+        fields: () =>
+          contextModel.dataFields(field) as GraphQLInputFieldConfigMap,
+      }),
+  )

@@ -16,6 +16,7 @@ import { createModelBuilder } from './modelBuilder'
 import {
   ContextModel,
   ContextMutator,
+  FieldDefinition,
   GenericGraphQLType,
   ListType,
   ModelBuilder,
@@ -25,6 +26,7 @@ import {
   Service,
   Wrapped,
 } from './types'
+import { isFieldDefinition } from './types/guards'
 
 import { v4 as uuid } from 'uuid'
 import {
@@ -35,7 +37,7 @@ import {
 import { SCHEMABUILDER } from './types/constants'
 
 import { reduceFields } from 'utils'
-import { DateType, JSONType, UploadType } from './generic-types'
+import { DateType, JSONType } from './generic-types'
 
 const wrapContext = <Context>(
   context: Context | null,
@@ -87,7 +89,17 @@ export const createSchemaBuilder = <Context = any>(): SchemaBuilder<
   const generics: Record<GenericGraphQLType, GraphQLType> = {
     Date: DateType,
     JSON: JSONType,
-    Upload: UploadType,
+  }
+
+  const setup = (context: Context | null) => {
+    const wrapped = wrapContext(context, generics)
+    forEach(models, model => model.setup(wrapped))
+
+    models.Node.build(wrapped)
+    models.Page.build(wrapped)
+    models.List.build(wrapped)
+
+    return wrapped
   }
 
   const builder: SchemaBuilder<Context> = {
@@ -100,20 +112,10 @@ export const createSchemaBuilder = <Context = any>(): SchemaBuilder<
     },
     interface: <Type>(interfaceName: string, service: Service<Type>) =>
       builder.model<Type>(interfaceName, service).setInterface(),
-    build: (context: Context | null = null) => {
-      const wrapped = wrapContext<Context>(context, generics)
-      forEach(models, model => model.setup(wrapped))
-
-      models.Node.build(wrapped)
-      models.Page.build(wrapped)
-      models.List.build(wrapped)
-
-      const fields = reduceFields(models, {
-        query: queryFieldsReducer(wrapped),
-        mutation: mutationFieldsReducer(wrapped),
-        subscription: subscriptionFieldsReducer(wrapped),
-      })
-
+    build: (context: Context | FieldDefinition) => {
+      const fields = isFieldDefinition(context)
+        ? context
+        : builder.fields(context)
       return new GraphQLSchema({
         query: new GraphQLObjectType({
           name: 'Query',
@@ -127,6 +129,14 @@ export const createSchemaBuilder = <Context = any>(): SchemaBuilder<
           name: 'Subscription',
           fields: fields.subscription,
         }),
+      })
+    },
+    fields: (context: Context | null = null) => {
+      const wrapped = setup(context)
+      return reduceFields(models, {
+        query: queryFieldsReducer(wrapped),
+        mutation: mutationFieldsReducer(wrapped),
+        subscription: subscriptionFieldsReducer(wrapped),
       })
     },
     setGenericType: (key, type) => {

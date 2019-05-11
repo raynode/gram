@@ -1,4 +1,2 @@
 /// <reference types="lodash" />
-import { GraphQLInputObjectType } from 'graphql';
-import { ContextModel } from '../types';
-export declare const create: ((contextModel: ContextModel<{}, any>) => GraphQLInputObjectType) & import("lodash").MemoizedFunction;
+export declare const create: ((contextModel: import("..").ContextModel<{}, any>) => import("graphql").GraphQLInputObjectType) & import("lodash").MemoizedFunction;
