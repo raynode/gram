@@ -140,7 +140,7 @@ export const createSchemaBuilder = <Context = any>(): SchemaBuilder<
     },
     interface: <Type>(interfaceName: string, service: Service<Type>) =>
       builder.model<Type>(interfaceName, service).setInterface(),
-    build: (context: Context | FieldDefinition) =>
+    build: (context: Context | FieldDefinition = null) =>
       createSchema(
         isFieldDefinition(context) ? context : builder.fields(context),
       ),
