@@ -1,1 +1,0 @@
-{"version":3,"file":"update.js","sourceRoot":"","sources":["../../src/event-types/update.ts"],"names":[],"mappings":";;AAAA,oCAAoD;AAEvC,QAAA,MAAM,GAAG,iCAAyB,CAAC,YAAY,CAAC,EAAE,CAAC,CAAC;IAC/D,QAAQ,EAAE,YAAY,CAAC,KAAK,CAAC,MAAM,CAAC,MAAM;IAC1C,SAAS,EAAE,MAAM;CAClB,CAAC,CAAC,CAAA"}

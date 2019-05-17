@@ -41,7 +41,7 @@ export declare type ContextMutator<Context, Type> = (model: ContextModel<Context
 export declare type ContextModelFieldFn<Type> = <Context>(contextModel: ContextModel<Context, Type>) => Type;
 export declare type ModelType<Context> = GraphQLType | ContextModel<Context, any>;
 export interface SchemaBuilder<Context> extends Builder {
-    build: (context: Context | FieldDefinition) => GraphQLSchema;
+    build: (context?: Context | FieldDefinition) => GraphQLSchema;
     interface: <Type>(interfaceName: string, service?: Service<Type>) => ModelBuilder<Context, Type>;
     model: <Type>(modelName: string, service?: Service<Type>) => ModelBuilder<Context, Type>;
     fields: (context: Context | null) => FieldDefinition;
