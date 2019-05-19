@@ -14,7 +14,8 @@ import {
   isType,
 } from 'graphql'
 
-import { ContextModel } from '../types'
+import { ContextModel, FilterMiddleware } from '../types'
+import { equals, joinFilters, list, numeric, record } from './filters'
 
 const hasParentType = (
   type: any,
@@ -46,6 +47,18 @@ export const isGraphQLID = (
   type: GraphQLScalarType,
 ): type is GraphQLScalarTypeInstance<'ID'> => type.name === 'ID'
 
+export const isIdOrString = (type: GraphQLType) =>
+  isScalarType(type) && (isGraphQLID(type) || isGraphQLString(type))
+export const isNumeric = (type: GraphQLType) =>
+  isScalarType(type) && (isGraphQLFloat(type) || isGraphQLInt(type))
+
+const middlewares: FilterMiddleware[] = [
+  [isGraphQLBoolean, equals],
+  [isIdOrString, joinFilters([equals, record])],
+  [isNumeric, joinFilters([equals, numeric])],
+  [isListType, list],
+]
+
 export const filterStrategy = <Type extends GraphQLType = GraphQLType>(
   inputType: Type | ContextModel<any, any>,
   inputName?: string,
@@ -59,27 +72,10 @@ export const filterStrategy = <Type extends GraphQLType = GraphQLType>(
     ? `F${inputType.toString()}`
     : inputType.name
   const list = GraphQLList(GraphQLNonNull(type))
-  if (isScalarType(type)) {
-    if (isGraphQLID(type) || isGraphQLString(type))
-      return {
-        [`${name}`]: { type },
-        [`${name}_not`]: { type },
-        [`${name}_in`]: { type: list },
-        [`${name}_not_in`]: { type: list },
-      }
-    if (isGraphQLBoolean(type)) return { [`${name}`]: { type } }
-    if (isGraphQLFloat(type) || isGraphQLInt(type))
-      return {
-        [`${name}`]: { type },
-        [`${name}_not`]: { type },
-        [`${name}_gt`]: { type },
-        [`${name}_lt`]: { type },
-      }
-  }
-  if (isListType(type))
-    return {
-      [`${name}_contains`]: { type },
-      [`${name}_not_contains`]: { type },
-    }
-  return {}
+
+  return middlewares.reduce(
+    (result, [check, filter]) =>
+      check(type) ? { ...result, ...filter(name, type, list) } : result,
+    {},
+  )
 }

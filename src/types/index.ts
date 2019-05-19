@@ -5,6 +5,7 @@ import {
   GraphQLInputFieldConfigMap,
   GraphQLInputObjectType,
   GraphQLInterfaceType,
+  GraphQLList,
   GraphQLObjectType,
   GraphQLSchema,
   GraphQLType,
@@ -25,6 +26,13 @@ export interface Builder {
 }
 
 export type Fields = Thunk<GraphQLFieldConfigMap<any, any>>
+export type FilterFn = (
+  name: string,
+  type: GraphQLType,
+  list: GraphQLList<any>,
+) => Record<string, { type: GraphQLType }>
+export type FilterCheckFn = (type: GraphQLType) => boolean
+export type FilterMiddleware = [FilterCheckFn, FilterFn]
 
 export type DataType =
   | 'create'

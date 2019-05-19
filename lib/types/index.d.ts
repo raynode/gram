@@ -1,4 +1,4 @@
-import { GraphQLFieldConfig, GraphQLFieldConfigMap, GraphQLFieldResolver, GraphQLInputFieldConfigMap, GraphQLSchema, GraphQLType, Thunk } from 'graphql';
+import { GraphQLFieldConfig, GraphQLFieldConfigMap, GraphQLFieldResolver, GraphQLInputFieldConfigMap, GraphQLList, GraphQLSchema, GraphQLType, Thunk } from 'graphql';
 import { Names } from '../strategies/naming';
 import { ATTRIBUTEBUILDER, MODELBUILDER, SCHEMABUILDER } from '../types/constants';
 import { Service } from '../types/service';
@@ -7,6 +7,11 @@ export interface Builder {
     type: string;
 }
 export declare type Fields = Thunk<GraphQLFieldConfigMap<any, any>>;
+export declare type FilterFn = (name: string, type: GraphQLType, list: GraphQLList<any>) => Record<string, {
+    type: GraphQLType;
+}>;
+export declare type FilterCheckFn = (type: GraphQLType) => boolean;
+export declare type FilterMiddleware = [FilterCheckFn, FilterFn];
 export declare type DataType = 'create' | 'filter' | 'data' | 'list' | 'page' | 'where' | 'order';
 export declare type FieldTypes = 'GraphQL' | 'Model' | 'All';
 export declare type GenericGraphQLType = 'Date' | 'JSON';

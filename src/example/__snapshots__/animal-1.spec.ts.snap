@@ -29,10 +29,11 @@ input AnimalFilter {
   name_in: [String!]
   name_not_in: [String!]
   tame: Boolean
+  tame_not: Boolean
   age: Int
   age_not: Int
-  age_gt: Int
   age_lt: Int
+  age_gt: Int
 }
 
 input AnimalPage {
@@ -81,10 +82,11 @@ input AnimalWhere {
   name_in: [String!]
   name_not_in: [String!]
   tame: Boolean
+  tame_not: Boolean
   age: Int
   age_not: Int
-  age_gt: Int
   age_lt: Int
+  age_gt: Int
 }
 
 input CreateAnimalData {

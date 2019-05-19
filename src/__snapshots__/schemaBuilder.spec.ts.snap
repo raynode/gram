@@ -148,8 +148,8 @@ input AccountFilter {
   name_not_in: [String!]
   amount: Float
   amount_not: Float
-  amount_gt: Float
   amount_lt: Float
+  amount_gt: Float
 }
 
 input AccountPage {
@@ -193,8 +193,8 @@ input AccountWhere {
   name_not_in: [String!]
   amount: Float
   amount_not: Float
-  amount_gt: Float
   amount_lt: Float
+  amount_gt: Float
 }
 
 input CreateAccountData {
