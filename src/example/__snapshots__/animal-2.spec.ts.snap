@@ -9,9 +9,9 @@ exports[`testing the example 2 should build the example code 1`] = `
 
 type Cat implements Node & Animal {
   id: ID
-  createdAt: Date
-  updatedAt: Date
-  deletedAt: Date
+  createdAt: DateTime
+  updatedAt: DateTime
+  deletedAt: DateTime
   name: String
   tame: Boolean
   age: Int
@@ -74,16 +74,14 @@ input CatWhere {
   age_gt: Int
 }
 
-\\"\\"\\"
-A special custom Scalar type for Dates that converts to a ISO formatted string 
-\\"\\"\\"
-scalar Date
+\\"\\"\\"Use JavaScript Date object for date/time fields.\\"\\"\\"
+scalar DateTime
 
 interface Node {
   id: ID
-  createdAt: Date
-  updatedAt: Date
-  deletedAt: Date
+  createdAt: DateTime
+  updatedAt: DateTime
+  deletedAt: DateTime
 }
 
 type Query {
@@ -142,9 +140,9 @@ input AnimalWhere {
 
 type Cat implements Node & Animal {
   id: ID
-  createdAt: Date
-  updatedAt: Date
-  deletedAt: Date
+  createdAt: DateTime
+  updatedAt: DateTime
+  deletedAt: DateTime
   name: String
   tame: Boolean
   age: Int
@@ -207,16 +205,14 @@ input CatWhere {
   age_gt: Int
 }
 
-\\"\\"\\"
-A special custom Scalar type for Dates that converts to a ISO formatted string 
-\\"\\"\\"
-scalar Date
+\\"\\"\\"Use JavaScript Date object for date/time fields.\\"\\"\\"
+scalar DateTime
 
 type Dog implements Node & Animal {
   id: ID
-  createdAt: Date
-  updatedAt: Date
-  deletedAt: Date
+  createdAt: DateTime
+  updatedAt: DateTime
+  deletedAt: DateTime
   name: String
   tame: Boolean
   age: Int
@@ -281,9 +277,9 @@ input DogWhere {
 
 interface Node {
   id: ID
-  createdAt: Date
-  updatedAt: Date
-  deletedAt: Date
+  createdAt: DateTime
+  updatedAt: DateTime
+  deletedAt: DateTime
 }
 
 type Query {

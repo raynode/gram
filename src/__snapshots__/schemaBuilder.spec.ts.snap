@@ -5,15 +5,13 @@ exports[`example should add User to the Schema 1`] = `
   name: String
   friends: UserWhere
   id: ID
-  createdAt: Date
-  updatedAt: Date
-  deletedAt: Date
+  createdAt: DateTime
+  updatedAt: DateTime
+  deletedAt: DateTime
 }
 
-\\"\\"\\"
-A special custom Scalar type for Dates that converts to a ISO formatted string 
-\\"\\"\\"
-scalar Date
+\\"\\"\\"Use JavaScript Date object for date/time fields.\\"\\"\\"
+scalar DateTime
 
 interface List {
   page: Page
@@ -28,9 +26,9 @@ type Mutation {
 
 interface Node {
   id: ID
-  createdAt: Date
-  updatedAt: Date
-  deletedAt: Date
+  createdAt: DateTime
+  updatedAt: DateTime
+  deletedAt: DateTime
 }
 
 type Page {
@@ -54,18 +52,18 @@ input UpdateUserData {
   name: String
   friends: UserWhere
   id: ID
-  createdAt: Date
-  updatedAt: Date
-  deletedAt: Date
+  createdAt: DateTime
+  updatedAt: DateTime
+  deletedAt: DateTime
 }
 
 type User implements Node {
   name: String
   friends: [User!]!
   id: ID
-  createdAt: Date
-  updatedAt: Date
-  deletedAt: Date
+  createdAt: DateTime
+  updatedAt: DateTime
+  deletedAt: DateTime
 }
 
 input UserFilter {
@@ -129,9 +127,9 @@ exports[`example should add account to the model 1`] = `
   amount: Float
   user: User!
   id: ID
-  createdAt: Date
-  updatedAt: Date
-  deletedAt: Date
+  createdAt: DateTime
+  updatedAt: DateTime
+  deletedAt: DateTime
 }
 
 input AccountFilter {
@@ -202,9 +200,9 @@ input CreateAccountData {
   amount: Float
   user: UserWhere!
   id: ID
-  createdAt: Date
-  updatedAt: Date
-  deletedAt: Date
+  createdAt: DateTime
+  updatedAt: DateTime
+  deletedAt: DateTime
 }
 
 input CreateUserData {
@@ -212,15 +210,13 @@ input CreateUserData {
   friends: UserWhere
   accounts: AccountWhere
   id: ID
-  createdAt: Date
-  updatedAt: Date
-  deletedAt: Date
+  createdAt: DateTime
+  updatedAt: DateTime
+  deletedAt: DateTime
 }
 
-\\"\\"\\"
-A special custom Scalar type for Dates that converts to a ISO formatted string 
-\\"\\"\\"
-scalar Date
+\\"\\"\\"Use JavaScript Date object for date/time fields.\\"\\"\\"
+scalar DateTime
 
 interface List {
   page: Page
@@ -238,9 +234,9 @@ type Mutation {
 
 interface Node {
   id: ID
-  createdAt: Date
-  updatedAt: Date
-  deletedAt: Date
+  createdAt: DateTime
+  updatedAt: DateTime
+  deletedAt: DateTime
 }
 
 type Page {
@@ -270,9 +266,9 @@ input UpdateAccountData {
   amount: Float
   user: UserWhere
   id: ID
-  createdAt: Date
-  updatedAt: Date
-  deletedAt: Date
+  createdAt: DateTime
+  updatedAt: DateTime
+  deletedAt: DateTime
 }
 
 input UpdateUserData {
@@ -280,9 +276,9 @@ input UpdateUserData {
   friends: UserWhere
   accounts: AccountWhere
   id: ID
-  createdAt: Date
-  updatedAt: Date
-  deletedAt: Date
+  createdAt: DateTime
+  updatedAt: DateTime
+  deletedAt: DateTime
 }
 
 type User implements Node {
@@ -290,9 +286,9 @@ type User implements Node {
   friends: [User!]!
   accounts: [Account!]!
   id: ID
-  createdAt: Date
-  updatedAt: Date
-  deletedAt: Date
+  createdAt: DateTime
+  updatedAt: DateTime
+  deletedAt: DateTime
 }
 
 input UserFilter {

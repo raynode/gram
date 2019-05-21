@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1558415878763" clover="3.2.0">
-  <project timestamp="1558415878763" name="All files">
-    <metrics statements="418" coveredstatements="368" conditionals="139" coveredconditionals="89" methods="176" coveredmethods="137" elements="733" coveredelements="594" complexity="0" loc="418" ncloc="418" packages="10" files="40" classes="40"/>
+<coverage generated="1558420680963" clover="3.2.0">
+  <project timestamp="1558420680963" name="All files">
+    <metrics statements="382" coveredstatements="358" conditionals="125" coveredconditionals="89" methods="158" coveredmethods="137" elements="665" coveredelements="584" complexity="0" loc="382" ncloc="382" packages="9" files="37" classes="37"/>
     <package name="src">
-      <metrics statements="212" coveredstatements="198" conditionals="56" coveredconditionals="43" methods="91" coveredmethods="81"/>
+      <metrics statements="213" coveredstatements="199" conditionals="56" coveredconditionals="43" methods="91" coveredmethods="81"/>
       <file name="attributeBuilder.ts" path="/Users/nox/projects/@raynode/utils/gram/src/attributeBuilder.ts">
         <metrics statements="19" coveredstatements="19" conditionals="8" coveredconditionals="8" methods="6" coveredmethods="6"/>
         <line num="1" count="3" type="stmt"/>
@@ -124,14 +124,15 @@
         <line num="124" count="26" type="stmt"/>
       </file>
       <file name="schemaBuilder.ts" path="/Users/nox/projects/@raynode/utils/gram/src/schemaBuilder.ts">
-        <metrics statements="64" coveredstatements="61" conditionals="12" coveredconditionals="9" methods="22" coveredmethods="20"/>
+        <metrics statements="65" coveredstatements="62" conditionals="12" coveredconditionals="9" methods="22" coveredmethods="20"/>
         <line num="1" count="3" type="stmt"/>
         <line num="15" count="3" type="stmt"/>
         <line num="16" count="3" type="stmt"/>
-        <line num="30" count="3" type="stmt"/>
-        <line num="32" count="3" type="stmt"/>
-        <line num="33" count="3" type="stmt"/>
-        <line num="38" count="3" type="stmt"/>
+        <line num="17" count="3" type="stmt"/>
+        <line num="18" count="3" type="stmt"/>
+        <line num="20" count="3" type="stmt"/>
+        <line num="25" count="3" type="stmt"/>
+        <line num="39" count="3" type="stmt"/>
         <line num="40" count="3" type="stmt"/>
         <line num="41" count="3" type="stmt"/>
         <line num="43" count="3" type="stmt"/>
@@ -363,55 +364,6 @@
         <line num="3" count="3" type="stmt"/>
         <line num="5" count="16" type="stmt"/>
         <line num="16" count="0" type="stmt"/>
-      </file>
-    </package>
-    <package name="src.generic-types">
-      <metrics statements="37" coveredstatements="11" conditionals="14" coveredconditionals="0" methods="18" coveredmethods="0"/>
-      <file name="date-type.ts" path="/Users/nox/projects/@raynode/utils/gram/src/generic-types/date-type.ts">
-        <metrics statements="16" coveredstatements="4" conditionals="10" coveredconditionals="0" methods="5" coveredmethods="0"/>
-        <line num="1" count="3" type="stmt"/>
-        <line num="3" count="3" type="stmt"/>
-        <line num="4" count="0" type="stmt"/>
-        <line num="5" count="3" type="stmt"/>
-        <line num="6" count="0" type="stmt"/>
-        <line num="16" count="3" type="stmt"/>
-        <line num="22" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="24" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="25" count="0" type="stmt"/>
-        <line num="29" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="31" count="0" type="stmt"/>
-        <line num="32" count="0" type="stmt"/>
-        <line num="34" count="0" type="stmt"/>
-        <line num="39" count="0" type="cond" truecount="0" falsecount="4"/>
-        <line num="40" count="0" type="stmt"/>
-        <line num="41" count="0" type="stmt"/>
-      </file>
-      <file name="index.ts" path="/Users/nox/projects/@raynode/utils/gram/src/generic-types/index.ts">
-        <metrics statements="2" coveredstatements="2" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
-        <line num="1" count="3" type="stmt"/>
-        <line num="2" count="3" type="stmt"/>
-      </file>
-      <file name="json-type.ts" path="/Users/nox/projects/@raynode/utils/gram/src/generic-types/json-type.ts">
-        <metrics statements="19" coveredstatements="5" conditionals="4" coveredconditionals="0" methods="13" coveredmethods="0"/>
-        <line num="1" count="3" type="stmt"/>
-        <line num="16" count="3" type="stmt"/>
-        <line num="17" count="3" type="stmt"/>
-        <line num="19" count="3" type="stmt"/>
-        <line num="20" count="0" type="stmt"/>
-        <line num="21" count="0" type="stmt"/>
-        <line num="23" count="0" type="stmt"/>
-        <line num="25" count="0" type="stmt"/>
-        <line num="26" count="0" type="stmt"/>
-        <line num="28" count="0" type="stmt"/>
-        <line num="30" count="0" type="stmt"/>
-        <line num="31" count="0" type="stmt"/>
-        <line num="32" count="0" type="stmt"/>
-        <line num="42" count="0" type="stmt"/>
-        <line num="46" count="3" type="stmt"/>
-        <line num="49" count="0" type="stmt"/>
-        <line num="50" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="52" count="0" type="stmt"/>
-        <line num="53" count="0" type="cond" truecount="0" falsecount="2"/>
       </file>
     </package>
     <package name="src.input-types">

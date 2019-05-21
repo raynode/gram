@@ -7,9 +7,9 @@ exports[`testing the example 1 should build the example code 1`] = `
   tame: Boolean
   age: Int
   id: ID
-  createdAt: Date
-  updatedAt: Date
-  deletedAt: Date
+  createdAt: DateTime
+  updatedAt: DateTime
+  deletedAt: DateTime
 }
 
 input AnimalFilter {
@@ -95,15 +95,13 @@ input CreateAnimalData {
   tame: Boolean
   age: Int
   id: ID
-  createdAt: Date
-  updatedAt: Date
-  deletedAt: Date
+  createdAt: DateTime
+  updatedAt: DateTime
+  deletedAt: DateTime
 }
 
-\\"\\"\\"
-A special custom Scalar type for Dates that converts to a ISO formatted string 
-\\"\\"\\"
-scalar Date
+\\"\\"\\"Use JavaScript Date object for date/time fields.\\"\\"\\"
+scalar DateTime
 
 interface List {
   page: Page
@@ -118,9 +116,9 @@ type Mutation {
 
 interface Node {
   id: ID
-  createdAt: Date
-  updatedAt: Date
-  deletedAt: Date
+  createdAt: DateTime
+  updatedAt: DateTime
+  deletedAt: DateTime
 }
 
 type Page {
@@ -146,9 +144,9 @@ input UpdateAnimalData {
   tame: Boolean
   age: Int
   id: ID
-  createdAt: Date
-  updatedAt: Date
-  deletedAt: Date
+  createdAt: DateTime
+  updatedAt: DateTime
+  deletedAt: DateTime
 }
 "
 `;

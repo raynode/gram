@@ -1,3 +1,4 @@
+import { DateTime } from '@saeris/graphql-scalars'
 import {
   GraphQLFieldConfigMap,
   GraphQLFieldResolver,
@@ -12,7 +13,15 @@ import {
   GraphQLString,
   GraphQLType,
 } from 'graphql'
+import { GraphQLJSONObject } from 'graphql-type-json'
 import { filter, forEach, reduce } from 'lodash'
+import { v4 as uuid } from 'uuid'
+
+import {
+  mutationFieldsReducer,
+  queryFieldsReducer,
+  subscriptionFieldsReducer,
+} from './field-reducers'
 import { createModelBuilder } from './modelBuilder'
 import {
   ContextModel,
@@ -27,18 +36,9 @@ import {
   Service,
   Wrapped,
 } from './types'
-import { isFieldDefinition } from './types/guards'
-
-import { v4 as uuid } from 'uuid'
-import {
-  mutationFieldsReducer,
-  queryFieldsReducer,
-  subscriptionFieldsReducer,
-} from './field-reducers'
 import { SCHEMABUILDER } from './types/constants'
-
-import { reduceFields } from 'utils'
-import { DateType, JSONType } from './generic-types'
+import { isFieldDefinition } from './types/guards'
+import { reduceFields } from './utils'
 
 const wrapContext = <Context>(
   context: Context | null,
@@ -130,7 +130,7 @@ export const createSchemaBuilder = <Context = any>(): SchemaBuilder<
   Context
 > => {
   const models: Models<Context> = createBaseModels<Context>()
-  const generics: Generics = { Date: DateType, JSON: JSONType }
+  const generics: Generics = { Date: DateTime, JSON: GraphQLJSONObject }
 
   const builder: SchemaBuilder<Context> = {
     type: SCHEMABUILDER,
