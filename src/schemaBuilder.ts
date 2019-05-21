@@ -12,7 +12,7 @@ import {
   GraphQLString,
   GraphQLType,
 } from 'graphql'
-import { forEach, reduce } from 'lodash'
+import { filter, forEach, reduce } from 'lodash'
 import { createModelBuilder } from './modelBuilder'
 import {
   ContextModel,
@@ -43,13 +43,15 @@ import { DateType, JSONType } from './generic-types'
 const wrapContext = <Context>(
   context: Context | null,
   generics: Record<string, GraphQLType>,
+  models: Models<Context>,
 ): Wrapped<Context> => {
-  const models: Record<string, ContextModel<Context, any>> = {}
+  const contextModels: Record<string, ContextModel<Context, any>> = {}
   return {
     id: uuid(),
     context,
-    addModel: (name, model) => (models[name] = model),
-    getModel: name => models[name],
+    addModel: (name, model) => (contextModels[name] = model),
+    getBaseModel: name => models[name],
+    getModel: name => contextModels[name],
     getGenericType: name => generics[name],
   }
 }
@@ -94,12 +96,12 @@ const setup = <Context>(
   generics: Generics,
   context: Context | null,
 ) => {
-  const wrapped = wrapContext(context, generics)
+  const wrapped = wrapContext(context, generics, models)
   forEach(models, model => model.setup(wrapped))
 
-  models.Node.build(wrapped)
-  models.Page.build(wrapped)
-  models.List.build(wrapped)
+  // models.Node.build(wrapped)
+  // models.Page.build(wrapped)
+  // models.List.build(wrapped)
 
   return wrapped
 }
@@ -136,16 +138,28 @@ export const createSchemaBuilder = <Context = any>(): SchemaBuilder<
     model: <Type>(modelName: string, service: Service<Type>) => {
       const model = createModelBuilder<Context, Type>(modelName, service || {})
       models[modelName] = model
-      return addNodeAttrs(model.interface('Node'))
+      return model.interface('Node')
     },
-    interface: <Type>(interfaceName: string, service: Service<Type>) =>
-      builder.model<Type>(interfaceName, service).setInterface(),
+    interface: <Type>(interfaceName: string, service: Service<Type>) => {
+      const model = createModelBuilder<Context, Type>(
+        interfaceName,
+        service || {},
+      )
+      models[interfaceName] = model
+      model.setInterface()
+      return model
+    },
     build: (context: Context | FieldDefinition = null) =>
       createSchema(
         isFieldDefinition(context) ? context : builder.fields(context),
       ),
     fields: (context: Context | null = null) => {
       const wrapped = setup(models, generics, context)
+      // build all interfaces
+      filter(models, model => model.isInterface()).forEach(model =>
+        model.build(wrapped),
+      )
+      // create the query, mutation and subscription fields
       return reduceFields(models, {
         query: queryFieldsReducer(wrapped),
         mutation: mutationFieldsReducer(wrapped),

@@ -5,6 +5,7 @@ import { createAttributeBuilder } from './attributeBuilder'
 import { createContextModel } from './createContextModel'
 import {
   AttributeBuilder,
+  Attributes,
   ContextFn,
   ContextMutator,
   ModelBuilder,
@@ -34,7 +35,7 @@ export const createModelBuilder = <Context, Type>(
   service: Service<Type>,
   contextFn?: ContextMutator<Context, Type>,
 ): ModelBuilder<Context, Type> => {
-  const attributes: Record<string, AttributeBuilder<Context, any, Type>> = {}
+  const attributes: Attributes<Context, Type> = {}
   let contextMutation: ContextMutator<Context, Type> = () => null
   let listType: GraphQLType | ModelBuilder<Context, any> = null
   let isInterface: boolean = false
@@ -94,6 +95,13 @@ export const createModelBuilder = <Context, Type>(
       context => {
         const contextModel = context.getModel<Type>(modelName)
         forEach(attributes, attr => contextModel.addField(attr))
+        interfaces
+          .map(name => context.getBaseModel(name))
+          .forEach(model => {
+            forEach(model.getAttributes(), (attr, name) => {
+              if (!attributes.hasOwnProperty(name)) contextModel.addField(attr)
+            })
+          })
         contextMutation(contextModel, context)
         return contextModel
       },
@@ -111,6 +119,7 @@ export const createModelBuilder = <Context, Type>(
       listType = model
       return builder
     },
+    getAttributes: () => attributes,
   }
   return builder
 }

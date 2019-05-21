@@ -30,94 +30,94 @@ Basic usage would let you generate a model by just defining it and adding some a
 
 If you have a service called `Animals` you could create a schema like this:
 ```typescript
-import { GraphQLString, GraphQLInt, GraphQLBoolean } from 'graphql'
-import { createSchemaBuilder } from 'gram'
-import { Animals } from './my-services/animals'
+  import { GraphQLString, GraphQLInt, GraphQLBoolean } from 'graphql'
+  import { createSchemaBuilder } from 'gram'
+  import { Animals } from './my-services/animals'
 
-const builder = createSchemaBuilder()
-const animal = builder.model('Animal', Animals)
+  const builder = createSchemaBuilder()
+  const animal = builder.model('Animal', Animals)
 
-// animal type like 'dog', 'cat'
-// field is required
-animal.attr('type', GraphQLString).isNonNull()
-// animal name like 'Fluffy', 'Rex'
-// field is not required
-animal.attr('name', GraphQLString)
-// is it a tame animal
-animal.attr('tame', GraphQLBoolean)
-// age of the animal
-animal.attr('age', GraphQLInt)
+  // animal type like 'dog', 'cat'
+  // field is required
+  animal.attr('type', GraphQLString).isNonNull()
+  // animal name like 'Fluffy', 'Rex'
+  // field is not required
+  animal.attr('name', GraphQLString)
+  // is it a tame animal
+  animal.attr('tame', GraphQLBoolean)
+  // age of the animal
+  animal.attr('age', GraphQLInt)
 
-const schema = builder.build()
+  const schema = builder.build()
 ```
 
 This will generate a graphql schema like:
 ```GraphQL
-type Animal implements Node {
-  id: ID
-  createdAt: String
-  updatedAt: String
-  deletedAt: String
-  type: String!
-  name: String
-  tame: Boolean
-  age: Int
-}
+  type Animal implements Node {
+    id: ID
+    createdAt: String
+    updatedAt: String
+    deletedAt: String
+    type: String!
+    name: String
+    tame: Boolean
+    age: Int
+  }
 
-input AnimalFilter { … }
+  input AnimalFilter { … }
 
-input AnimalPage {
-  limit: Int
-  offset: Int
-}
+  input AnimalPage {
+    limit: Int
+    offset: Int
+  }
 
-type Animals implements List {
-  page: Page
-  nodes: [Animal!]!
-}
+  type Animals implements List {
+    page: Page
+    nodes: [Animal!]!
+  }
 
-enum AnimalSortOrder { … }
+  enum AnimalSortOrder { … }
 
-input AnimalWhere { … }
+  input AnimalWhere { … }
 
-input CreateAnimalData { … }
+  input CreateAnimalData { … }
 
-interface List {
-  page: Page
-  nodes: [Node!]!
-}
+  interface List {
+    page: Page
+    nodes: [Node!]!
+  }
 
-type Mutation {
-  createAnimal(data: CreateAnimalData!): Animal
-  updateAnimal(data: UpdateAnimalData!, where: AnimalWhere!): [Animal!]!
-  deleteAnimals(where: AnimalWhere!): [Animal!]!
-}
+  type Mutation {
+    createAnimal(data: CreateAnimalData!): Animal
+    updateAnimal(data: UpdateAnimalData!, where: AnimalWhere!): [Animal!]!
+    deleteAnimals(where: AnimalWhere!): [Animal!]!
+  }
 
-interface Node {
-  id: ID
-  createdAt: String
-  updatedAt: String
-  deletedAt: String
-}
+  interface Node {
+    id: ID
+    createdAt: String
+    updatedAt: String
+    deletedAt: String
+  }
 
-type Page {
-  page: Int
-  limit: Int
-  offset: Int
-}
+  type Page {
+    page: Int
+    limit: Int
+    offset: Int
+  }
 
-type Query {
-  getAnimal(where: AnimalWhere!, order: AnimalSortOrder): Animal
-  getAnimals(order: AnimalSortOrder, page: AnimalPage, where: AnimalWhere!): Animals
-}
+  type Query {
+    getAnimal(where: AnimalWhere!, order: AnimalSortOrder): Animal
+    getAnimals(order: AnimalSortOrder, page: AnimalPage, where: AnimalWhere!): Animals
+  }
 
-type Subscription {
-  onCreateAnimal: Animal!
-  onUpdateAnimal: [Animal!]!
-  onDeleteAnimals: [Animal!]!
-}
+  type Subscription {
+    onCreateAnimal: Animal!
+    onUpdateAnimal: [Animal!]!
+    onDeleteAnimals: [Animal!]!
+  }
 
-input UpdateAnimalData { … }
+  input UpdateAnimalData { … }
 ```
 
 As you can see, some types and interfaces were added.
@@ -129,6 +129,135 @@ Gram will automatically assume all implemented methods on the service will work.
 If you, for example, do not have a findMany method, Gram will remove the `getAnimals` method and just generate the rest.
 
 If you want to generate more than one schema from your models, there will be a feature implemented in the near future to enable and disable parts depending on the context given in the build method.
+
+### Interfaces
+
+Of course our `Animal` model is just an interface to help us build `Cat` and `Dog` models.
+We will convert our Animal into an interface and generate a `Cat` model that implements the interface.
+There will be no use for that `type` attribute any more, we will just skip it.
+
+```typescript
+  const builder = createSchemaBuilder()
+  const animal = builder.interface('Animal')
+  // animal name like 'Fluffy', 'Rex'
+  // field is not required
+  animal.attr('name', GraphQLString)
+  // is it a tame animal
+  animal.attr('tame', GraphQLBoolean)
+  // age of the animal
+  animal.attr('age', GraphQLInt)
+
+  const cat = builder.model('Cat', Animals)
+  cat.interface('Animal')
+```
+
+```GraphQL
+  interface Animal {
+    name: String
+    tame: Boolean
+  }
+
+  type Cat implements Node & Animal {
+    id: ID
+    createdAt: Date
+    updatedAt: Date
+    deletedAt: Date
+    name: String
+    tame: Boolean
+  }
+
+  type Query {
+    getCat(where: CatWhere!, order: CatSortOrder): Cat
+    getCats(order: CatSortOrder, page: CatPage, where: CatWhere!): Cats
+  }
+```
+
+As you can see it now added the attributes to the `Cat` model and we can now easily add more animal-type models to our system.
+We moved the service to the `Cat` model, which is not quite right.
+It would be best to have a `Cat` specific service, which will use the `Animal` service in turn, by adding some filters.
+But we will want to fetch any `Animals` as well.
+
+```typescript
+
+  interface Animal {
+    type: AnimalTypes
+    name: string
+    tame: boolean
+    age: number
+  }
+
+  interface Cat extends Animal {
+    type: AnimalTypes.Cat,
+  }
+  interface Dog extends Animal {
+    type: AnimalTypes.Dog,
+  }
+
+  const Animals: Service<Animal> = {
+    findOne: async ({ order, where }) => Magically.findData(where, order),
+  }
+
+  const Cats: Service<Cat> = {
+    findOne: async ({ order, where }) => Animals.findOne({
+      order, where: { ...where, type: AnimalTypes.Cat },
+    }) as Promise<Cat>,
+  }
+  const Dogs: Service<Dog> = {
+    findOne: async ({ order, where }) => Animals.findOne({
+      order, where: { ...where, type: AnimalTypes.Dog },
+    }) as Promise<Dog>,
+  }
+
+  // after defining all interfaces we setup the schema
+
+  const builder = createSchemaBuilder()
+  const animal = builder.interface('Animal', Animals)
+  animal.attr('name', GraphQLString)
+  animal.attr('tame', GraphQLBoolean)
+  animal.attr('age', GraphQLInt)
+
+  const cat = builder.model('Cat', Cats)
+  cat.interface('Animal')
+  const dog = builder.model('Dog', Dogs)
+  dog.interface('Animal')
+```
+
+```GraphQL
+
+  interface Animal {
+    name: String
+    tame: Boolean
+    age: Int
+  }
+
+  type Cat implements Node & Animal {
+    id: ID
+    createdAt: Date
+    updatedAt: Date
+    deletedAt: Date
+    name: String
+    tame: Boolean
+    age: Int
+  }
+
+  type Dog implements Node & Animal {
+    id: ID
+    createdAt: Date
+    updatedAt: Date
+    deletedAt: Date
+    name: String
+    tame: Boolean
+    age: Int
+  }
+
+  type Query {
+    getAnimal(where: AnimalWhere!, order: AnimalSortOrder): Animal
+    getCat(where: CatWhere!, order: CatSortOrder): Cat
+    getDog(where: DogWhere!, order: DogSortOrder): Dog
+  }
+```
+
+Now we can find any animal with a `getAnimal(where: { name: "Fluffy" }) { ... on Dog { … }}` or find our Dog directly `getDog(where: { name: "Fluffy" }) { … }`.
 
 ## Contributing
 

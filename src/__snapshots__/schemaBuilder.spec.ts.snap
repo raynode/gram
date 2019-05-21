@@ -2,12 +2,12 @@
 
 exports[`example should add User to the Schema 1`] = `
 "input CreateUserData {
+  name: String
+  friends: UserWhere
   id: ID
   createdAt: Date
   updatedAt: Date
   deletedAt: Date
-  name: String
-  friends: UserWhere
 }
 
 \\"\\"\\"
@@ -51,35 +51,35 @@ type Subscription {
 }
 
 input UpdateUserData {
+  name: String
+  friends: UserWhere
   id: ID
   createdAt: Date
   updatedAt: Date
   deletedAt: Date
-  name: String
-  friends: UserWhere
 }
 
 type User implements Node {
+  name: String
+  friends: [User!]!
   id: ID
   createdAt: Date
   updatedAt: Date
   deletedAt: Date
-  name: String
-  friends: [User!]!
 }
 
 input UserFilter {
   AND: [UserFilter!]
   OR: [UserFilter!]
   NOT: UserFilter
-  id: ID
-  id_not: ID
-  id_in: [ID!]
-  id_not_in: [ID!]
   name: String
   name_not: String
   name_in: [String!]
   name_not_in: [String!]
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
 }
 
 input UserPage {
@@ -93,6 +93,10 @@ type Users implements List {
 }
 
 enum UserSortOrder {
+  name_ASC
+  name_DESC
+  friends_ASC
+  friends_DESC
   id_ASC
   id_DESC
   createdAt_ASC
@@ -101,47 +105,39 @@ enum UserSortOrder {
   updatedAt_DESC
   deletedAt_ASC
   deletedAt_DESC
-  name_ASC
-  name_DESC
-  friends_ASC
-  friends_DESC
 }
 
 input UserWhere {
   AND: [UserFilter!]
   OR: [UserFilter!]
   NOT: UserFilter
-  id: ID
-  id_not: ID
-  id_in: [ID!]
-  id_not_in: [ID!]
   name: String
   name_not: String
   name_in: [String!]
   name_not_in: [String!]
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
 }
 "
 `;
 
 exports[`example should add account to the model 1`] = `
 "type Account implements Node {
+  name: String
+  amount: Float
+  user: User!
   id: ID
   createdAt: Date
   updatedAt: Date
   deletedAt: Date
-  name: String
-  amount: Float
-  user: User!
 }
 
 input AccountFilter {
   AND: [AccountFilter!]
   OR: [AccountFilter!]
   NOT: AccountFilter
-  id: ID
-  id_not: ID
-  id_in: [ID!]
-  id_not_in: [ID!]
   name: String
   name_not: String
   name_in: [String!]
@@ -150,6 +146,10 @@ input AccountFilter {
   amount_not: Float
   amount_lt: Float
   amount_gt: Float
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
 }
 
 input AccountPage {
@@ -163,6 +163,12 @@ type Accounts implements List {
 }
 
 enum AccountSortOrder {
+  name_ASC
+  name_DESC
+  amount_ASC
+  amount_DESC
+  user_ASC
+  user_DESC
   id_ASC
   id_DESC
   createdAt_ASC
@@ -171,22 +177,12 @@ enum AccountSortOrder {
   updatedAt_DESC
   deletedAt_ASC
   deletedAt_DESC
-  name_ASC
-  name_DESC
-  amount_ASC
-  amount_DESC
-  user_ASC
-  user_DESC
 }
 
 input AccountWhere {
   AND: [AccountFilter!]
   OR: [AccountFilter!]
   NOT: AccountFilter
-  id: ID
-  id_not: ID
-  id_in: [ID!]
-  id_not_in: [ID!]
   name: String
   name_not: String
   name_in: [String!]
@@ -195,26 +191,30 @@ input AccountWhere {
   amount_not: Float
   amount_lt: Float
   amount_gt: Float
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
 }
 
 input CreateAccountData {
-  id: ID
-  createdAt: Date
-  updatedAt: Date
-  deletedAt: Date
   name: String
   amount: Float
   user: UserWhere!
-}
-
-input CreateUserData {
   id: ID
   createdAt: Date
   updatedAt: Date
   deletedAt: Date
+}
+
+input CreateUserData {
   name: String
   friends: UserWhere
   accounts: AccountWhere
+  id: ID
+  createdAt: Date
+  updatedAt: Date
+  deletedAt: Date
 }
 
 \\"\\"\\"
@@ -266,47 +266,47 @@ type Subscription {
 }
 
 input UpdateAccountData {
-  id: ID
-  createdAt: Date
-  updatedAt: Date
-  deletedAt: Date
   name: String
   amount: Float
   user: UserWhere
+  id: ID
+  createdAt: Date
+  updatedAt: Date
+  deletedAt: Date
 }
 
 input UpdateUserData {
-  id: ID
-  createdAt: Date
-  updatedAt: Date
-  deletedAt: Date
   name: String
   friends: UserWhere
   accounts: AccountWhere
-}
-
-type User implements Node {
   id: ID
   createdAt: Date
   updatedAt: Date
   deletedAt: Date
+}
+
+type User implements Node {
   name: String
   friends: [User!]!
   accounts: [Account!]!
+  id: ID
+  createdAt: Date
+  updatedAt: Date
+  deletedAt: Date
 }
 
 input UserFilter {
   AND: [UserFilter!]
   OR: [UserFilter!]
   NOT: UserFilter
-  id: ID
-  id_not: ID
-  id_in: [ID!]
-  id_not_in: [ID!]
   name: String
   name_not: String
   name_in: [String!]
   name_not_in: [String!]
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
 }
 
 input UserPage {
@@ -320,6 +320,12 @@ type Users implements List {
 }
 
 enum UserSortOrder {
+  name_ASC
+  name_DESC
+  friends_ASC
+  friends_DESC
+  accounts_ASC
+  accounts_DESC
   id_ASC
   id_DESC
   createdAt_ASC
@@ -328,26 +334,20 @@ enum UserSortOrder {
   updatedAt_DESC
   deletedAt_ASC
   deletedAt_DESC
-  name_ASC
-  name_DESC
-  friends_ASC
-  friends_DESC
-  accounts_ASC
-  accounts_DESC
 }
 
 input UserWhere {
   AND: [UserFilter!]
   OR: [UserFilter!]
   NOT: UserFilter
-  id: ID
-  id_not: ID
-  id_in: [ID!]
-  id_not_in: [ID!]
   name: String
   name_not: String
   name_in: [String!]
   name_not_in: [String!]
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
 }
 "
 `;

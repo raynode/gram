@@ -25,6 +25,11 @@ export interface Builder {
   type: string
 }
 
+export type Attributes<Context, Type> = Record<
+  string,
+  AttributeBuilder<Context, any, Type>
+>
+
 export type Fields = Thunk<GraphQLFieldConfigMap<any, any>>
 export type FilterFn = (
   name: string,
@@ -74,6 +79,7 @@ export interface ContextModel<Context, Type> {
 
 export interface Wrapped<Context> {
   id: string
+  getBaseModel: <Type>(name: string) => ModelBuilder<Context, Type>
   getModel: <Type>(name: string) => ContextModel<Context, Type>
   addModel: <Type>(name: string, model: ContextModel<Context, Type>) => void
   context: Context | null
@@ -127,6 +133,7 @@ export interface ModelBuilder<Context, Type> extends Builder {
   ) => AttributeBuilder<Context, Type, AttributeType>
   build: (context: Wrapped<Context>) => ContextModel<Context, Type>
   context: (contextMutation: ContextMutator<Context, Type>) => this
+  getAttributes: () => Attributes<Context, Type>
   getInterfaces: () => string[]
   getListType: () => GraphQLType | ModelBuilder<Context, any>
   interface: (model: string) => this

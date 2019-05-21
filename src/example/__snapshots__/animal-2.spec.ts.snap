@@ -1,0 +1,295 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`testing the example 2 should build the example code 1`] = `
+"interface Animal {
+  name: String
+  tame: Boolean
+  age: Int
+}
+
+type Cat implements Node & Animal {
+  id: ID
+  createdAt: Date
+  updatedAt: Date
+  deletedAt: Date
+  name: String
+  tame: Boolean
+  age: Int
+}
+
+input CatFilter {
+  AND: [CatFilter!]
+  OR: [CatFilter!]
+  NOT: CatFilter
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  name: String
+  name_not: String
+  name_in: [String!]
+  name_not_in: [String!]
+  tame: Boolean
+  tame_not: Boolean
+  age: Int
+  age_not: Int
+  age_lt: Int
+  age_gt: Int
+}
+
+enum CatSortOrder {
+  id_ASC
+  id_DESC
+  createdAt_ASC
+  createdAt_DESC
+  updatedAt_ASC
+  updatedAt_DESC
+  deletedAt_ASC
+  deletedAt_DESC
+  name_ASC
+  name_DESC
+  tame_ASC
+  tame_DESC
+  age_ASC
+  age_DESC
+}
+
+input CatWhere {
+  AND: [CatFilter!]
+  OR: [CatFilter!]
+  NOT: CatFilter
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  name: String
+  name_not: String
+  name_in: [String!]
+  name_not_in: [String!]
+  tame: Boolean
+  tame_not: Boolean
+  age: Int
+  age_not: Int
+  age_lt: Int
+  age_gt: Int
+}
+
+\\"\\"\\"
+A special custom Scalar type for Dates that converts to a ISO formatted string 
+\\"\\"\\"
+scalar Date
+
+interface Node {
+  id: ID
+  createdAt: Date
+  updatedAt: Date
+  deletedAt: Date
+}
+
+type Query {
+  getCat(where: CatWhere!, order: CatSortOrder): Cat
+}
+"
+`;
+
+exports[`testing the example 2 should build the second part of the example 1`] = `
+"interface Animal {
+  name: String
+  tame: Boolean
+  age: Int
+}
+
+input AnimalFilter {
+  AND: [AnimalFilter!]
+  OR: [AnimalFilter!]
+  NOT: AnimalFilter
+  name: String
+  name_not: String
+  name_in: [String!]
+  name_not_in: [String!]
+  tame: Boolean
+  tame_not: Boolean
+  age: Int
+  age_not: Int
+  age_lt: Int
+  age_gt: Int
+}
+
+enum AnimalSortOrder {
+  name_ASC
+  name_DESC
+  tame_ASC
+  tame_DESC
+  age_ASC
+  age_DESC
+}
+
+input AnimalWhere {
+  AND: [AnimalFilter!]
+  OR: [AnimalFilter!]
+  NOT: AnimalFilter
+  name: String
+  name_not: String
+  name_in: [String!]
+  name_not_in: [String!]
+  tame: Boolean
+  tame_not: Boolean
+  age: Int
+  age_not: Int
+  age_lt: Int
+  age_gt: Int
+}
+
+type Cat implements Node & Animal {
+  id: ID
+  createdAt: Date
+  updatedAt: Date
+  deletedAt: Date
+  name: String
+  tame: Boolean
+  age: Int
+}
+
+input CatFilter {
+  AND: [CatFilter!]
+  OR: [CatFilter!]
+  NOT: CatFilter
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  name: String
+  name_not: String
+  name_in: [String!]
+  name_not_in: [String!]
+  tame: Boolean
+  tame_not: Boolean
+  age: Int
+  age_not: Int
+  age_lt: Int
+  age_gt: Int
+}
+
+enum CatSortOrder {
+  id_ASC
+  id_DESC
+  createdAt_ASC
+  createdAt_DESC
+  updatedAt_ASC
+  updatedAt_DESC
+  deletedAt_ASC
+  deletedAt_DESC
+  name_ASC
+  name_DESC
+  tame_ASC
+  tame_DESC
+  age_ASC
+  age_DESC
+}
+
+input CatWhere {
+  AND: [CatFilter!]
+  OR: [CatFilter!]
+  NOT: CatFilter
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  name: String
+  name_not: String
+  name_in: [String!]
+  name_not_in: [String!]
+  tame: Boolean
+  tame_not: Boolean
+  age: Int
+  age_not: Int
+  age_lt: Int
+  age_gt: Int
+}
+
+\\"\\"\\"
+A special custom Scalar type for Dates that converts to a ISO formatted string 
+\\"\\"\\"
+scalar Date
+
+type Dog implements Node & Animal {
+  id: ID
+  createdAt: Date
+  updatedAt: Date
+  deletedAt: Date
+  name: String
+  tame: Boolean
+  age: Int
+}
+
+input DogFilter {
+  AND: [DogFilter!]
+  OR: [DogFilter!]
+  NOT: DogFilter
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  name: String
+  name_not: String
+  name_in: [String!]
+  name_not_in: [String!]
+  tame: Boolean
+  tame_not: Boolean
+  age: Int
+  age_not: Int
+  age_lt: Int
+  age_gt: Int
+}
+
+enum DogSortOrder {
+  id_ASC
+  id_DESC
+  createdAt_ASC
+  createdAt_DESC
+  updatedAt_ASC
+  updatedAt_DESC
+  deletedAt_ASC
+  deletedAt_DESC
+  name_ASC
+  name_DESC
+  tame_ASC
+  tame_DESC
+  age_ASC
+  age_DESC
+}
+
+input DogWhere {
+  AND: [DogFilter!]
+  OR: [DogFilter!]
+  NOT: DogFilter
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  name: String
+  name_not: String
+  name_in: [String!]
+  name_not_in: [String!]
+  tame: Boolean
+  tame_not: Boolean
+  age: Int
+  age_not: Int
+  age_lt: Int
+  age_gt: Int
+}
+
+interface Node {
+  id: ID
+  createdAt: Date
+  updatedAt: Date
+  deletedAt: Date
+}
+
+type Query {
+  getAnimal(where: AnimalWhere!, order: AnimalSortOrder): Animal
+  getCat(where: CatWhere!, order: CatSortOrder): Cat
+  getDog(where: DogWhere!, order: DogSortOrder): Dog
+}
+"
+`;

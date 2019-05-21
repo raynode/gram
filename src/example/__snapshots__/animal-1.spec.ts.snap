@@ -2,24 +2,20 @@
 
 exports[`testing the example 1 should build the example code 1`] = `
 "type Animal implements Node {
-  id: ID
-  createdAt: Date
-  updatedAt: Date
-  deletedAt: Date
   type: String!
   name: String
   tame: Boolean
   age: Int
+  id: ID
+  createdAt: Date
+  updatedAt: Date
+  deletedAt: Date
 }
 
 input AnimalFilter {
   AND: [AnimalFilter!]
   OR: [AnimalFilter!]
   NOT: AnimalFilter
-  id: ID
-  id_not: ID
-  id_in: [ID!]
-  id_not_in: [ID!]
   type: String
   type_not: String
   type_in: [String!]
@@ -34,6 +30,10 @@ input AnimalFilter {
   age_not: Int
   age_lt: Int
   age_gt: Int
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
 }
 
 input AnimalPage {
@@ -47,14 +47,6 @@ type Animals implements List {
 }
 
 enum AnimalSortOrder {
-  id_ASC
-  id_DESC
-  createdAt_ASC
-  createdAt_DESC
-  updatedAt_ASC
-  updatedAt_DESC
-  deletedAt_ASC
-  deletedAt_DESC
   type_ASC
   type_DESC
   name_ASC
@@ -63,16 +55,20 @@ enum AnimalSortOrder {
   tame_DESC
   age_ASC
   age_DESC
+  id_ASC
+  id_DESC
+  createdAt_ASC
+  createdAt_DESC
+  updatedAt_ASC
+  updatedAt_DESC
+  deletedAt_ASC
+  deletedAt_DESC
 }
 
 input AnimalWhere {
   AND: [AnimalFilter!]
   OR: [AnimalFilter!]
   NOT: AnimalFilter
-  id: ID
-  id_not: ID
-  id_in: [ID!]
-  id_not_in: [ID!]
   type: String
   type_not: String
   type_in: [String!]
@@ -87,17 +83,21 @@ input AnimalWhere {
   age_not: Int
   age_lt: Int
   age_gt: Int
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
 }
 
 input CreateAnimalData {
-  id: ID
-  createdAt: Date
-  updatedAt: Date
-  deletedAt: Date
   type: String!
   name: String
   tame: Boolean
   age: Int
+  id: ID
+  createdAt: Date
+  updatedAt: Date
+  deletedAt: Date
 }
 
 \\"\\"\\"
@@ -141,14 +141,14 @@ type Subscription {
 }
 
 input UpdateAnimalData {
-  id: ID
-  createdAt: Date
-  updatedAt: Date
-  deletedAt: Date
   type: String!
   name: String
   tame: Boolean
   age: Int
+  id: ID
+  createdAt: Date
+  updatedAt: Date
+  deletedAt: Date
 }
 "
 `;

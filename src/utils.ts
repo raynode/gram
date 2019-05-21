@@ -41,10 +41,10 @@ export const fieldsReducer = <Context>(
   reducer: (
     contextModel: ContextModel<Context, any>,
   ) => GraphQLFieldConfigMap<any, any> | GraphQLInputFieldConfigMap,
-) => (context: Wrapped<Context>): FieldReducerFn<Context> => (fields, model) =>
-  model.isInterface()
-    ? fields
-    : { ...fields, ...clearRecord(reducer(model.build(context))) }
+) => (context: Wrapped<Context>): FieldReducerFn<Context> => (
+  fields,
+  model,
+) => ({ ...fields, ...clearRecord(reducer(model.build(context))) })
 
 // this Type construct will ensure that the returned object will have the same keys as
 // the input object. It will also convert the properties from ModelBuilder to FieldReducer
