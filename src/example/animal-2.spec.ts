@@ -4,7 +4,7 @@ import {
   GraphQLString,
   printSchema,
 } from 'graphql'
-import { createSchemaBuilder, Service } from '..'
+import { createSchemaBuilder, Paged, Service } from '..'
 
 enum AnimalTypes {
   Cat,
@@ -27,22 +27,30 @@ interface Dog extends Animal {
 
 const Animals: Service<Animal> = {
   findOne: async () => null,
+  findMany: async () => ({
+    page: null,
+    nodes: [],
+  }),
 }
 
-const Cats: Service<Cat> = {
+const createAnimalService = <Type extends Animal>(
+  type: AnimalTypes,
+): Service<Type> => ({
   findOne: async ({ order, where }) =>
     Animals.findOne({
       order,
-      where: { ...where, type: AnimalTypes.Cat },
-    }) as Promise<Cat>,
-}
-const Dogs: Service<Dog> = {
-  findOne: async ({ order, where }) =>
-    Animals.findOne({
+      where: { ...where, type },
+    }) as Promise<Type>,
+  findMany: async ({ order, page, where }) =>
+    Animals.findMany({
       order,
-      where: { ...where, type: AnimalTypes.Dog },
-    }) as Promise<Dog>,
-}
+      page,
+      where: { ...where, type },
+    }) as Promise<Paged<Type>>,
+})
+
+const Cats = createAnimalService<Cat>(AnimalTypes.Cat)
+const Dogs = createAnimalService<Cat>(AnimalTypes.Dog)
 
 describe('testing the example 2', () => {
   it('should build the example code', () => {

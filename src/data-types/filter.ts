@@ -1,5 +1,4 @@
 import { isType } from 'graphql'
-import { filterStrategy } from '../strategies/filter'
 import { memoizeContextModel, reduceContextFields } from '../utils'
 
 export const filter = memoizeContextModel(contextModel =>
@@ -8,7 +7,9 @@ export const filter = memoizeContextModel(contextModel =>
     contextModel.baseFilters(),
     (where, attr, type, field) => ({
       ...where,
-      ...(isType(field) ? filterStrategy(type, attr.name) : null),
+      ...(isType(field)
+        ? contextModel.context.filterStrategy(type, attr.name)
+        : null),
     }),
   ),
 )

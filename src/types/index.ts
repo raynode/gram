@@ -7,6 +7,7 @@ import {
   GraphQLInterfaceType,
   GraphQLList,
   GraphQLObjectType,
+  GraphQLScalarType,
   GraphQLSchema,
   GraphQLType,
   Thunk,
@@ -39,6 +40,11 @@ export type FilterFn = (
 export type FilterCheckFn = (type: GraphQLType) => boolean
 export type FilterMiddleware = [FilterCheckFn, FilterFn]
 
+export type FilterStrategy = <Type extends GraphQLType = GraphQLType>(
+  inputType: Type | ContextModel<any, any>,
+  inputName?: string,
+) => Record<string, { type: GraphQLType }>
+
 export type DataType =
   | 'create'
   | 'filter'
@@ -49,7 +55,7 @@ export type DataType =
   | 'order'
 
 export type FieldTypes = 'GraphQL' | 'Model' | 'All'
-export type GenericGraphQLType = 'Date' | 'JSON'
+export type GenericGraphQLType = 'Date'
 export type FieldDefinition = Record<
   'query' | 'mutation' | 'subscription',
   GraphQLFieldConfigMap<any, any>
@@ -82,8 +88,9 @@ export interface Wrapped<Context> {
   getBaseModel: <Type>(name: string) => ModelBuilder<Context, Type>
   getModel: <Type>(name: string) => ContextModel<Context, Type>
   addModel: <Type>(name: string, model: ContextModel<Context, Type>) => void
+  filterStrategy: FilterStrategy
   context: Context | null
-  getGenericType: (key: string) => GraphQLType
+  getScalar: (key: string) => GraphQLScalarType
 }
 
 export type ContextModelFn<Result> = <Context>(
@@ -116,11 +123,9 @@ export interface SchemaBuilder<Context> extends Builder {
   fields: (context: Context | null) => FieldDefinition
   models: Record<string, ModelBuilder<Context, any>>
   type: typeof SCHEMABUILDER
-  setGenericType: <Type extends GraphQLType>(
-    key: GenericGraphQLType,
-    type: Type,
-  ) => this
-  getGenericType: (key: GenericGraphQLType) => GraphQLType
+  setScalar: <Type extends GraphQLScalarType>(key: string, type: Type) => Type
+  getScalar: (key: string) => GraphQLScalarType
+  addFilter: (check: FilterCheckFn, filter: FilterFn) => this
 }
 
 export interface ModelBuilder<Context, Type> extends Builder {

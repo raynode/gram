@@ -261,7 +261,74 @@ Now we can find any animal with a `getAnimal(where: { name: "Fluffy" }) { ... on
 
 ### Scalars
 
+For use as `DateTime` type inside this library `@saeris/graphql-scalars` is used.
+It is applied in the pagination system and allows more types to be setup, see the [documentation](https://www.npmjs.com/package/@saeris/graphql-scalars) for more information.
+Sadly this library has no typing.
 
+To install another type, simply attach it to the `schemabuilder`.
+
+```typescript
+  const EatingType = new GraphQLScalarType({
+    name: 'EatingType',
+    description: 'What is this animal eating',
+    serialize: val => val,
+  })
+
+  const builder = createSchemaBuilder()
+  builder.setScalar('EatingType', EatingType)
+
+  const animal = builder.model('Animal', Animals)
+
+  const DateTime = builder.getScalar('DateTime')
+  // animal name like 'Fluffy', 'Rex'
+  // field is not required
+  animal.attr('name', GraphQLString)
+  // is it a tame animal
+  animal.attr('tame', GraphQLBoolean)
+  // age of the animal
+  animal.attr('date-of-birth', DateTime)
+  // feeding type of the animal
+  animal.attr('feed', EatingType)
+```
+
+```GraphQL
+  """What is this animal eating"""
+  scalar EatingType
+
+  type Animal implements Node {
+    name: String
+    tame: Boolean
+    date-of-birth: DateTime
+    feed: EatingType
+    id: ID
+    createdAt: DateTime
+    updatedAt: DateTime
+    deletedAt: DateTime
+  }
+```
+
+There is no filter strategy setup for the new scalar type yet.
+To add this we will to setup this.
+
+```typescript
+  const checkFn = isSpecificScalarType('EatingType')
+  const filterFn = filters.joinFilters([
+    filters.equals, // adds equal & not-equal filter
+    filters.record, // adds in && not-in filters
+  ])
+  builder.addFilter(checkFn, filterFn)
+```
+
+```GraphQL
+  input AnimalFilter {
+    {…}
+    feed: EatingType
+    feed_not: EatingType
+    feed_in: [EatingType!]
+    feed_not_in: [EatingType!]
+    {…}
+  }
+```
 
 ## Contributing
 

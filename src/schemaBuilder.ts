@@ -8,6 +8,7 @@ import {
   GraphQLList,
   GraphQLNonNull,
   GraphQLObjectType,
+  GraphQLScalarType,
   GraphQLSchema,
   GraphQLSchemaConfig,
   GraphQLString,
@@ -23,10 +24,12 @@ import {
   subscriptionFieldsReducer,
 } from './field-reducers'
 import { createModelBuilder } from './modelBuilder'
+import { createFilterStrategy, defaultMiddlewares } from './strategies/filter'
 import {
   ContextModel,
   ContextMutator,
   FieldDefinition,
+  FilterMiddleware,
   GenericGraphQLType,
   ListType,
   ModelBuilder,
@@ -42,25 +45,27 @@ import { reduceFields } from './utils'
 
 const wrapContext = <Context>(
   context: Context | null,
-  generics: Record<string, GraphQLType>,
+  scalars: Record<string, GraphQLScalarType>,
   models: Models<Context>,
+  filters: FilterMiddleware[],
 ): Wrapped<Context> => {
   const contextModels: Record<string, ContextModel<Context, any>> = {}
   return {
     id: uuid(),
     context,
+    filterStrategy: createFilterStrategy(filters),
     addModel: (name, model) => (contextModels[name] = model),
     getBaseModel: name => models[name],
     getModel: name => contextModels[name],
-    getGenericType: name => generics[name],
+    getScalar: name => scalars[name],
   }
 }
 
 const addNodeAttrs = <Context>(model: ModelBuilder<Context, any>) => {
   model.attr('id', GraphQLID)
-  model.attr('createdAt', context => context.getGenericType('Date'))
-  model.attr('updatedAt', context => context.getGenericType('Date'))
-  model.attr('deletedAt', context => context.getGenericType('Date'))
+  model.attr('createdAt', context => context.getScalar('DateTime'))
+  model.attr('updatedAt', context => context.getScalar('DateTime'))
+  model.attr('deletedAt', context => context.getScalar('DateTime'))
   return model
 }
 
@@ -89,20 +94,15 @@ const createBaseModels = <Context>() => {
 }
 
 type Models<Context> = Record<string, ModelBuilder<Context, any>>
-type Generics = Record<GenericGraphQLType, GraphQLType>
 
 const setup = <Context>(
   models: Models<Context>,
-  generics: Generics,
+  scalars: Record<string, GraphQLScalarType>,
   context: Context | null,
+  filters: FilterMiddleware[],
 ) => {
-  const wrapped = wrapContext(context, generics, models)
+  const wrapped = wrapContext(context, scalars, models, filters)
   forEach(models, model => model.setup(wrapped))
-
-  // models.Node.build(wrapped)
-  // models.Page.build(wrapped)
-  // models.List.build(wrapped)
-
   return wrapped
 }
 
@@ -130,7 +130,8 @@ export const createSchemaBuilder = <Context = any>(): SchemaBuilder<
   Context
 > => {
   const models: Models<Context> = createBaseModels<Context>()
-  const generics: Generics = { Date: DateTime, JSON: GraphQLJSONObject }
+  const scalars: Record<string, GraphQLScalarType> = { DateTime }
+  const filters = defaultMiddlewares
 
   const builder: SchemaBuilder<Context> = {
     type: SCHEMABUILDER,
@@ -154,7 +155,7 @@ export const createSchemaBuilder = <Context = any>(): SchemaBuilder<
         isFieldDefinition(context) ? context : builder.fields(context),
       ),
     fields: (context: Context | null = null) => {
-      const wrapped = setup(models, generics, context)
+      const wrapped = setup(models, scalars, context, filters)
       // build all interfaces
       filter(models, model => model.isInterface()).forEach(model =>
         model.build(wrapped),
@@ -166,11 +167,15 @@ export const createSchemaBuilder = <Context = any>(): SchemaBuilder<
         subscription: subscriptionFieldsReducer(wrapped),
       })
     },
-    setGenericType: (key, type) => {
-      generics[key] = type
+    setScalar: (key, type) => {
+      scalars[key] = type
+      return type
+    },
+    getScalar: key => scalars[key],
+    addFilter: (check, filter) => {
+      filters.push([check, filter])
       return builder
     },
-    getGenericType: key => generics[key],
   }
 
   return builder

@@ -37,6 +37,16 @@ input CatFilter {
   age_gt: Int
 }
 
+input CatPage {
+  limit: Int
+  offset: Int
+}
+
+type Cats implements List {
+  page: Page
+  nodes: [Cat!]!
+}
+
 enum CatSortOrder {
   id_ASC
   id_DESC
@@ -77,6 +87,11 @@ input CatWhere {
 \\"\\"\\"Use JavaScript Date object for date/time fields.\\"\\"\\"
 scalar DateTime
 
+interface List {
+  page: Page
+  nodes: [Node!]!
+}
+
 interface Node {
   id: ID
   createdAt: DateTime
@@ -84,8 +99,15 @@ interface Node {
   deletedAt: DateTime
 }
 
+type Page {
+  page: Int
+  limit: Int
+  offset: Int
+}
+
 type Query {
   getCat(where: CatWhere!, order: CatSortOrder): Cat
+  getCats(order: CatSortOrder, page: CatPage, where: CatWhere!): Cats
 }
 "
 `;
@@ -111,6 +133,16 @@ input AnimalFilter {
   age_not: Int
   age_lt: Int
   age_gt: Int
+}
+
+input AnimalPage {
+  limit: Int
+  offset: Int
+}
+
+type Animals implements List {
+  page: Page
+  nodes: [Animal!]!
 }
 
 enum AnimalSortOrder {
@@ -166,6 +198,16 @@ input CatFilter {
   age_not: Int
   age_lt: Int
   age_gt: Int
+}
+
+input CatPage {
+  limit: Int
+  offset: Int
+}
+
+type Cats implements List {
+  page: Page
+  nodes: [Cat!]!
 }
 
 enum CatSortOrder {
@@ -238,6 +280,16 @@ input DogFilter {
   age_gt: Int
 }
 
+input DogPage {
+  limit: Int
+  offset: Int
+}
+
+type Dogs implements List {
+  page: Page
+  nodes: [Dog!]!
+}
+
 enum DogSortOrder {
   id_ASC
   id_DESC
@@ -275,6 +327,11 @@ input DogWhere {
   age_gt: Int
 }
 
+interface List {
+  page: Page
+  nodes: [Node!]!
+}
+
 interface Node {
   id: ID
   createdAt: DateTime
@@ -282,10 +339,19 @@ interface Node {
   deletedAt: DateTime
 }
 
+type Page {
+  page: Int
+  limit: Int
+  offset: Int
+}
+
 type Query {
   getAnimal(where: AnimalWhere!, order: AnimalSortOrder): Animal
+  getAnimals(order: AnimalSortOrder, page: AnimalPage, where: AnimalWhere!): Animals
   getCat(where: CatWhere!, order: CatSortOrder): Cat
+  getCats(order: CatSortOrder, page: CatPage, where: CatWhere!): Cats
   getDog(where: DogWhere!, order: DogSortOrder): Dog
+  getDogs(order: DogSortOrder, page: DogPage, where: DogWhere!): Dogs
 }
 "
 `;

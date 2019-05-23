@@ -1,0 +1,217 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`testing the example 3 should build the example code 1`] = `
+"type Animal implements Node {
+  name: String
+  tame: Boolean
+  date-of-birth: DateTime
+  feed: EatingType
+  id: ID
+  createdAt: DateTime
+  updatedAt: DateTime
+  deletedAt: DateTime
+}
+
+input AnimalFilter {
+  AND: [AnimalFilter!]
+  OR: [AnimalFilter!]
+  NOT: AnimalFilter
+  name: String
+  name_not: String
+  name_in: [String!]
+  name_not_in: [String!]
+  tame: Boolean
+  tame_not: Boolean
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+}
+
+input AnimalPage {
+  limit: Int
+  offset: Int
+}
+
+type Animals implements List {
+  page: Page
+  nodes: [Animal!]!
+}
+
+enum AnimalSortOrder {
+  name_ASC
+  name_DESC
+  tame_ASC
+  tame_DESC
+  dateOfBirth_ASC
+  dateOfBirth_DESC
+  feed_ASC
+  feed_DESC
+  id_ASC
+  id_DESC
+  createdAt_ASC
+  createdAt_DESC
+  updatedAt_ASC
+  updatedAt_DESC
+  deletedAt_ASC
+  deletedAt_DESC
+}
+
+input AnimalWhere {
+  AND: [AnimalFilter!]
+  OR: [AnimalFilter!]
+  NOT: AnimalFilter
+  name: String
+  name_not: String
+  name_in: [String!]
+  name_not_in: [String!]
+  tame: Boolean
+  tame_not: Boolean
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+}
+
+\\"\\"\\"Use JavaScript Date object for date/time fields.\\"\\"\\"
+scalar DateTime
+
+\\"\\"\\"What is this animal eating\\"\\"\\"
+scalar EatingType
+
+interface List {
+  page: Page
+  nodes: [Node!]!
+}
+
+interface Node {
+  id: ID
+  createdAt: DateTime
+  updatedAt: DateTime
+  deletedAt: DateTime
+}
+
+type Page {
+  page: Int
+  limit: Int
+  offset: Int
+}
+
+type Query {
+  getAnimal(where: AnimalWhere!, order: AnimalSortOrder): Animal
+  getAnimals(order: AnimalSortOrder, page: AnimalPage, where: AnimalWhere!): Animals
+}
+"
+`;
+
+exports[`testing the example 3 should handle new filters 1`] = `
+"type Animal implements Node {
+  name: String
+  tame: Boolean
+  date-of-birth: DateTime
+  feed: EatingType
+  id: ID
+  createdAt: DateTime
+  updatedAt: DateTime
+  deletedAt: DateTime
+}
+
+input AnimalFilter {
+  AND: [AnimalFilter!]
+  OR: [AnimalFilter!]
+  NOT: AnimalFilter
+  name: String
+  name_not: String
+  name_in: [String!]
+  name_not_in: [String!]
+  tame: Boolean
+  tame_not: Boolean
+  feed: EatingType
+  feed_not: EatingType
+  feed_in: [EatingType!]
+  feed_not_in: [EatingType!]
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+}
+
+input AnimalPage {
+  limit: Int
+  offset: Int
+}
+
+type Animals implements List {
+  page: Page
+  nodes: [Animal!]!
+}
+
+enum AnimalSortOrder {
+  name_ASC
+  name_DESC
+  tame_ASC
+  tame_DESC
+  dateOfBirth_ASC
+  dateOfBirth_DESC
+  feed_ASC
+  feed_DESC
+  id_ASC
+  id_DESC
+  createdAt_ASC
+  createdAt_DESC
+  updatedAt_ASC
+  updatedAt_DESC
+  deletedAt_ASC
+  deletedAt_DESC
+}
+
+input AnimalWhere {
+  AND: [AnimalFilter!]
+  OR: [AnimalFilter!]
+  NOT: AnimalFilter
+  name: String
+  name_not: String
+  name_in: [String!]
+  name_not_in: [String!]
+  tame: Boolean
+  tame_not: Boolean
+  feed: EatingType
+  feed_not: EatingType
+  feed_in: [EatingType!]
+  feed_not_in: [EatingType!]
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+}
+
+\\"\\"\\"Use JavaScript Date object for date/time fields.\\"\\"\\"
+scalar DateTime
+
+\\"\\"\\"What is this animal eating\\"\\"\\"
+scalar EatingType
+
+interface List {
+  page: Page
+  nodes: [Node!]!
+}
+
+interface Node {
+  id: ID
+  createdAt: DateTime
+  updatedAt: DateTime
+  deletedAt: DateTime
+}
+
+type Page {
+  page: Int
+  limit: Int
+  offset: Int
+}
+
+type Query {
+  getAnimal(where: AnimalWhere!, order: AnimalSortOrder): Animal
+  getAnimals(order: AnimalSortOrder, page: AnimalPage, where: AnimalWhere!): Animals
+}
+"
+`;
