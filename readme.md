@@ -259,6 +259,10 @@ But we will want to fetch any `Animals` as well.
 
 Now we can find any animal with a `getAnimal(where: { name: "Fluffy" }) { ... on Dog { … }}` or find our Dog directly `getDog(where: { name: "Fluffy" }) { … }`.
 
+### Scalars
+
+
+
 ## Contributing
 
 If you want to help with this project, just leave a bug report or pull request.

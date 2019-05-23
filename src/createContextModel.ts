@@ -27,6 +27,19 @@ import * as DataTypes from './data-types'
 import { filter } from './input-types'
 import { toList } from './utils'
 
+const fieldBuilderFn = <Context>(context: Wrapped<Context>) => <Type>(
+  fields: GraphQLFieldConfigMap<any, any>,
+  attr: AttributeBuilder<Context, Type, any>,
+) => {
+  fields[attr.name] = attr.build(context)
+  return fields
+}
+
+const fieldBuilder = <Context>(context: Wrapped<Context>) => <Type>(
+  fields: Array<AttributeBuilder<Context, Type, any>>,
+): GraphQLFieldConfigMap<any, any> =>
+  reduce(fields, fieldBuilderFn(context), {})
+
 export const createContextModel = <Context, Type>(
   model: ModelBuilder<Context, any>,
   service: Service<Type>,
@@ -34,16 +47,7 @@ export const createContextModel = <Context, Type>(
   visibility: ModelVisibility,
 ) => {
   type Attribute = AttributeBuilder<Context, Type, any>
-  const buildFields = (fields: Attribute[]): GraphQLFieldConfigMap<any, any> =>
-    reduce(
-      fields,
-      (fields, attr) => {
-        fields[attr.name] = attr.build(context)
-        return fields
-      },
-      {},
-    )
-
+  const buildFields = fieldBuilder(context)
   const fields: Attribute[] = []
   const getFields = () => buildFields(fields)
   let contextModelIsInterface: boolean = false
