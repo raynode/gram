@@ -56,14 +56,15 @@ export const reduceFields = <
 >(
   models: Record<string, ModelBuilder<Context, any>>,
   reducers: Record<ReducerKeys, FieldReducerFn<Context>>,
+  fields: Record<ReducerKeys, GraphQLFieldConfigMap<any, any>>,
 ): Record<ReducerKeys, GraphQLFieldConfigMap<any, any>> =>
   reduce(
     reducers,
     (fields, reducer, name) => ({
       ...fields,
-      [name]: reduce(models, reducer, {}),
+      [name]: reduce(models, reducer, fields[name]),
     }),
-    {} as any,
+    fields,
   )
 
 export type ToContextFnResult<Context> = ContextFn<

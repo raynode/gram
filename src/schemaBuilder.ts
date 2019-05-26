@@ -13,6 +13,7 @@ import {
   GraphQLSchemaConfig,
   GraphQLString,
   GraphQLType,
+  isType,
 } from 'graphql'
 import { GraphQLJSONObject } from 'graphql-type-json'
 import { filter, forEach, reduce } from 'lodash'
@@ -28,6 +29,7 @@ import { createFilterStrategy, defaultMiddlewares } from './strategies/filter'
 import {
   ContextModel,
   ContextMutator,
+  ContextResolver,
   FieldDefinition,
   FilterMiddleware,
   GenericGraphQLType,
@@ -132,6 +134,10 @@ export const createSchemaBuilder = <Context = any>(): SchemaBuilder<
   const models: Models<Context> = createBaseModels<Context>()
   const scalars: Record<string, GraphQLScalarType> = { DateTime }
   const filters = defaultMiddlewares
+  const typeResolvers: Record<
+    string,
+    { resolver: ContextResolver<Context>; type: any }
+  > = {}
 
   const builder: SchemaBuilder<Context> = {
     type: SCHEMABUILDER,
@@ -160,12 +166,34 @@ export const createSchemaBuilder = <Context = any>(): SchemaBuilder<
       filter(models, model => model.isInterface()).forEach(model =>
         model.build(wrapped),
       )
+      const query: any = reduce(
+        typeResolvers,
+        (memo, { resolver, type: contextType }, typeName) => {
+          const type = isType(contextType)
+            ? contextType
+            : wrapped.getModel(contextType.name).getType()
+          memo[typeName] = {
+            type,
+            resolve: resolver(wrapped),
+          }
+          return memo
+        },
+        {},
+      )
       // create the query, mutation and subscription fields
-      return reduceFields(models, {
-        query: queryFieldsReducer(wrapped),
-        mutation: mutationFieldsReducer(wrapped),
-        subscription: subscriptionFieldsReducer(wrapped),
-      })
+      return reduceFields(
+        models,
+        {
+          query: queryFieldsReducer(wrapped),
+          mutation: mutationFieldsReducer(wrapped),
+          subscription: subscriptionFieldsReducer(wrapped),
+        },
+        {
+          mutation: {},
+          query,
+          subscription: {},
+        },
+      )
     },
     setScalar: (key, type) => {
       scalars[key] = type
@@ -174,6 +202,10 @@ export const createSchemaBuilder = <Context = any>(): SchemaBuilder<
     getScalar: key => scalars[key],
     addFilter: (check, filter) => {
       filters.push([check, filter])
+      return builder
+    },
+    addType: (name, type, resolver) => {
+      typeResolvers[name] = { resolver, type }
       return builder
     },
   }
