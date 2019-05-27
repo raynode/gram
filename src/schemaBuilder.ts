@@ -29,7 +29,6 @@ import { createFilterStrategy, defaultMiddlewares } from './strategies/filter'
 import {
   ContextModel,
   ContextMutator,
-  ContextResolver,
   FieldDefinition,
   FilterMiddleware,
   GenericGraphQLType,
@@ -130,9 +129,10 @@ export const createSchema = (definition: FieldDefinition) => {
   return new GraphQLSchema(schema)
 }
 
-export const createSchemaBuilder = <Context = any>(): SchemaBuilder<
-  Context
-> => {
+export const createSchemaBuilder = <
+  Context = any,
+  QueryContext = any
+>(): SchemaBuilder<Context> => {
   const models: Models<Context> = createBaseModels<Context>()
   const scalars: Record<string, GraphQLScalarType> = { DateTime }
   const filters = defaultMiddlewares
@@ -168,18 +168,16 @@ export const createSchemaBuilder = <Context = any>(): SchemaBuilder<
         model.build(wrapped),
       )
       const query: any = typeResolvers.reduce((memo, queryDefinition) => {
-        const { args, name, resolver, type: contextType } = extractData(
-          queryDefinition,
-        )(wrapped)
+        const {
+          args,
+          name,
+          resolver: resolve,
+          type: contextType,
+        } = extractData(queryDefinition)(wrapped)
         const type = isType(contextType)
           ? contextType
           : wrapped.getModel(contextType.name).getType()
-        memo[name] = {
-          name,
-          type,
-          args,
-          resolve: resolver(wrapped),
-        }
+        memo[name] = { name, type, args, resolve }
         return memo
       }, {})
       // create the query, mutation and subscription fields

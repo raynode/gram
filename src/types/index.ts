@@ -61,10 +61,6 @@ export type FieldDefinition = Record<
   GraphQLFieldConfigMap<any, any>
 >
 
-export type ContextResolver<Context> = (
-  context: Wrapped<Context>,
-) => GraphQLFieldResolver<any, any>
-
 export interface ContextModel<Context, Type> {
   addField: <AttributeType>(
     field: AttributeBuilder<Context, Type, AttributeType>,
@@ -116,12 +112,18 @@ export type WithContext<Context, Type> = Type | ContextFn<Context, Type>
 
 export type ModelType<Context> = GraphQLType | ContextModel<Context, any>
 
-export interface QueryTypeDefinition<Context, Type> {
+export interface QueryTypeDefinition<
+  Context,
+  Type,
+  SchemaContext = any,
+  Args extends Record<string, any> = any
+> {
   name: string
-  args?: Record<string, any>
+  args?: Args
   type: GraphQLType | ModelBuilder<Context, Type>
-  resolver: ContextResolver<Context>
+  resolver: GraphQLFieldResolver<null, SchemaContext, Args>
 }
+// GraphQLFieldResolver<TSource, TContext, TArgs>
 
 export interface SchemaBuilder<Context> extends Builder {
   build: (context?: Context | FieldDefinition) => GraphQLSchema

@@ -25,34 +25,30 @@ describe('testing the example 1', () => {
       authId?: string
     }
 
-    const builder = createSchemaBuilder<SchemaTypes>()
+    const builder = createSchemaBuilder<SchemaTypes, GQLContext>()
     const user = builder.model('User')
     user.attr('email', GraphQLString)
 
-    builder.addQuery({
+    builder.addQuery(({ context }) => ({
       name: 'context',
       type: GraphQLString,
-      resolver: ({ context }) => () => context,
-    })
+      resolver: () => context,
+    }))
 
-    builder.addQuery({
+    builder.addQuery(({ context }) => ({
       name: 'me',
       type: user,
-      resolver: ({ context: schemaContext }) => (
-        root,
-        args,
-        context?: GQLContext,
-      ) => {
-        if (!context) throw new Error('Need an authToken-context')
-        if (schemaContext === 'user' && !context.authToken)
+      resolver: (root, args, queryContext) => {
+        if (!queryContext) throw new Error('Need an authToken-context')
+        if (context === 'user' && !queryContext.authToken)
           throw new Error('Need an user:authToken')
-        if (!context.authId) throw new Error('Need an authID')
+        if (!queryContext.authId) throw new Error('Need an authID')
         return {
-          id: context.authId,
-          email: schemaContext === 'admin' ? 'admin' : context.authToken,
+          id: queryContext.authId,
+          email: context === 'admin' ? 'admin' : queryContext.authToken,
         }
       },
-    })
+    }))
 
     const adminSchema = builder.build('admin')
     const userSchema = builder.build('user')

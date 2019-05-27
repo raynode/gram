@@ -15,7 +15,7 @@ describe('testing the example 1', () => {
 
     builder.addQuery({
       name: 'random',
-      resolver: () => () => {
+      resolver: () => {
         randomNumber = Math.random()
         return randomNumber
       },
