@@ -13,9 +13,13 @@ describe('testing the example 1', () => {
     const builder = createSchemaBuilder()
     let randomNumber: number
 
-    builder.addQuery('random', GraphQLFloat, () => () => {
-      randomNumber = Math.random()
-      return randomNumber
+    builder.addQuery({
+      name: 'random',
+      resolver: () => () => {
+        randomNumber = Math.random()
+        return randomNumber
+      },
+      type: GraphQLFloat,
     })
 
     const schema = builder.build()

@@ -29,12 +29,20 @@ describe('testing the example 1', () => {
     const user = builder.model('User')
     user.attr('email', GraphQLString)
 
-    builder.addQuery('context', GraphQLString, ({ context }) => () => context)
+    builder.addQuery({
+      name: 'context',
+      type: GraphQLString,
+      resolver: ({ context }) => () => context,
+    })
 
-    builder.addQuery(
-      'me',
-      user,
-      ({ context: schemaContext }) => (root, args, context?: GQLContext) => {
+    builder.addQuery({
+      name: 'me',
+      type: user,
+      resolver: ({ context: schemaContext }) => (
+        root,
+        args,
+        context?: GQLContext,
+      ) => {
         if (!context) throw new Error('Need an authToken-context')
         if (schemaContext === 'user' && !context.authToken)
           throw new Error('Need an user:authToken')
@@ -44,7 +52,7 @@ describe('testing the example 1', () => {
           email: schemaContext === 'admin' ? 'admin' : context.authToken,
         }
       },
-    )
+    })
 
     const adminSchema = builder.build('admin')
     const userSchema = builder.build('user')
@@ -66,6 +74,10 @@ describe('testing the example 1', () => {
         authToken: 'My@Token.com',
       },
     })
+    expect(printSchema(adminSchema)).toMatchSnapshot()
+    expect(printSchema(userSchema)).toMatchSnapshot()
+    expect(adminResult).not.toHaveProperty('errors')
+    expect(userResult).not.toHaveProperty('errors')
     expect(userResult.data).toEqual({
       context: 'user',
       me: { email: 'My@Token.com' },
@@ -74,6 +86,5 @@ describe('testing the example 1', () => {
       context: 'admin',
       me: { email: 'admin' },
     })
-    expect(printSchema(userSchema)).toMatchSnapshot()
   })
 })

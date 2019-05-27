@@ -112,7 +112,16 @@ export type ContextModelFieldFn<Type> = <Context>(
   contextModel: ContextModel<Context, Type>,
 ) => Type
 
+export type WithContext<Context, Type> = Type | ContextFn<Context, Type>
+
 export type ModelType<Context> = GraphQLType | ContextModel<Context, any>
+
+export interface QueryTypeDefinition<Context, Type> {
+  name: string
+  args?: Record<string, any>
+  type: GraphQLType | ModelBuilder<Context, Type>
+  resolver: ContextResolver<Context>
+}
 
 export interface SchemaBuilder<Context> extends Builder {
   build: (context?: Context | FieldDefinition) => GraphQLSchema
@@ -131,9 +140,7 @@ export interface SchemaBuilder<Context> extends Builder {
   getScalar: (key: string) => GraphQLScalarType
   addFilter: (check: FilterCheckFn, filter: FilterFn) => this
   addQuery: <Type>(
-    name: string,
-    type: Type,
-    resolver: ContextResolver<Context>,
+    queryDefinition: WithContext<Context, QueryTypeDefinition<Context, Type>>,
   ) => this
   // addMutation: () => this
 }

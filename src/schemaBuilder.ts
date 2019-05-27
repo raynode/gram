@@ -37,13 +37,15 @@ import {
   ModelBuilder,
   NodeType,
   PageData,
+  QueryTypeDefinition,
   SchemaBuilder,
   Service,
+  WithContext,
   Wrapped,
 } from './types'
 import { SCHEMABUILDER } from './types/constants'
 import { isFieldDefinition } from './types/guards'
-import { reduceFields } from './utils'
+import { extractData, reduceFields } from './utils'
 
 const wrapContext = <Context>(
   context: Context | null,
@@ -134,10 +136,9 @@ export const createSchemaBuilder = <Context = any>(): SchemaBuilder<
   const models: Models<Context> = createBaseModels<Context>()
   const scalars: Record<string, GraphQLScalarType> = { DateTime }
   const filters = defaultMiddlewares
-  const typeResolvers: Record<
-    string,
-    { resolver: ContextResolver<Context>; type: any }
-  > = {}
+  const typeResolvers: Array<
+    WithContext<Context, QueryTypeDefinition<Context, any>>
+  > = []
 
   const builder: SchemaBuilder<Context> = {
     type: SCHEMABUILDER,
@@ -166,20 +167,21 @@ export const createSchemaBuilder = <Context = any>(): SchemaBuilder<
       filter(models, model => model.isInterface()).forEach(model =>
         model.build(wrapped),
       )
-      const query: any = reduce(
-        typeResolvers,
-        (memo, { resolver, type: contextType }, typeName) => {
-          const type = isType(contextType)
-            ? contextType
-            : wrapped.getModel(contextType.name).getType()
-          memo[typeName] = {
-            type,
-            resolve: resolver(wrapped),
-          }
-          return memo
-        },
-        {},
-      )
+      const query: any = typeResolvers.reduce((memo, queryDefinition) => {
+        const { args, name, resolver, type: contextType } = extractData(
+          queryDefinition,
+        )(wrapped)
+        const type = isType(contextType)
+          ? contextType
+          : wrapped.getModel(contextType.name).getType()
+        memo[name] = {
+          name,
+          type,
+          args,
+          resolve: resolver(wrapped),
+        }
+        return memo
+      }, {})
       // create the query, mutation and subscription fields
       return reduceFields(
         models,
@@ -204,8 +206,8 @@ export const createSchemaBuilder = <Context = any>(): SchemaBuilder<
       filters.push([check, filter])
       return builder
     },
-    addQuery: (name, type, resolver) => {
-      typeResolvers[name] = { resolver, type }
+    addQuery: definition => {
+      typeResolvers.push(definition)
       return builder
     },
   }

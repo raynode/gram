@@ -25,3 +25,29 @@ type User implements Node {
 }
 "
 `;
+
+exports[`testing the example 1 should build the example code 2`] = `
+"\\"\\"\\"Use JavaScript Date object for date/time fields.\\"\\"\\"
+scalar DateTime
+
+interface Node {
+  id: ID
+  createdAt: DateTime
+  updatedAt: DateTime
+  deletedAt: DateTime
+}
+
+type Query {
+  context: String
+  me: User
+}
+
+type User implements Node {
+  email: String
+  id: ID
+  createdAt: DateTime
+  updatedAt: DateTime
+  deletedAt: DateTime
+}
+"
+`;

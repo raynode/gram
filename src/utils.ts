@@ -21,8 +21,17 @@ import {
   ModelBuilder,
   ModelType,
   PageData,
+  WithContext,
   Wrapped,
 } from './types'
+
+export const isContextFn = <Context, Type>(
+  val: any,
+): val is ContextFn<Context, Type> => typeof val === 'function'
+
+export const extractData = <Context, Type>(
+  data: WithContext<Context, Type>,
+) => (context: Wrapped<Context>) => (isContextFn(data) ? data(context) : data)
 
 export const record = (service: Record<string, any>) => ({
   exists: (key: string) =>
