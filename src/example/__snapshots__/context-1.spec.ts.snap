@@ -1,0 +1,27 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`testing the example 1 should build the example code 1`] = `
+"\\"\\"\\"Use JavaScript Date object for date/time fields.\\"\\"\\"
+scalar DateTime
+
+interface Node {
+  id: ID
+  createdAt: DateTime
+  updatedAt: DateTime
+  deletedAt: DateTime
+}
+
+type Query {
+  context: String
+  me: User
+}
+
+type User implements Node {
+  email: String
+  id: ID
+  createdAt: DateTime
+  updatedAt: DateTime
+  deletedAt: DateTime
+}
+"
+`;
