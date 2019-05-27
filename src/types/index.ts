@@ -61,6 +61,10 @@ export type FieldDefinition = Record<
   GraphQLFieldConfigMap<any, any>
 >
 
+export type ContextResolver<Context> = (
+  context: Wrapped<Context>,
+) => GraphQLFieldResolver<any, any>
+
 export interface ContextModel<Context, Type> {
   addField: <AttributeType>(
     field: AttributeBuilder<Context, Type, AttributeType>,
@@ -126,6 +130,12 @@ export interface SchemaBuilder<Context> extends Builder {
   setScalar: <Type extends GraphQLScalarType>(key: string, type: Type) => Type
   getScalar: (key: string) => GraphQLScalarType
   addFilter: (check: FilterCheckFn, filter: FilterFn) => this
+  addType: <Type>(
+    name: string,
+    type: Type,
+    resolver: ContextResolver<Context>,
+  ) => this
+  // addMutation: () => this
 }
 
 export interface ModelBuilder<Context, Type> extends Builder {
@@ -156,7 +166,7 @@ export interface AttributeBuilder<Context, Type, AttributeType>
   field: ContextFn<Context, GraphQLType | ContextModel<Context, Type>>
   nullable: boolean
   listType: boolean
-  resolve: (resolver: GraphQLFieldResolver<Type, Context>) => this
+  resolve: (resolver: GraphQLFieldResolver<Type, any>) => this
   isList: (isList?: boolean) => this
   isNotNullable: (isNotNullable?: boolean) => this
   // contextType: ContextFn<Context, ModelType<Context>>

@@ -330,6 +330,64 @@ To add this we will to setup this.
   }
 ```
 
+### Direct Queries & Mutations
+
+```typescript
+```
+
+### Context
+
+The schema builder will allow you to create different schemas from one definition.
+When accessing a graphql endpoint we always need to keep in mind who and with what rights the access is done.
+
+```typescript
+  type SchemaTypes = 'admin' | 'user'
+
+  const user = builder.model('User')
+  user.attr('email', GraphQLString)
+
+  builder.addType('context', GraphQLString, ({ context }) => () => context)
+  builder.addType(
+    'me',
+    user,
+    ({ context: schemaContext }) => (root, args, context?: GQLContext) => {
+      if (!context) throw new Error('Need an authToken-context')
+      if (schemaContext === 'user' && !context.authToken)
+        throw new Error('Need an user:authToken')
+      if (!context.authId) throw new Error('Need an authID')
+      return {
+        id: context.authId,
+        email: schemaContext === 'admin' ? 'admin' : context.authToken,
+      }
+    },
+  )
+
+  const adminSchema = builder.build('admin')
+  const userSchema = builder.build('user')
+  const query = `{ context me { email }}`
+
+  const adminResult = await graphql({
+    schema: adminSchema,
+    source: query,
+    contextValue: {
+      authId: 'AdminID',
+    },
+  })
+  const userResult = await graphql({
+    schema: userSchema,
+    source: query,
+    contextValue: {
+      authId: 'AuthenticationID',
+      authToken: 'My@Token.com',
+    },
+  })
+```
+
+This will generate 2 different graphql schema.
+The user-schema will be used for requests against the graphql system when the request is authenticated and identified to be a normal user.
+The admin-schema will then be used for requests from the system administrators.
+
+
 ## Contributing
 
 If you want to help with this project, just leave a bug report or pull request.
