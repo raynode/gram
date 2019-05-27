@@ -332,7 +332,17 @@ To add this we will to setup this.
 
 ### Direct Queries & Mutations
 
+With `gram` you could also just build up a graphQL schema by hand, it provides all necessary method to do so.
+
 ```typescript
+  const builder = createSchemaBuilder()
+  builder.addQuery('random', GraphQLFloat, () => Math.random)
+```
+
+```graphQL
+  type Query {
+    random: Float
+  }
 ```
 
 ### Context
@@ -342,12 +352,13 @@ When accessing a graphql endpoint we always need to keep in mind who and with wh
 
 ```typescript
   type SchemaTypes = 'admin' | 'user'
+  const builder = createSchemaBuilder<SchemaTypes>()
 
   const user = builder.model('User')
   user.attr('email', GraphQLString)
 
-  builder.addType('context', GraphQLString, ({ context }) => () => context)
-  builder.addType(
+  builder.addQuery('context', GraphQLString, ({ context }) => () => context)
+  builder.addQuery(
     'me',
     user,
     ({ context: schemaContext }) => (root, args, context?: GQLContext) => {

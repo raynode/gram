@@ -1,0 +1,8 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`testing the example 1 should build the example code 1`] = `
+"type Query {
+  random: Float
+}
+"
+`;

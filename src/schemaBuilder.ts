@@ -204,7 +204,7 @@ export const createSchemaBuilder = <Context = any>(): SchemaBuilder<
       filters.push([check, filter])
       return builder
     },
-    addType: (name, type, resolver) => {
+    addQuery: (name, type, resolver) => {
       typeResolvers[name] = { resolver, type }
       return builder
     },

@@ -130,7 +130,7 @@ export interface SchemaBuilder<Context> extends Builder {
   setScalar: <Type extends GraphQLScalarType>(key: string, type: Type) => Type
   getScalar: (key: string) => GraphQLScalarType
   addFilter: (check: FilterCheckFn, filter: FilterFn) => this
-  addType: <Type>(
+  addQuery: <Type>(
     name: string,
     type: Type,
     resolver: ContextResolver<Context>,

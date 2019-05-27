@@ -29,9 +29,9 @@ describe('testing the example 1', () => {
     const user = builder.model('User')
     user.attr('email', GraphQLString)
 
-    builder.addType('context', GraphQLString, ({ context }) => () => context)
+    builder.addQuery('context', GraphQLString, ({ context }) => () => context)
 
-    builder.addType(
+    builder.addQuery(
       'me',
       user,
       ({ context: schemaContext }) => (root, args, context?: GQLContext) => {
@@ -50,8 +50,7 @@ describe('testing the example 1', () => {
     const userSchema = builder.build('user')
 
     const source = `{ context me { email }}`
-    // console.log(printSchema(adminSchema))
-    // console.log(printSchema(userSchema))
+
     const adminResult = await graphql({
       schema: adminSchema,
       source,
