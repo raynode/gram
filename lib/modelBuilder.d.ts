@@ -1,2 +1,2 @@
 import { ContextMutator, ModelBuilder, Service } from './types';
-export declare const createModelBuilder: <Context, Type>(modelName: string, service: Service<Type, Type>, contextFn?: ContextMutator<Context, Type>) => ModelBuilder<Context, Type>;
+export declare const createModelBuilder: <Context, Type, GQLType = Type>(modelName: string, service: Service<Type, GQLType>, contextFn?: ContextMutator<Context, Type, GQLType>) => ModelBuilder<Context, Type, GQLType>;

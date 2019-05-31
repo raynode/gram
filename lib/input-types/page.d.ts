@@ -1,2 +1,2 @@
 /// <reference types="lodash" />
-export declare const page: ((contextModel: import("..").ContextModel<unknown, any>) => import("graphql").GraphQLInputObjectType) & import("lodash").MemoizedFunction;
+export declare const page: ((contextModel: import("..").ContextModel<unknown, any, any>) => import("graphql").GraphQLInputObjectType) & import("lodash").MemoizedFunction;

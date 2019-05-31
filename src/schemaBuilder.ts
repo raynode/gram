@@ -96,7 +96,7 @@ const createBaseModels = <Context>() => {
   }
 }
 
-type Models<Context> = Record<string, ModelBuilder<Context, any>>
+type Models<Context> = Record<string, ModelBuilder<Context, any, any>>
 
 const setup = <Context>(
   models: Models<Context>,
@@ -129,10 +129,7 @@ export const createSchema = (definition: FieldDefinition) => {
   return new GraphQLSchema(schema)
 }
 
-export const createSchemaBuilder = <
-  Context = any,
-  QueryContext = any
->(): SchemaBuilder<Context, QueryContext> => {
+export const createSchemaBuilder = <Context = any, QueryContext = any>() => {
   const models: Models<Context> = createBaseModels<Context>()
   const scalars: Record<string, GraphQLScalarType> = { DateTime }
   const filters = defaultMiddlewares
@@ -140,11 +137,17 @@ export const createSchemaBuilder = <
     WithContext<Context, QueryTypeDefinition<Context, any, QueryContext>>
   > = []
 
-  const builder: SchemaBuilder<Context> = {
+  const builder: SchemaBuilder<Context, QueryContext> = {
     type: SCHEMABUILDER,
     models,
-    model: <Type>(modelName: string, service: Service<Type>) => {
-      const model = createModelBuilder<Context, Type>(modelName, service || {})
+    model: <Type, GQLType = Type>(
+      modelName: string,
+      service: Service<Type, GQLType>,
+    ) => {
+      const model = createModelBuilder<Context, Type, GQLType>(
+        modelName,
+        service || {},
+      )
       models[modelName] = model
       return model.interface('Node')
     },

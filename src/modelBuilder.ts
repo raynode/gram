@@ -30,13 +30,13 @@ const serviceToVisibility = (service: Service<any>): ModelVisibility => {
   }
 }
 
-export const createModelBuilder = <Context, Type>(
+export const createModelBuilder = <Context, Type, GQLType = Type>(
   modelName: string,
-  service: Service<Type>,
-  contextFn?: ContextMutator<Context, Type>,
-): ModelBuilder<Context, Type> => {
+  service: Service<Type, GQLType>,
+  contextFn?: ContextMutator<Context, Type, GQLType>,
+) => {
   const attributes: Attributes<Context, Type> = {}
-  let contextMutation: ContextMutator<Context, Type> = () => null
+  let contextMutation: ContextMutator<Context, Type, GQLType> = () => null
   let listType: GraphQLType | ModelBuilder<Context, any> = null
   let isInterface: boolean = false
   const interfaces: string[] = []
@@ -53,7 +53,7 @@ export const createModelBuilder = <Context, Type>(
         deleteSubscription: false,
       }
 
-  const builder: ModelBuilder<Context, Type> = {
+  const builder: ModelBuilder<Context, Type, GQLType> = {
     type: MODELBUILDER,
     name: modelName,
     getInterfaces: () => interfaces,
@@ -93,7 +93,7 @@ export const createModelBuilder = <Context, Type>(
     },
     build: memoize(
       context => {
-        const contextModel = context.getModel<Type>(modelName)
+        const contextModel = context.getModel<Type, GQLType>(modelName)
         forEach(attributes, attr => contextModel.addField(attr))
         interfaces
           .map(name => context.getBaseModel(name))

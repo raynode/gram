@@ -61,7 +61,7 @@ export type FieldDefinition = Record<
   GraphQLFieldConfigMap<any, any>
 >
 
-export interface ContextModel<Context, Type> {
+export interface ContextModel<Context, Type, GQLType = Type> {
   addField: <AttributeType>(
     field: AttributeBuilder<Context, Type, AttributeType>,
   ) => void
@@ -78,34 +78,41 @@ export interface ContextModel<Context, Type> {
   isInterface: () => boolean
   name: string
   names: Names
-  service: Service<Type>
+  service: Service<Type, GQLType>
   setInterface: () => void
   visibility: ModelVisibility
 }
 
 export interface Wrapped<Context> {
   id: string
-  getBaseModel: <Type>(name: string) => ModelBuilder<Context, Type>
-  getModel: <Type>(name: string) => ContextModel<Context, Type>
-  addModel: <Type>(name: string, model: ContextModel<Context, Type>) => void
+  getBaseModel: <Type, GQLType>(
+    name: string,
+  ) => ModelBuilder<Context, Type, GQLType>
+  getModel: <Type, GQLType>(
+    name: string,
+  ) => ContextModel<Context, Type, GQLType>
+  addModel: <Type, GQLType>(
+    name: string,
+    model: ContextModel<Context, Type, GQLType>,
+  ) => void
   filterStrategy: FilterStrategy
   context: Context | null
   getScalar: (key: string) => GraphQLScalarType
 }
 
 export type ContextModelFn<Result> = <Context>(
-  contextModel: ContextModel<Context, any>,
+  contextModel: ContextModel<Context, any, any>,
 ) => Result
 
 export type ContextFn<Context, Result = boolean> = (
   context: Wrapped<Context>,
 ) => Result
-export type ContextMutator<Context, Type> = (
-  model: ContextModel<Context, Type>,
+export type ContextMutator<Context, Type, GQLType> = (
+  model: ContextModel<Context, Type, GQLType>,
   context: Wrapped<Context>,
 ) => void
-export type ContextModelFieldFn<Type> = <Context>(
-  contextModel: ContextModel<Context, Type>,
+export type ContextModelFieldFn<Type, GQLType> = <Context>(
+  contextModel: ContextModel<Context, Type, GQLType>,
 ) => Type
 
 export type WithContext<Context, Type> = Type | ContextFn<Context, Type>
@@ -131,10 +138,10 @@ export interface SchemaBuilder<Context, QueryContext = any> extends Builder {
     interfaceName: string,
     service?: Service<Type>,
   ) => ModelBuilder<Context, Type>
-  model: <Type>(
+  model: <Type, GQLType = Type>(
     modelName: string,
-    service?: Service<Type>,
-  ) => ModelBuilder<Context, Type>
+    service?: Service<Type, GQLType>,
+  ) => ModelBuilder<Context, Type, GQLType>
   fields: (context: Context | null) => FieldDefinition
   models: Record<string, ModelBuilder<Context, any>>
   type: typeof SCHEMABUILDER
@@ -150,7 +157,7 @@ export interface SchemaBuilder<Context, QueryContext = any> extends Builder {
   // addMutation: () => this
 }
 
-export interface ModelBuilder<Context, Type> extends Builder {
+export interface ModelBuilder<Context, Type, GQLType = Type> extends Builder {
   attr: <AttributeType>(
     attributeName: string,
     type:
@@ -158,8 +165,8 @@ export interface ModelBuilder<Context, Type> extends Builder {
       | ModelBuilder<Context, any>
       | ContextFn<Context, GraphQLType>,
   ) => AttributeBuilder<Context, Type, AttributeType>
-  build: (context: Wrapped<Context>) => ContextModel<Context, Type>
-  context: (contextMutation: ContextMutator<Context, Type>) => this
+  build: (context: Wrapped<Context>) => ContextModel<Context, Type, GQLType>
+  context: (contextMutation: ContextMutator<Context, Type, GQLType>) => this
   getAttributes: () => Attributes<Context, Type>
   getInterfaces: () => string[]
   getListType: () => GraphQLType | ModelBuilder<Context, any>
@@ -175,7 +182,7 @@ export interface ModelBuilder<Context, Type> extends Builder {
 export interface AttributeBuilder<Context, Type, AttributeType>
   extends Builder {
   name: string
-  field: ContextFn<Context, GraphQLType | ContextModel<Context, Type>>
+  field: ContextFn<Context, GraphQLType | ContextModel<Context, Type, any>>
   nullable: boolean
   listType: boolean
   resolve: (resolver: GraphQLFieldResolver<Type, any>) => this

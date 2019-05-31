@@ -40,9 +40,9 @@ const fieldBuilder = <Context>(context: Wrapped<Context>) => <Type>(
 ): GraphQLFieldConfigMap<any, any> =>
   reduce(fields, fieldBuilderFn(context), {})
 
-export const createContextModel = <Context, Type>(
+export const createContextModel = <Context, Type, GQLType = Type>(
   model: ModelBuilder<Context, any>,
-  service: Service<Type>,
+  service: Service<Type, GQLType>,
   context: Wrapped<Context>,
   visibility: ModelVisibility,
 ) => {
@@ -52,7 +52,7 @@ export const createContextModel = <Context, Type>(
   const getFields = () => buildFields(fields)
   let contextModelIsInterface: boolean = false
 
-  const contextModel: ContextModel<Context, Type> = {
+  const contextModel: ContextModel<Context, Type, GQLType> = {
     addField: (field: Attribute) => {
       fields.push(field)
       return field

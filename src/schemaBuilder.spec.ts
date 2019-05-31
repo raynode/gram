@@ -51,7 +51,7 @@ describe('example', () => {
   })
 
   it('should add User to the Schema', () => {
-    const user = builder.model<User>('User', Users)
+    const user = builder.model('User', Users)
     user.attr('name', GraphQLString)
     user.attr('friends', user).isList()
     const schema = builder.build(0)
@@ -59,7 +59,7 @@ describe('example', () => {
   })
 
   it('should add account to the model', () => {
-    const account = builder.model<Account>('Account', Accounts)
+    const account = builder.model('Account', Accounts)
 
     // will add input types for "STRING"
     account.attr('name', GraphQLString)

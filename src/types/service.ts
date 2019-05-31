@@ -1,8 +1,8 @@
 export type AnyPartial<Type> = { [Key in keyof Type]?: any }
 
 export type Filter<Type> = {
-  AND?: Filter<Type>;
-  OR?: Filter<Type>;
+  AND?: Array<Filter<Type>>;
+  OR?: Array<Filter<Type>>;
 } & AnyPartial<Type>
 
 export type Where<Type> = Partial<Filter<Type>>

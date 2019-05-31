@@ -1,6 +1,6 @@
 /// <reference types="lodash" />
 import { GraphQLNonNull, GraphQLOutputType } from 'graphql';
-export declare const findOne: ((contextModel: import("..").ContextModel<unknown, any>) => {
+export declare const findOne: ((contextModel: import("..").ContextModel<unknown, any, any>) => {
     args: {
         [x: string]: {
             type: GraphQLNonNull<import("graphql").GraphQLNullableType>;
