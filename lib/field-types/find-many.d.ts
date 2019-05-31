@@ -1,6 +1,6 @@
 /// <reference types="lodash" />
 import { GraphQLNonNull, GraphQLOutputType } from 'graphql';
-export declare const findMany: ((contextModel: import("..").ContextModel<{}, any>) => {
+export declare const findMany: ((contextModel: import("..").ContextModel<unknown, any>) => {
     args: {
         [x: string]: {
             type: import("graphql").GraphQLEnumType;

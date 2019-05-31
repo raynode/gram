@@ -46,24 +46,24 @@
     "lodash": "^4.17.11"
   },
   "peerDependencies": {
-    "graphql": "^14.3.0"
+    "graphql": "^14.3.1"
   },
   "devDependencies": {
     "@types/graphql": "^14.2.0",
     "@types/inflection": "^1.5.28",
     "@types/jest": "^24.0.13",
-    "@types/lodash": "^4.14.130",
+    "@types/lodash": "^4.14.133",
     "@types/uuid": "^3.4.4",
     "coveralls": "^3.0.3",
-    "graphql": "^14.3.0",
+    "graphql": "^14.3.1",
     "husky": "^2.3.0",
     "jest": "^24.8.0",
     "lint-staged": "^8.1.7",
     "prettier": "^1.17.1",
     "rimraf": "^2.6.3",
     "ts-jest": "^24.0.2",
-    "ts-node": "^8.1.0",
-    "tslint": "^5.16.0",
-    "typescript": "^3.4.5"
+    "ts-node": "^8.2.0",
+    "tslint": "^5.17.0",
+    "typescript": "^3.5.1"
   }
 }

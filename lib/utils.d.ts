@@ -42,5 +42,5 @@ export declare const createContextModelFieldFn: <Context>(configFn: (contextMode
     }) => any;
     type: import("graphql").GraphQLScalarType | import("graphql").GraphQLEnumType | GraphQLInputObjectType | GraphQLList<any> | GraphQLNonNull<import("graphql").GraphQLScalarType | import("graphql").GraphQLEnumType | GraphQLInputObjectType | GraphQLList<any>> | GraphQLNonNull<import("graphql").GraphQLNullableType>;
 };
-export declare const createInputType: <Context>(field: DataType, nameFn: ContextModelFn<string>) => ((contextModel: ContextModel<{}, any>) => GraphQLInputObjectType) & import("lodash").MemoizedFunction;
+export declare const createInputType: <Context>(field: DataType, nameFn: ContextModelFn<string>) => ((contextModel: ContextModel<unknown, any>) => GraphQLInputObjectType) & import("lodash").MemoizedFunction;
 export {};

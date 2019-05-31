@@ -1,5 +1,5 @@
 /// <reference types="lodash" />
-export declare const list: ((contextModel: import("..").ContextModel<{}, any>) => {
+export declare const list: ((contextModel: import("..").ContextModel<unknown, any>) => {
     page: {
         type: import("graphql").GraphQLType;
     };
