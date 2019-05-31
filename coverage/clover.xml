@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1559336489589" clover="3.2.0">
-  <project timestamp="1559336489589" name="All files">
+<coverage generated="1559336930815" clover="3.2.0">
+  <project timestamp="1559336930815" name="All files">
     <metrics statements="398" coveredstatements="378" conditionals="131" coveredconditionals="100" methods="164" coveredmethods="146" elements="693" coveredelements="624" complexity="0" loc="398" ncloc="398" packages="9" files="37" classes="37"/>
     <package name="src">
       <metrics statements="231" coveredstatements="220" conditionals="60" coveredconditionals="48" methods="99" coveredmethods="91"/>
@@ -174,36 +174,36 @@
         <line num="125" count="9" type="stmt"/>
         <line num="129" count="17" type="stmt"/>
         <line num="132" count="6" type="stmt"/>
-        <line num="136" count="10" type="stmt"/>
-        <line num="137" count="10" type="stmt"/>
+        <line num="133" count="10" type="stmt"/>
+        <line num="134" count="10" type="stmt"/>
+        <line num="135" count="10" type="stmt"/>
         <line num="138" count="10" type="stmt"/>
-        <line num="141" count="10" type="stmt"/>
-        <line num="143" count="10" type="stmt"/>
-        <line num="147" count="9" type="cond" truecount="2" falsecount="0"/>
-        <line num="148" count="9" type="stmt"/>
-        <line num="149" count="9" type="stmt"/>
-        <line num="152" count="2" type="stmt"/>
-        <line num="156" count="2" type="stmt"/>
-        <line num="157" count="2" type="stmt"/>
-        <line num="158" count="2" type="stmt"/>
-        <line num="161" count="17" type="stmt"/>
-        <line num="165" count="17" type="stmt"/>
-        <line num="167" count="76" type="stmt"/>
-        <line num="168" count="36" type="stmt"/>
-        <line num="170" count="17" type="stmt"/>
-        <line num="176" count="5" type="stmt"/>
-        <line num="177" count="5" type="stmt"/>
+        <line num="140" count="10" type="stmt"/>
+        <line num="147" count="9" type="stmt"/>
+        <line num="151" count="9" type="stmt"/>
+        <line num="152" count="9" type="stmt"/>
+        <line num="155" count="2" type="stmt"/>
+        <line num="159" count="2" type="stmt"/>
+        <line num="160" count="2" type="stmt"/>
+        <line num="161" count="2" type="stmt"/>
+        <line num="164" count="17" type="stmt"/>
+        <line num="168" count="17" type="stmt"/>
+        <line num="170" count="76" type="stmt"/>
+        <line num="171" count="36" type="stmt"/>
+        <line num="173" count="17" type="stmt"/>
+        <line num="179" count="5" type="stmt"/>
         <line num="180" count="5" type="stmt"/>
-        <line num="181" count="5" type="stmt"/>
-        <line num="184" count="17" type="stmt"/>
-        <line num="199" count="2" type="stmt"/>
-        <line num="200" count="2" type="stmt"/>
+        <line num="183" count="5" type="stmt"/>
+        <line num="184" count="5" type="stmt"/>
+        <line num="187" count="17" type="stmt"/>
         <line num="202" count="2" type="stmt"/>
-        <line num="204" count="1" type="stmt"/>
-        <line num="205" count="1" type="stmt"/>
-        <line num="208" count="3" type="stmt"/>
-        <line num="209" count="3" type="stmt"/>
-        <line num="213" count="10" type="stmt"/>
+        <line num="203" count="2" type="stmt"/>
+        <line num="205" count="2" type="stmt"/>
+        <line num="207" count="1" type="stmt"/>
+        <line num="208" count="1" type="stmt"/>
+        <line num="211" count="3" type="stmt"/>
+        <line num="212" count="3" type="stmt"/>
+        <line num="216" count="10" type="stmt"/>
       </file>
       <file name="utils.ts" path="/Users/nox/projects/@raynode/utils/gram/src/utils.ts">
         <metrics statements="45" coveredstatements="42" conditionals="20" coveredconditionals="14" methods="30" coveredmethods="27"/>
