@@ -115,17 +115,17 @@ export type ModelType<Context> = GraphQLType | ContextModel<Context, any>
 export interface QueryTypeDefinition<
   Context,
   Type,
-  SchemaContext = any,
+  QueryContext,
   Args extends Record<string, any> = any
 > {
   name: string
   args?: Args
   type: GraphQLType | ModelBuilder<Context, Type>
-  resolver: GraphQLFieldResolver<null, SchemaContext, Args>
+  resolver: GraphQLFieldResolver<null, QueryContext, Args>
 }
 // GraphQLFieldResolver<TSource, TContext, TArgs>
 
-export interface SchemaBuilder<Context> extends Builder {
+export interface SchemaBuilder<Context, QueryContext = any> extends Builder {
   build: (context?: Context | FieldDefinition) => GraphQLSchema
   interface: <Type>(
     interfaceName: string,
@@ -142,7 +142,10 @@ export interface SchemaBuilder<Context> extends Builder {
   getScalar: (key: string) => GraphQLScalarType
   addFilter: (check: FilterCheckFn, filter: FilterFn) => this
   addQuery: <Type>(
-    queryDefinition: WithContext<Context, QueryTypeDefinition<Context, Type>>,
+    definition: WithContext<
+      Context,
+      QueryTypeDefinition<Context, Type, QueryContext>
+    >,
   ) => this
   // addMutation: () => this
 }

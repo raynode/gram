@@ -124,7 +124,10 @@
 <a name='L76'></a><a href='#L76'>76</a>
 <a name='L77'></a><a href='#L77'>77</a>
 <a name='L78'></a><a href='#L78'>78</a>
-<a name='L79'></a><a href='#L79'>79</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">4x</span>
+<a name='L79'></a><a href='#L79'>79</a>
+<a name='L80'></a><a href='#L80'>80</a>
+<a name='L81'></a><a href='#L81'>81</a>
+<a name='L82'></a><a href='#L82'>82</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -142,15 +145,15 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">336x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">336x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -159,30 +162,33 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">31x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1282x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-yes">282x</span>
-<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-yes">282x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-yes">6x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-yes">14x</span>
+<span class="cline-any cline-yes">6x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">17x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -237,8 +243,10 @@ export interface GraphQLScalarTypeInstance&lt;T extends string&gt;
   extends GraphQLScalarType {
   name: T
 }
-export const isSpecificScalarType = &lt;Type extends string&gt;(name: string) =&gt;
-  (type: GraphQLType): type is GraphQLScalarTypeInstance&lt;Type&gt; =&gt; isScalarType(type) &amp;&amp; type.name === name
+export const isSpecificScalarType = &lt;Type extends string&gt;(name: string) =&gt; (
+  type: GraphQLType,
+): type is GraphQLScalarTypeInstance&lt;Type&gt; =&gt;
+  isScalarType(type) &amp;&amp; type.name === name
 &nbsp;
 export const isGraphQLString = isSpecificScalarType&lt;'String'&gt;('String')
 export const isGraphQLBoolean = isSpecificScalarType&lt;'Boolean'&gt;('Boolean')
@@ -259,34 +267,35 @@ export const defaultMiddlewares: FilterMiddleware[] = [
   [isListType, list],
 ]
 &nbsp;
-export const createFilterStrategy = (middlewares: FilterMiddleware[]): FilterStrategy =&gt;
-  &lt;Type extends GraphQLType = GraphQLType&gt;(
-    inputType: Type | ContextModel&lt;any, any&gt;,
-    inputName?: string,
-  ) =&gt; {
-    const type = getParentType(
-      isType(inputType) ? inputType : <span class="branch-1 cbranch-no" title="branch not covered" >inputType.getType(),</span>
-    )
-    const name = inputName
-      ? inputName
-      : <span class="branch-1 cbranch-no" title="branch not covered" >isType(inputType)</span>
-      ? `F${inputType.toString()}`
-      : inputType.name
-    const list = GraphQLList(GraphQLNonNull(type))
+export const createFilterStrategy = (
+  middlewares: FilterMiddleware[],
+): FilterStrategy =&gt; &lt;Type extends GraphQLType = GraphQLType&gt;(
+  inputType: Type | ContextModel&lt;any, any&gt;,
+  inputName?: string,
+) =&gt; {
+  const type = getParentType(
+    isType(inputType) ? inputType : <span class="branch-1 cbranch-no" title="branch not covered" >inputType.getType(),</span>
+  )
+  const name = inputName
+    ? inputName
+    : <span class="branch-1 cbranch-no" title="branch not covered" >isType(inputType)</span>
+    ? `F${inputType.toString()}`
+    : inputType.name
+  const list = GraphQLList(GraphQLNonNull(type))
 &nbsp;
-    return middlewares.reduce(
-      (result, [check, filter]) =&gt;
-        check(type) ? { ...result, ...filter(name, type, list) } : result,
-      {},
-    )
-  }
+  return middlewares.reduce(
+    (result, [check, filter]) =&gt;
+      check(type) ? { ...result, ...filter(name, type, list) } : result,
+    {},
+  )
+}
 &nbsp;</pre></td></tr>
 </table></pre>
 <div class='push'></div><!-- for sticky footer -->
 </div><!-- /wrapper -->
 <div class='footer quiet pad2 space-top1 center small'>
   Code coverage
-  generated by <a href="https://istanbul.js.org/" target="_blank">istanbul</a> at Thu May 23 2019 11:29:33 GMT+0200 (Central European Summer Time)
+  generated by <a href="https://istanbul.js.org/" target="_blank">istanbul</a> at Fri May 31 2019 20:52:13 GMT+0200 (Central European Summer Time)
 </div>
 </div>
 <script src="../../prettify.js"></script>

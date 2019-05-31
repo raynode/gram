@@ -132,12 +132,12 @@ export const createSchema = (definition: FieldDefinition) => {
 export const createSchemaBuilder = <
   Context = any,
   QueryContext = any
->(): SchemaBuilder<Context> => {
+>(): SchemaBuilder<Context, QueryContext> => {
   const models: Models<Context> = createBaseModels<Context>()
   const scalars: Record<string, GraphQLScalarType> = { DateTime }
   const filters = defaultMiddlewares
-  const typeResolvers: Array<
-    WithContext<Context, QueryTypeDefinition<Context, any>>
+  const queryDefinitions: Array<
+    WithContext<Context, QueryTypeDefinition<Context, any, QueryContext>>
   > = []
 
   const builder: SchemaBuilder<Context> = {
@@ -167,7 +167,7 @@ export const createSchemaBuilder = <
       filter(models, model => model.isInterface()).forEach(model =>
         model.build(wrapped),
       )
-      const query: any = typeResolvers.reduce((memo, queryDefinition) => {
+      const query: any = queryDefinitions.reduce((memo, queryDefinition) => {
         const {
           args,
           name,
@@ -205,7 +205,7 @@ export const createSchemaBuilder = <
       return builder
     },
     addQuery: definition => {
-      typeResolvers.push(definition)
+      queryDefinitions.push(definition)
       return builder
     },
   }
