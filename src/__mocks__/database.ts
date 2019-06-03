@@ -103,9 +103,9 @@ export const reset = () => {
   const user1: User = {
     id: '1',
     name: 'test',
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    deletedAt: null,
+    created_at: new Date(),
+    updated_at: new Date(),
+    deleted_at: null,
     accounts: [],
     friends: [],
   }

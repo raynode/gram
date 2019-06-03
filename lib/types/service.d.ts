@@ -9,12 +9,12 @@ export declare type Filter<Type> = {
 export declare type Where<Type> = Partial<Filter<Type>>;
 export declare type Order = any;
 export declare type Page = any;
-export declare type Data<Type> = Type;
+export declare type Data<Type> = Partial<Type>;
 export interface NodeType {
     id: string;
-    createdAt: Date;
-    updatedAt: Date;
-    deletedAt: Date | null;
+    created_at: Date;
+    updated_at: Date;
+    deleted_at: Date | null;
 }
 export interface ListType<Type extends NodeType> {
     page: PageData;

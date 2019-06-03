@@ -10,13 +10,13 @@ export type Filter<Type> = {
 export type Where<Type> = Partial<Filter<Type>>
 export type Order = any
 export type Page = any
-export type Data<Type> = Type
+export type Data<Type> = Partial<Type>
 
 export interface NodeType {
   id: string
-  createdAt: Date
-  updatedAt: Date
-  deletedAt: Date | null
+  created_at: Date
+  updated_at: Date
+  deleted_at: Date | null
 }
 
 export interface ListType<Type extends NodeType> {
