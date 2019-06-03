@@ -7,5 +7,5 @@ export declare const update: ((contextModel: import("..").ContextModel<unknown, 
         };
     };
     type: GraphQLInputType;
-    resolve: (_: any, args: any, context: any) => Promise<Type>;
+    resolve: (_: any, args: any, context: any) => Promise<Type[]>;
 }) & import("lodash").MemoizedFunction;

@@ -62,6 +62,6 @@ export interface Service<Type, GQLType = Type> {
   findOne?: (args: FindOneArgs<GQLType>) => Promise<Type>
   findMany?: (args: FindOneMany<GQLType>) => Promise<Paged<Type>>
   create?: (args: CreateArgs<GQLType>) => Promise<Type>
-  update?: (args: UpdateArgs<GQLType>) => Promise<Type>
+  update?: (args: UpdateArgs<GQLType>) => Promise<Type[]>
   remove?: (args: RemoveArgs<GQLType>) => Promise<Type[]>
 }
