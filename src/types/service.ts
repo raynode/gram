@@ -1,10 +1,11 @@
-export type AnyPartial<Type> = { [Key in keyof Type]?: any }
+export type AnyPartial<Type> = { [Key in keyof Type]?: Type[Key] }
 
 export type Filter<Type> = {
   AND?: Array<Filter<Type>>;
   OR?: Array<Filter<Type>>;
   NOT?: Filter<Type>;
-} & AnyPartial<Type>
+} & AnyPartial<Type> &
+  Record<string, any>
 
 export type Where<Type> = Partial<Filter<Type>>
 export type Order = any
