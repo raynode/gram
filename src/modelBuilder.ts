@@ -8,6 +8,7 @@ import {
   Attributes,
   ContextFn,
   ContextMutator,
+  GraphQLResolverMap,
   ModelBuilder,
   ModelType,
   ModelVisibility,
@@ -39,6 +40,7 @@ export const createModelBuilder = <Context, Type, GQLType = Type>(
   let contextMutation: ContextMutator<Context, Type, GQLType> = () => null
   let listType: GraphQLType | ModelBuilder<Context, any> = null
   let isInterface: boolean = false
+  let resolver: ContextFn<Context, GraphQLResolverMap<GQLType>> = null
   const interfaces: string[] = []
   const visibility = service
     ? serviceToVisibility(service)
@@ -86,6 +88,7 @@ export const createModelBuilder = <Context, Type, GQLType = Type>(
         service,
         context,
         visibility,
+        resolver ? resolver(context) : {},
       )
       if (contextFn) contextFn(contextModel, context)
       if (isInterface) contextModel.setInterface()
@@ -107,6 +110,10 @@ export const createModelBuilder = <Context, Type, GQLType = Type>(
       },
       context => context.id,
     ),
+    resolve: modelResolver => {
+      resolver = modelResolver
+      return builder
+    },
     context: mutator => {
       contextMutation = mutator
       return builder

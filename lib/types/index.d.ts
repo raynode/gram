@@ -70,8 +70,10 @@ export interface SchemaBuilder<Context, QueryContext = any> extends Builder {
     addFilter: (check: FilterCheckFn, filter: FilterFn) => this;
     addQuery: <Type>(definition: WithContext<Context, QueryTypeDefinition<Context, Type, QueryContext>>) => this;
 }
+export declare type GraphQLResolverMap<GQLType, Attrs extends string = string> = Record<Attrs, GraphQLFieldResolver<GQLType, any, any>>;
 export interface ModelBuilder<Context, Type, GQLType = Type> extends Builder {
     attr: <AttributeType>(attributeName: string, type: ModelType<Context> | ModelBuilder<Context, any> | ContextFn<Context, GraphQLType>) => AttributeBuilder<Context, Type, AttributeType>;
+    resolve: <Attrs extends string>(resolver: ContextFn<Context, GraphQLResolverMap<GQLType, Attrs>>) => this;
     build: (context: Wrapped<Context>) => ContextModel<Context, Type, GQLType>;
     context: (contextMutation: ContextMutator<Context, Type, GQLType>) => this;
     getAttributes: () => Attributes<Context, Type>;

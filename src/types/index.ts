@@ -157,6 +157,11 @@ export interface SchemaBuilder<Context, QueryContext = any> extends Builder {
   // addMutation: () => this
 }
 
+export type GraphQLResolverMap<GQLType, Attrs extends string = string> = Record<
+  Attrs,
+  GraphQLFieldResolver<GQLType, any, any>
+>
+
 export interface ModelBuilder<Context, Type, GQLType = Type> extends Builder {
   attr: <AttributeType>(
     attributeName: string,
@@ -165,6 +170,9 @@ export interface ModelBuilder<Context, Type, GQLType = Type> extends Builder {
       | ModelBuilder<Context, any>
       | ContextFn<Context, GraphQLType>,
   ) => AttributeBuilder<Context, Type, AttributeType>
+  resolve: <Attrs extends string>(
+    resolver: ContextFn<Context, GraphQLResolverMap<GQLType, Attrs>>,
+  ) => this
   build: (context: Wrapped<Context>) => ContextModel<Context, Type, GQLType>
   context: (contextMutation: ContextMutator<Context, Type, GQLType>) => this
   getAttributes: () => Attributes<Context, Type>

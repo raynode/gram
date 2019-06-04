@@ -17,6 +17,7 @@ import {
   AttributeBuilder,
   ContextModel,
   FieldTypes,
+  GraphQLResolverMap,
   ModelBuilder,
   ModelVisibility,
   Service,
@@ -27,27 +28,35 @@ import * as DataTypes from './data-types'
 import { filter } from './input-types'
 import { toList } from './utils'
 
-const fieldBuilderFn = <Context>(context: Wrapped<Context>) => <Type>(
+const fieldBuilderFn = <Context>(
+  context: Wrapped<Context>,
+  resolvers: GraphQLResolverMap<any>,
+) => <Type>(
   fields: GraphQLFieldConfigMap<any, any>,
   attr: AttributeBuilder<Context, Type, any>,
 ) => {
   fields[attr.name] = attr.build(context)
+  if (resolvers[attr.name]) fields[attr.name].resolve = resolvers[attr.name]
   return fields
 }
 
-const fieldBuilder = <Context>(context: Wrapped<Context>) => <Type>(
+const fieldBuilder = <Context>(
+  context: Wrapped<Context>,
+  resolvers: GraphQLResolverMap<any>,
+) => <Type>(
   fields: Array<AttributeBuilder<Context, Type, any>>,
 ): GraphQLFieldConfigMap<any, any> =>
-  reduce(fields, fieldBuilderFn(context), {})
+  reduce(fields, fieldBuilderFn(context, resolvers), {})
 
 export const createContextModel = <Context, Type, GQLType = Type>(
   model: ModelBuilder<Context, any>,
   service: Service<Type, GQLType>,
   context: Wrapped<Context>,
   visibility: ModelVisibility,
+  resolvers: GraphQLResolverMap<GQLType>,
 ) => {
   type Attribute = AttributeBuilder<Context, Type, any>
-  const buildFields = fieldBuilder(context)
+  const buildFields = fieldBuilder(context, resolvers)
   const fields: Attribute[] = []
   const getFields = () => buildFields(fields)
   let contextModelIsInterface: boolean = false

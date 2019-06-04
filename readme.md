@@ -130,6 +130,31 @@ If you, for example, do not have a findMany method, Gram will remove the `getAni
 
 If you want to generate more than one schema from your models, there will be a feature implemented in the near future to enable and disable parts depending on the context given in the build method.
 
+### Model Resolvers
+
+To add a resolver to the model we can use the `.resolve(() => Resolver)` method on the model.
+In this example the database does not have an `age` column, and we need to calculate the age of the animal in the resolver.
+
+```typescript
+  const animal = builder.model('Animal', Animals)
+
+  // animal type like 'dog', 'cat'
+  // field is required
+  animal.attr('type', GraphQLString).isNonNull()
+  // animal name like 'Fluffy', 'Rex'
+  // field is not required
+  animal.attr('name', GraphQLString)
+  // is it a tame animal
+  animal.attr('tame', GraphQLBoolean)
+  // age of the animal
+  animal.attr('age', GraphQLInt)
+
+  animal.resolve(() => ({
+    // calculate the age of the animal
+    age: animal => Math.floor((Date.now() - animal.birthdate) / 1000 / 60 / 60 / 24 / 365)
+  }))
+```
+
 ### Interfaces
 
 Of course our `Animal` model is just an interface to help us build `Cat` and `Dog` models.
