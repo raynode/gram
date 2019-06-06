@@ -22,22 +22,22 @@
       <div class='fl pad1y space-right2'>
         <span class="strong">100% </span>
         <span class="quiet">Statements</span>
-        <span class='fraction'>28/28</span>
+        <span class='fraction'>36/36</span>
       </div>
       <div class='fl pad1y space-right2'>
-        <span class="strong">80% </span>
+        <span class="strong">83.33% </span>
         <span class="quiet">Branches</span>
-        <span class='fraction'>16/20</span>
+        <span class='fraction'>20/24</span>
       </div>
       <div class='fl pad1y space-right2'>
         <span class="strong">100% </span>
         <span class="quiet">Functions</span>
-        <span class='fraction'>9/9</span>
+        <span class='fraction'>12/12</span>
       </div>
       <div class='fl pad1y space-right2'>
         <span class="strong">100% </span>
         <span class="quiet">Lines</span>
-        <span class='fraction'>27/27</span>
+        <span class='fraction'>33/33</span>
       </div>
     </div>
     <p class="quiet">
@@ -127,7 +127,16 @@
 <a name='L79'></a><a href='#L79'>79</a>
 <a name='L80'></a><a href='#L80'>80</a>
 <a name='L81'></a><a href='#L81'>81</a>
-<a name='L82'></a><a href='#L82'>82</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">7x</span>
+<a name='L82'></a><a href='#L82'>82</a>
+<a name='L83'></a><a href='#L83'>83</a>
+<a name='L84'></a><a href='#L84'>84</a>
+<a name='L85'></a><a href='#L85'>85</a>
+<a name='L86'></a><a href='#L86'>86</a>
+<a name='L87'></a><a href='#L87'>87</a>
+<a name='L88'></a><a href='#L88'>88</a>
+<a name='L89'></a><a href='#L89'>89</a>
+<a name='L90'></a><a href='#L90'>90</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -153,9 +162,15 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">372x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">342x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">372x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">342x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -183,7 +198,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">314x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">7x</span>
@@ -193,13 +208,14 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">314x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">314x</span>
 <span class="cline-any cline-yes">314x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">314x</span>
+<span class="cline-any cline-yes">314x</span>
 <span class="cline-any cline-yes">314x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">314x</span>
@@ -220,6 +236,7 @@
   GraphQLType,
   isLeafType,
   isListType,
+  isNullableType,
   isScalarType,
   isType,
 } from 'graphql'
@@ -234,9 +251,15 @@ const hasParentType = (
 ): type is GraphQLNonNull&lt;any&gt; | GraphQLList&lt;any&gt; =&gt;
   type &amp;&amp; type.hasOwnProperty('ofType')
 &nbsp;
+const isNonNullType = (type: GraphQLType): type is GraphQLNonNull&lt;any&gt; =&gt; !isNullableType(type)
+&nbsp;
 const getParentType = (
   type: GraphQLType | GraphQLNonNull&lt;any&gt; | GraphQLList&lt;any&gt;,
 ): GraphQLType =&gt; (hasParentType(type) ? getParentType(type.ofType) : type)
+&nbsp;
+const isList = (type: GraphQLType): type is GraphQLList&lt;any&gt; =&gt; isNonNullType(type)
+  ? isList(type.ofType)
+  : isListType(type)
 &nbsp;
 // sadly no correct typescript-guards, as the GraphQL basic types are not real "Types"
 export interface GraphQLScalarTypeInstance&lt;T extends string&gt;
@@ -264,7 +287,7 @@ export const defaultMiddlewares: FilterMiddleware[] = [
   [isGraphQLBoolean, equals],
   [isIdOrString, joinFilters([equals, record])],
   [isNumeric, joinFilters([equals, numeric])],
-  [isListType, list],
+  [(type, required, isList) =&gt; isScalarType(type) &amp;&amp; isList, list],
 ]
 &nbsp;
 export const createFilterStrategy = (
@@ -273,19 +296,20 @@ export const createFilterStrategy = (
   inputType: Type | ContextModel&lt;any, any&gt;,
   inputName?: string,
 ) =&gt; {
-  const type = getParentType(
-    isType(inputType) ? inputType : <span class="branch-1 cbranch-no" title="branch not covered" >inputType.getType(),</span>
-  )
+  const baseType = isType(inputType) ? inputType : <span class="branch-1 cbranch-no" title="branch not covered" >inputType.getType()</span>
+  const type = getParentType(baseType)
   const name = inputName
     ? inputName
     : <span class="branch-1 cbranch-no" title="branch not covered" >isType(inputType)</span>
     ? `F${inputType.toString()}`
     : inputType.name
   const list = GraphQLList(GraphQLNonNull(type))
+  const isRequired = !isNullableType(baseType)
+  const isListType = isList(baseType)
 &nbsp;
   return middlewares.reduce(
     (result, [check, filter]) =&gt;
-      check(type) ? { ...result, ...filter(name, type, list) } : result,
+      check(type, isRequired, isListType, baseType) ? { ...result, ...filter(name, type, list) } : result,
     {},
   )
 }
@@ -295,7 +319,7 @@ export const createFilterStrategy = (
 </div><!-- /wrapper -->
 <div class='footer quiet pad2 space-top1 center small'>
   Code coverage
-  generated by <a href="https://istanbul.js.org/" target="_blank">istanbul</a> at Tue Jun 04 2019 21:56:52 GMT+0200 (Central European Summer Time)
+  generated by <a href="https://istanbul.js.org/" target="_blank">istanbul</a> at Thu Jun 06 2019 13:25:58 GMT+0200 (Central European Summer Time)
 </div>
 </div>
 <script src="../../prettify.js"></script>

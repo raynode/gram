@@ -37,7 +37,12 @@ export type FilterFn = (
   type: GraphQLType,
   list: GraphQLList<any>,
 ) => Record<string, { type: GraphQLType }>
-export type FilterCheckFn = (type: GraphQLType) => boolean
+export type FilterCheckFn = (
+  type: GraphQLType,
+  required: boolean,
+  list: boolean,
+  baseType: GraphQLType,
+) => boolean
 export type FilterMiddleware = [FilterCheckFn, FilterFn]
 
 export type FilterStrategy = <Type extends GraphQLType = GraphQLType>(

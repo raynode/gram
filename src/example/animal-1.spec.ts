@@ -1,6 +1,7 @@
 import {
   GraphQLBoolean,
   GraphQLInt,
+  GraphQLList,
   GraphQLString,
   printSchema,
 } from 'graphql'

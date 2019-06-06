@@ -11,7 +11,7 @@ export declare type Fields = Thunk<GraphQLFieldConfigMap<any, any>>;
 export declare type FilterFn = (name: string, type: GraphQLType, list: GraphQLList<any>) => Record<string, {
     type: GraphQLType;
 }>;
-export declare type FilterCheckFn = (type: GraphQLType) => boolean;
+export declare type FilterCheckFn = (type: GraphQLType, required: boolean, list: boolean, baseType: GraphQLType) => boolean;
 export declare type FilterMiddleware = [FilterCheckFn, FilterFn];
 export declare type FilterStrategy = <Type extends GraphQLType = GraphQLType>(inputType: Type | ContextModel<any, any>, inputName?: string) => Record<string, {
     type: GraphQLType;

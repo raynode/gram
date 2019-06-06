@@ -10,6 +10,7 @@ import {
   GraphQLType,
   isLeafType,
   isListType,
+  isNullableType,
   isScalarType,
   isType,
 } from 'graphql'
@@ -24,9 +25,15 @@ const hasParentType = (
 ): type is GraphQLNonNull<any> | GraphQLList<any> =>
   type && type.hasOwnProperty('ofType')
 
+const isNonNullType = (type: GraphQLType): type is GraphQLNonNull<any> =>
+  !isNullableType(type)
+
 const getParentType = (
   type: GraphQLType | GraphQLNonNull<any> | GraphQLList<any>,
 ): GraphQLType => (hasParentType(type) ? getParentType(type.ofType) : type)
+
+const isList = (type: GraphQLType): type is GraphQLList<any> =>
+  isNonNullType(type) ? isList(type.ofType) : isListType(type)
 
 // sadly no correct typescript-guards, as the GraphQL basic types are not real "Types"
 export interface GraphQLScalarTypeInstance<T extends string>
@@ -54,7 +61,7 @@ export const defaultMiddlewares: FilterMiddleware[] = [
   [isGraphQLBoolean, equals],
   [isIdOrString, joinFilters([equals, record])],
   [isNumeric, joinFilters([equals, numeric])],
-  [isListType, list],
+  [(type, required, isList) => isScalarType(type) && isList, list],
 ]
 
 export const createFilterStrategy = (
@@ -63,19 +70,22 @@ export const createFilterStrategy = (
   inputType: Type | ContextModel<any, any>,
   inputName?: string,
 ) => {
-  const type = getParentType(
-    isType(inputType) ? inputType : inputType.getType(),
-  )
+  const baseType = isType(inputType) ? inputType : inputType.getType()
+  const type = getParentType(baseType)
   const name = inputName
     ? inputName
     : isType(inputType)
     ? `F${inputType.toString()}`
     : inputType.name
   const list = GraphQLList(GraphQLNonNull(type))
+  const isRequired = !isNullableType(baseType)
+  const isListType = isList(baseType)
 
   return middlewares.reduce(
     (result, [check, filter]) =>
-      check(type) ? { ...result, ...filter(name, type, list) } : result,
+      check(type, isRequired, isListType, baseType)
+        ? { ...result, ...filter(name, type, list) }
+        : result,
     {},
   )
 }
