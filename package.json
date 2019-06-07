@@ -1,6 +1,6 @@
 {
   "name": "gram",
-  "version": "1.0.0",
+  "version": "0.0.0-development",
   "description": "",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
@@ -12,11 +12,12 @@
     "test": "npm run test:coverage",
     "test-only": "jest",
     "test:coverage": "jest --coverage",
-    "test:watch": "jest --watch"
+    "test:watch": "jest --watch",
+    "semantic-release": "semantic-release"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/raynode/gram.git"
+    "url": "https://github.com/raynode/gram.git"
   },
   "husky": {
     "hooks": {
@@ -64,6 +65,7 @@
     "ts-jest": "^24.0.2",
     "ts-node": "^8.2.0",
     "tslint": "^5.17.0",
-    "typescript": "^3.5.1"
+    "typescript": "^3.5.1",
+    "semantic-release": "^15.13.12"
   }
 }
