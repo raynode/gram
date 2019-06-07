@@ -15,7 +15,6 @@ export const joinFilters = (filters: FilterFn[]): FilterFn => (
     {},
   )
 
-export const joinValidators = (filters: FilterCheckFn[]): FilterCheckFn => (
+export const joinValidators = (filters: FilterCheckFn[]): FilterCheckFn =>
   // prettier-ignore
-  ...args,
-) => filters.reduce((valid, check) => valid && check(...args), true)
+  (...args) => filters.reduce((valid, check) => valid && check(...args), true)

@@ -1,6 +1,6 @@
 /// <reference types="lodash" />
-import { GraphQLFieldConfigMap, GraphQLInputFieldConfigMap, GraphQLInputObjectType, GraphQLList, GraphQLNonNull, GraphQLType } from 'graphql';
-import { AttributeBuilder, ContextFn, ContextModel, ContextModelFn, DataType, ModelBuilder, ModelType, PageData, WithContext, Wrapped } from './types';
+import { GraphQLFieldConfigMap, GraphQLInputFieldConfigMap, GraphQLInputObjectType, GraphQLList, GraphQLNonNull, GraphQLType } from "graphql";
+import { AttributeBuilder, ContextFn, ContextModel, ContextModelFn, DataType, ModelBuilder, ModelType, PageData, WithContext, Wrapped } from "./types";
 export declare const isContextFn: <Context, Type>(val: any) => val is ContextFn<Context, Type>;
 export declare const extractData: <Context, Type>(data: WithContext<Context, Type>) => (context: Wrapped<Context>) => Type;
 export declare const record: (service: Record<string, any>) => {
@@ -20,7 +20,7 @@ export declare type ToContextFnResult<Context> = ContextFn<Context, GraphQLType 
 export declare const toContextFn: <Context>(type: import("graphql").GraphQLObjectType<any, any, {
     [key: string]: any;
 }> | import("graphql").GraphQLScalarType | import("graphql").GraphQLInterfaceType | import("graphql").GraphQLUnionType | import("graphql").GraphQLEnumType | GraphQLInputObjectType | GraphQLList<any> | GraphQLNonNull<any> | ContextModel<Context, any, any> | ModelBuilder<Context, any, any> | ContextFn<Context, GraphQLType>) => ContextFn<Context, ModelType<Context>>;
-export declare type TypeCondition = 'nonnull' | 'list' | 'none';
+export declare type TypeCondition = "nonnull" | "list" | "none";
 export declare const toList: <Type extends GraphQLType = GraphQLType>(type: Type) => Type;
 export declare const conditionalList: <Type extends GraphQLType>(type: Type, isList: boolean) => Type;
 export declare const conditionalNonNull: <Type extends GraphQLType>(type: Type, nonNull: boolean) => Type | GraphQLNonNull<import("graphql").GraphQLNullableType>;
