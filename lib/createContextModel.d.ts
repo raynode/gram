@@ -1,2 +1,0 @@
-import { ContextModel, ModelBuilder, ModelVisibility, Service, Wrapped } from "./types";
-export declare const createContextModel: <Context, Type, GQLType = Type>(model: ModelBuilder<Context, any, any>, service: Service<Type, GQLType>, context: Wrapped<Context>, visibility: ModelVisibility, resolvers: Record<string, import("graphql").GraphQLFieldResolver<GQLType, any, any>>) => ContextModel<Context, Type, GQLType>;
