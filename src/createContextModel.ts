@@ -8,7 +8,6 @@ import {
   GraphQLType,
   isType,
 } from 'graphql'
-import { PubSub } from 'graphql-subscriptions'
 import { memoize, reduce } from 'lodash'
 import { v4 as uuid } from 'uuid'
 
@@ -98,7 +97,6 @@ export const createContextModel = <Context, Type, GQLType = Type>(
           interfaces: (): any => [context.getModel('List').getType()],
         }),
     ),
-    getPubSub: memoize(() => new PubSub()),
     getType: memoize(() =>
       contextModelIsInterface
         ? new GraphQLInterfaceType({

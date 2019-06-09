@@ -9,8 +9,13 @@ export const remove = memoizeContextModel(contextModel => ({
     },
   },
   type: toList(contextModel.getType()) as GraphQLInputType,
-  resolve: (_, args, context) =>
-    contextModel.service.remove({
+  resolve: (_, args, context) => {
+    const node = contextModel.service.remove({
       where: args[contextModel.names.arguments.where],
-    }),
+    })
+    contextModel.context.pubSub.publish(contextModel.names.events.delete, {
+      node,
+    })
+    return node
+  },
 }))

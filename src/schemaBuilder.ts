@@ -15,6 +15,7 @@ import {
   GraphQLType,
   isType,
 } from 'graphql'
+import { PubSub } from 'graphql-subscriptions'
 import { GraphQLJSONObject } from 'graphql-type-json'
 import { filter, forEach, reduce } from 'lodash'
 import { v4 as uuid } from 'uuid'
@@ -51,6 +52,7 @@ const wrapContext = <Context>(
   scalars: Record<string, GraphQLScalarType>,
   models: Models<Context>,
   filters: FilterMiddleware[],
+  pubSub: PubSub,
 ): Wrapped<Context> => {
   const contextModels: Record<string, ContextModel<Context, any>> = {}
   return {
@@ -61,6 +63,7 @@ const wrapContext = <Context>(
     getBaseModel: name => models[name],
     getModel: name => contextModels[name],
     getScalar: name => scalars[name],
+    pubSub,
   }
 }
 
@@ -103,8 +106,9 @@ const setup = <Context>(
   scalars: Record<string, GraphQLScalarType>,
   context: Context | null,
   filters: FilterMiddleware[],
+  pubSub: PubSub = new PubSub(),
 ) => {
-  const wrapped = wrapContext(context, scalars, models, filters)
+  const wrapped = wrapContext(context, scalars, models, filters, pubSub)
   forEach(models, model => model.setup(wrapped))
   return wrapped
 }
@@ -133,6 +137,7 @@ export const createSchemaBuilder = <Context = any, QueryContext = any>() => {
   const models: Models<Context> = createBaseModels<Context>()
   const scalars: Record<string, GraphQLScalarType> = { DateTime }
   const filters = defaultMiddlewares
+  let externalPubSub: PubSub = null
   const queryDefinitions: Array<
     WithContext<Context, QueryTypeDefinition<Context, any, QueryContext>>
   > = []
@@ -165,7 +170,8 @@ export const createSchemaBuilder = <Context = any, QueryContext = any>() => {
         isFieldDefinition(context) ? context : builder.fields(context),
       ),
     fields: (context: Context | null = null) => {
-      const wrapped = setup(models, scalars, context, filters)
+      const pubSub = externalPubSub || new PubSub()
+      const wrapped = setup(models, scalars, context, filters, pubSub)
       // build all interfaces
       filter(models, model => model.isInterface()).forEach(model =>
         model.build(wrapped),
@@ -203,6 +209,10 @@ export const createSchemaBuilder = <Context = any, QueryContext = any>() => {
       return type
     },
     getScalar: key => scalars[key],
+    setPubSub: (pubSub: PubSub) => {
+      externalPubSub = pubSub
+      return builder
+    },
     addFilter: (check, filter) => {
       filters.push([check, filter])
       return builder

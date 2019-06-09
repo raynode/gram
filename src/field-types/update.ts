@@ -12,9 +12,14 @@ export const update = memoizeContextModel(contextModel => ({
     },
   },
   type: toList(contextModel.getType()) as GraphQLInputType,
-  resolve: (_, args, context) =>
-    contextModel.service.update({
+  resolve: (_, args, context) => {
+    const node = contextModel.service.update({
       data: args[contextModel.names.arguments.data],
       where: args[contextModel.names.arguments.where],
-    }),
+    })
+    contextModel.context.pubSub.publish(contextModel.names.events.update, {
+      node,
+    })
+    return node
+  },
 }))

@@ -116,8 +116,8 @@ export const conditionalType = <Type extends GraphQLType>(
     ? GraphQLNonNull(type)
     : type
 
-export const memoizeContextModel = <Context, Result, Type = any>(
-  fn: (contextModel: ContextModel<Context, Type>) => Result,
+export const memoizeContextModel = <Context = any, Result = any, Type = any>(
+  fn: (contextModel: ContextModel<Context, Type, any>) => Result,
 ) =>
   memoize(fn, (contextModel: ContextModel<Context, Type>) => contextModel.id)
 
@@ -160,7 +160,7 @@ export const createContextModelFieldFn = <Context>(
 ) => (contextModel: ContextModel<Context, any>) => {
   const { iterator, condition = 'none' } = configFn(contextModel)
   return {
-    subscribe: () => contextModel.getPubSub().asyncIterator(iterator),
+    subscribe: () => contextModel.context.pubSub.asyncIterator(iterator),
     resolve: ({ node }) => node,
     type: conditionalType(contextModel.getType() as GraphQLInputType, condition),
   }

@@ -1,7 +1,7 @@
 import { createContextModelFieldFn } from '../utils'
 
 export const create = createContextModelFieldFn(contextModel => ({
-  iterator: contextModel.names.events.delete,
+  iterator: contextModel.names.events.create,
   condition: 'nonnull',
 }))
 

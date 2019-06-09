@@ -9,8 +9,13 @@ export const create = memoizeContextModel(contextModel => ({
     },
   },
   type: contextModel.getType() as GraphQLInputType,
-  resolve: (_, args, context) =>
-    contextModel.service.create({
+  resolve: (_, args, context) => {
+    const node = contextModel.service.create({
       data: args[contextModel.names.arguments.data],
-    }),
+    })
+    contextModel.context.pubSub.publish(contextModel.names.events.create, {
+      node,
+    })
+    return node
+  },
 }))

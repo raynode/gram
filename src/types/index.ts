@@ -12,6 +12,7 @@ import {
   GraphQLType,
   Thunk,
 } from 'graphql'
+import { PubSub } from 'graphql-subscriptions'
 
 import { Names } from '../strategies/naming'
 import {
@@ -77,7 +78,6 @@ export interface ContextModel<Context, Type, GQLType = Type> {
   ) => GraphQLInputFieldConfigMap | GraphQLFieldConfigMap<any, any>
   getFields: () => Array<AttributeBuilder<Context, Type, any>>
   getListType: () => GraphQLType
-  getPubSub: () => any
   getType: () => GraphQLType
   id: string
   isInterface: () => boolean
@@ -103,6 +103,7 @@ export interface Wrapped<Context> {
   filterStrategy: FilterStrategy
   context: Context | null
   getScalar: (key: string) => GraphQLScalarType
+  pubSub: PubSub
 }
 
 export type ContextModelFn<Result> = <Context>(
@@ -159,6 +160,7 @@ export interface SchemaBuilder<Context, QueryContext = any> extends Builder {
       QueryTypeDefinition<Context, Type, QueryContext>
     >,
   ) => this
+  setPubSub: (pubSub: PubSub) => this
   // addMutation: () => this
 }
 
