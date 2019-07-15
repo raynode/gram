@@ -1,7 +1,7 @@
 import { graphql, GraphQLNonNull, GraphQLString, printSchema } from 'graphql'
 import { makeExecutableSchema } from 'graphql-tools'
 import { createBuild } from '.'
-import { AddNonScalarTypeArgs } from './method-addType'
+import { AddObjectArgsType, AddObjectType } from './method-addType'
 
 const initialPets = [
   {
@@ -62,7 +62,7 @@ describe('createBuild', () => {
     build.addQuery('myScalar', 'MyScalar', () => 'TEST')
     const result = await graphql({
       schema: build.toSchema(),
-      source: '{ test }',
+      source: '{ myScalar }',
     })
     expect(result).toMatchSnapshot()
   })
@@ -70,8 +70,10 @@ describe('createBuild', () => {
   it('should be able to accept a new object type', async () => {
     const build = createBuild()
     build.addType('Pet', 'type', {
-      name: GraphQLString,
-      age: 'Int!',
+      fields: {
+        name: GraphQLString,
+        age: 'Int!',
+      },
     })
     build.addQuery('myPets', '[Pet!]!', () => data.pets)
     const result = await graphql({
@@ -86,7 +88,7 @@ describe('createBuild', () => {
     const adminBuild = createBuild<BuildMode>('admin')
     const userBuild = createBuild<BuildMode>('user')
 
-    const petType = (buildMode: BuildMode) => ({
+    const petFields = (buildMode: BuildMode) => ({
       name: GraphQLString,
       age: 'Int!',
       ...(buildMode === 'admin' && {
@@ -94,8 +96,8 @@ describe('createBuild', () => {
       }),
     })
 
-    adminBuild.addType('Pet', 'type', petType)
-    userBuild.addType('Pet', 'type', petType)
+    adminBuild.addType('Pet', 'type', { fields: petFields })
+    userBuild.addType('Pet', 'type', { fields: petFields })
     adminBuild.addQuery('myPets', '[Pet!]!', () => data.pets)
     userBuild.addQuery('myPets', '[Pet!]!', () => data.pets)
     expect(adminBuild.toTypeDefs().typeDefs).toMatchSnapshot()
@@ -107,23 +109,17 @@ describe('createBuild', () => {
     const adminBuild = createBuild<BuildMode>('admin')
     const userBuild = createBuild<BuildMode>('user')
 
-    const petType = (buildMode: BuildMode) => ({
-      name: GraphQLString,
-      age: 'Int!',
-      ...(buildMode === 'admin' && {
-        owner: GraphQLNonNull(GraphQLString),
-      }),
-    })
-
-    const Pet = (buildMode: BuildMode): AddNonScalarTypeArgs => [
+    const Pet = (buildMode: BuildMode): AddObjectArgsType<BuildMode> => [
       'Pet',
       'type',
       {
-        name: GraphQLString,
-        age: 'Int!',
-        ...(buildMode === 'admin' && {
-          owner: GraphQLNonNull(GraphQLString),
-        }),
+        fields: {
+          name: GraphQLString,
+          age: 'Int!',
+          ...(buildMode === 'admin' && {
+            owner: GraphQLNonNull(GraphQLString),
+          }),
+        },
       },
     ]
 

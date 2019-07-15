@@ -15,8 +15,8 @@ exports[`createBuild should accept build mode generators on type level 1`] = `
     
   type Pet {
     name: String
-age: Int!
-owner: String!
+    age: Int!
+    owner: String!
   }
 
     
@@ -37,7 +37,7 @@ exports[`createBuild should accept build mode generators on type level 2`] = `
     
   type Pet {
     name: String
-age: Int!
+    age: Int!
   }
 
     
@@ -66,9 +66,9 @@ Object {
 
 exports[`createBuild should be able to accept a new scalar type 1`] = `
 Object {
-  "errors": Array [
-    [GraphQLError: Cannot query field "test" on type "Query".],
-  ],
+  "data": Object {
+    "myScalar": "TEST",
+  },
 }
 `;
 
@@ -108,8 +108,8 @@ exports[`createBuild should have types that are different based on buildMode 1`]
     
   type Pet {
     name: String
-age: Int!
-owner: String!
+    age: Int!
+    owner: String!
   }
 
     
@@ -130,7 +130,7 @@ exports[`createBuild should have types that are different based on buildMode 2`]
     
   type Pet {
     name: String
-age: Int!
+    age: Int!
   }
 
     

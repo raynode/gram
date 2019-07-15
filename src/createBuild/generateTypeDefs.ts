@@ -9,11 +9,12 @@ import {
 import { reduceRecord } from './utils'
 
 const generateCreateableType = (
-  createable: CreateableTypes,
+  createable: string,
   typeName: string,
   fields: GQLRecord,
+  interfaceName?: string,
 ) => `
-  ${createable} ${typeName} {
+  ${createable} ${typeName} ${interfaceName ? `extends ${interfaceName} ` : ''}{
     ${reduceRecord(fields)}
   }
 `
@@ -21,14 +22,27 @@ const generateCreateableType = (
 const generateNonEmpty = (typeName: Resolvables, data: GQLRecord) =>
   isEmpty(data) ? '' : generateCreateableType('type', typeName, data)
 
-const generateCreateables = (
-  createable: CreateableTypes,
-  createables: Record<string, GQLRecord>,
+const generateFields = (
+  createable: string,
+  createables: Record<
+    string,
+    {
+      fields: GQLRecord;
+      interface?: string;
+    }
+  >,
 ) =>
   reduce(
     createables,
-    (result, fields, typeName) => {
-      result.push(generateCreateableType(createable, typeName, fields))
+    (result, config, typeName) => {
+      result.push(
+        generateCreateableType(
+          createable,
+          typeName,
+          config.fields,
+          config.interface,
+        ),
+      )
       return result
     },
     [],
@@ -39,11 +53,11 @@ export const generateTypeDefs = (
   types: CreateableTypesRecord,
 ): ITypeDefinitions => {
   if (isEmpty(resolvables.Query)) throw new Error('Query cannot be empty')
-  // console.log(types)
+
   return `
-    ${generateCreateables('interface', types.interface)}
-    ${generateCreateables('input', types.input)}
-    ${generateCreateables('type', types.type)}
+    ${generateFields('interface', types.interface)}
+    ${generateFields('input', types.input)}
+    ${generateFields('type', types.type)}
     ${generateCreateableType('type', 'Query', resolvables.Query)}
     ${generateNonEmpty('Mutation', resolvables.Mutation)}
     ${generateNonEmpty('Subscription', resolvables.Subscription)}

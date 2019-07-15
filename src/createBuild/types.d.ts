@@ -35,12 +35,25 @@ export type FieldType = string | GraphQLType
 export type Fields = Record<string, FieldType>
 
 export type Resolvables = 'Query' | 'Mutation' | 'Subscription'
+export interface ObjectTypesRecordConfig {
+  fields: GQLRecord
+  interface: string
+}
+export interface InterfaceTypesRecordConfig {
+  fields: GQLRecord
+}
+export interface InputTypesRecordConfig {
+  fields: GQLRecord
+}
+export interface EnumTypesRecordConfig {
+  values: string[]
+}
 export interface CreateableTypesRecord {
   scalar: string[]
-  type: Record<string, GQLRecord>
-  interface: Record<string, GQLRecord>
-  input: Record<string, GQLRecord>
-  enum: Record<string, string[]>
+  type: Record<string, ObjectTypesRecordConfig>
+  interface: Record<string, InterfaceTypesRecordConfig>
+  input: Record<string, InputTypesRecordConfig>
+  enum: Record<string, EnumTypesRecordConfig>
 }
 export type CreateableTypes = keyof CreateableTypesRecord
 

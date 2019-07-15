@@ -12,7 +12,7 @@ export const reduceRecord = (gqlData: GQLRecord) =>
       return list
     },
     [],
-  ).join('\n')
+  ).join('\n    ')
 
 export const fieldsToGQLRecord = (fields: Fields) =>
   reduce(

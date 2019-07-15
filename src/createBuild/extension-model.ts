@@ -41,17 +41,25 @@ export const addModel = <BuildMode>(baseBuild: Build<BuildMode>) => {
   const build = baseBuild as WithAddModel<BuildMode>
   build.addModel = modelBuilder => {
     const resolver: IFieldResolver<any, any> = modelBuilder.getResolver()
-    const attrs = reduce(
-      modelBuilder.getAttributes(),
-      (fields, attr, name) => {
-        fields[name] = buildAttribute(build.buildMode, attr)
-        return fields
-      },
-      {},
-    )
-    build.addType(modelBuilder.name, 'type', { fields: attrs })
-    // console.log('RESOLVER:', modelBuilder.getResolver())
-    // console.log('RESOLVER:', )
+
+    const type = modelBuilder.isInterface() ? 'interface' : 'type'
+    const typeConfig = {
+      fields: reduce(
+        modelBuilder.getAttributes(),
+        (fields, attr, name) => {
+          fields[name] = buildAttribute(build.buildMode, attr)
+          return fields
+        },
+        {},
+      ),
+    }
+    if (type === 'interface')
+      build.addType(modelBuilder.name, 'interface', typeConfig)
+    else
+      build.addType(modelBuilder.name, 'type', {
+        ...typeConfig,
+        interface: modelBuilder.getInterfaces()[0],
+      })
   }
   build.addQuery('test', 'String')
   return build

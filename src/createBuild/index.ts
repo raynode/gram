@@ -49,9 +49,9 @@ export const createBuild = <BuildMode = null, Context = any>(
 
   const buildModeResolver = createBuildModeResolver(buildMode)
   const addInterfaceOrInputType = (typeName, createAble, config) =>
-    (types[createAble][typeName] = fieldsToGQLRecord(
-      buildModeResolver(config.fields),
-    ))
+    (types[createAble][typeName] = {
+      fields: fieldsToGQLRecord(buildModeResolver(config.fields)),
+    })
 
   const addType = createAddType(
     buildMode,
@@ -59,8 +59,12 @@ export const createBuild = <BuildMode = null, Context = any>(
     addInterfaceOrInputType,
     addInterfaceOrInputType,
     (typeName, createAble, config) =>
-      (types[createAble][typeName] = buildModeResolver(config.values)),
-    addInterfaceOrInputType,
+      (types.enum[typeName] = { values: buildModeResolver(config.values) }),
+    (typeName, createAble, config) =>
+      (types.type[typeName] = {
+        fields: fieldsToGQLRecord(buildModeResolver(config.fields)),
+        interface: buildModeResolver(config.interface),
+      }),
   )
 
   const builder: Build<BuildMode> = {
