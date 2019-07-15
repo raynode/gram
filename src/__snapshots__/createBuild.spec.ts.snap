@@ -1,0 +1,30 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`createBuild should accept a buildMode function 1`] = `
+Object {
+  "data": Object {
+    "test": "TEST",
+  },
+}
+`;
+
+exports[`createBuild should be able to create a simple graphql interface 1`] = `
+Object {
+  "data": Object {
+    "test": "TEST",
+  },
+}
+`;
+
+exports[`createBuild should create a base object with methods to add everything for gql 1`] = `
+Object {
+  "addMutation": [Function],
+  "addQuery": [Function],
+  "addSubscription": [Function],
+  "addType": [Function],
+  "buildMode": undefined,
+  "builder": "Build",
+  "toSchema": [Function],
+  "toTypeDefs": [Function],
+}
+`;
