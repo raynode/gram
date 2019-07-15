@@ -10,6 +10,7 @@ type GQLRecord = Record<string, string>
 type Resolver<Source, Context> = IFieldResolver<Source, Context>
 type Resolvers = IResolvers
 type BuildModeGenerator<BuildMode, Result> = (buildMode?: BuildMode) => Result
+type Resolvables = 'Query' | 'Mutation' | 'Subscription'
 
 const isBuildModeGenerator = <BuildMode, Result>(
   val: any,
@@ -29,22 +30,25 @@ const buildData = (data: GQLRecord) =>
     [],
   ).join('\n')
 
-const generateData = (typeName: string, data: GQLRecord) => `
+const generateData = (typeName: Resolvables, data: GQLRecord) => `
   type ${typeName} {
     ${buildData(data)}
   }
 `
 
-const generateNonEmpty = (typeName: string, data: GQLRecord) =>
+const generateNonEmpty = (typeName: Resolvables, data: GQLRecord) =>
   isEmpty(data) ? '' : generateData(typeName, data)
 
-export const generateTypeDefs = (queries, mutations, subscriptions, types) => {
-  if (isEmpty(queries)) throw new Error('Query cannot be empty')
+export const generateTypeDefs = (
+  resolvables: Record<Resolvables, GQLRecord>,
+  types,
+) => {
+  if (isEmpty(resolvables.Query)) throw new Error('Query cannot be empty')
 
   const typeDefs = `
-    ${generateData('Query', queries)}
-    ${generateNonEmpty('Mutation', mutations)}
-    ${generateNonEmpty('Subscription', subscriptions)}
+    ${generateData('Query', resolvables.Query)}
+    ${generateNonEmpty('Mutation', resolvables.Mutation)}
+    ${generateNonEmpty('Subscription', resolvables.Subscription)}
   `
   return typeDefs
 }
@@ -52,9 +56,11 @@ export const generateTypeDefs = (queries, mutations, subscriptions, types) => {
 export const createBuild = <BuildMode = null, Context = any>(
   buildMode?: BuildMode,
 ) => {
-  const queries: GQLRecord = {}
-  const mutations: GQLRecord = {}
-  const subscriptions: GQLRecord = {}
+  const resolvables: Record<Resolvables, GQLRecord> = {
+    Mutation: {},
+    Query: {},
+    Subscription: {},
+  }
   const types: Record<string, GQLRecord> = {}
   const resolvers: Resolvers = {}
   const addResolver = <Source>(
@@ -66,7 +72,7 @@ export const createBuild = <BuildMode = null, Context = any>(
     resolvers[base][name] = resolver
   }
 
-  type AddQuery = (<Source, Type = string | GraphQLType>(
+  type AddResolvable = (<Source, Type = string | GraphQLType>(
     name: string,
     type: Type,
     resolver?: Resolver<Source, Context>,
@@ -77,34 +83,31 @@ export const createBuild = <BuildMode = null, Context = any>(
       resolver?: BuildModeGenerator<BuildMode, Resolver<Source, Context>>,
     ) => void)
 
-  const addQuery: AddQuery = (name, type, resolver?) => {
+  const createResolvable = (typeName: Resolvables): AddResolvable => (
+    name,
+    type,
+    resolver?,
+  ) => {
     if (isBuildModeGenerator<BuildMode, string | GraphQLType>(type)) {
-      const x = type(buildMode)
-      const y = typeToString(x)
-      queries[name] = y
+      resolvables[typeName][name] = typeToString(type(buildMode))
       addResolver('Query', name, resolver(buildMode))
     } else {
-      queries[name] = typeToString(type)
+      resolvables[typeName][name] = typeToString(type)
       addResolver('Query', name, resolver)
     }
   }
   const builder = {
     builder: 'Build',
     buildMode,
-    addQuery,
-    addMutation: () => null,
-    addSubscription: () => null,
+    addQuery: createResolvable('Query'),
+    addMutation: createResolvable('Mutation'),
+    addSubscription: createResolvable('Subscription'),
     addType: () => null,
     toSchema: () => makeExecutableSchema(builder.toTypeDefs()),
-    toTypeDefs: () => {
-      const typeDefs = generateTypeDefs(
-        queries,
-        mutations,
-        subscriptions,
-        types,
-      )
-      return { typeDefs, resolvers }
-    },
+    toTypeDefs: () => ({
+      typeDefs: generateTypeDefs(resolvables, types),
+      resolvers,
+    }),
   }
   return builder
 }
