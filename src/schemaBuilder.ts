@@ -47,14 +47,14 @@ import { SCHEMABUILDER } from './types/constants'
 import { isFieldDefinition } from './types/guards'
 import { extractData, reduceFields } from './utils'
 
-const wrapContext = <Context>(
-  buildMode: Context | null,
+const wrapContext = <BuildMode>(
+  buildMode: BuildMode | null,
   scalars: Record<string, GraphQLScalarType>,
-  models: Models<Context>,
+  models: Models<BuildMode>,
   filters: FilterMiddleware[],
   pubSub: PubSub,
-): Wrapped<Context> => {
-  const buildModeModels: Record<string, ContextModel<Context, any>> = {}
+): Wrapped<BuildMode> => {
+  const buildModeModels: Record<string, ContextModel<BuildMode, any>> = {}
   return {
     id: uuid(),
     buildMode,
@@ -67,7 +67,7 @@ const wrapContext = <Context>(
   }
 }
 
-const addNodeAttrs = <Context>(model: ModelBuilder<Context, any>) => {
+const addNodeAttrs = <BuildMode>(model: ModelBuilder<BuildMode, any>) => {
   model.attr('id', GraphQLID)
   model.attr('createdAt', buildMode => buildMode.getScalar('DateTime'))
   model.attr('updatedAt', buildMode => buildMode.getScalar('DateTime'))
@@ -75,10 +75,13 @@ const addNodeAttrs = <Context>(model: ModelBuilder<Context, any>) => {
   return model
 }
 
-const createBaseModels = <Context>() => {
-  const node = createModelBuilder<Context, NodeType>('Node', {}).setInterface()
-  const page = createModelBuilder<Context, PageData>('Page', {})
-  const list = createModelBuilder<Context, ListType<NodeType>>(
+const createBaseModels = <BuildMode>() => {
+  const node = createModelBuilder<BuildMode, NodeType>(
+    'Node',
+    {},
+  ).setInterface()
+  const page = createModelBuilder<BuildMode, PageData>('Page', {})
+  const list = createModelBuilder<BuildMode, ListType<NodeType>>(
     'List',
     {},
   ).setInterface()
@@ -99,12 +102,12 @@ const createBaseModels = <Context>() => {
   }
 }
 
-type Models<Context> = Record<string, ModelBuilder<Context, any, any>>
+type Models<BuildMode> = Record<string, ModelBuilder<BuildMode, any, any>>
 
-const setup = <Context>(
-  models: Models<Context>,
+const setup = <BuildMode>(
+  models: Models<BuildMode>,
   scalars: Record<string, GraphQLScalarType>,
-  buildMode: Context | null,
+  buildMode: BuildMode | null,
   filters: FilterMiddleware[],
   pubSub: PubSub = new PubSub(),
 ) => {
@@ -133,23 +136,23 @@ export const createSchema = (definition: FieldDefinition) => {
   return new GraphQLSchema(schema)
 }
 
-export const createSchemaBuilder = <Context = any, QueryContext = any>() => {
-  const models: Models<Context> = createBaseModels<Context>()
+export const createSchemaBuilder = <BuildMode = any, QueryContext = any>() => {
+  const models: Models<BuildMode> = createBaseModels<BuildMode>()
   const scalars: Record<string, GraphQLScalarType> = { DateTime }
   const filters = defaultMiddlewares
   let externalPubSub: PubSub = null
   const queryDefinitions: Array<
-    WithContext<Context, QueryTypeDefinition<Context, any, QueryContext>>
+    WithContext<BuildMode, QueryTypeDefinition<BuildMode, any, QueryContext>>
   > = []
 
-  const builder: SchemaBuilder<Context, QueryContext> = {
+  const builder: SchemaBuilder<BuildMode, QueryContext> = {
     type: SCHEMABUILDER,
     models,
     model: <Type, GQLType = Type>(
       modelName: string,
       service: Service<Type, GQLType>,
     ) => {
-      const model = createModelBuilder<Context, Type, GQLType>(
+      const model = createModelBuilder<BuildMode, Type, GQLType>(
         modelName,
         service || {},
       )
@@ -157,7 +160,7 @@ export const createSchemaBuilder = <Context = any, QueryContext = any>() => {
       return model.interface('Node')
     },
     interface: <Type>(interfaceName: string, service: Service<Type>) => {
-      const model = createModelBuilder<Context, Type>(
+      const model = createModelBuilder<BuildMode, Type>(
         interfaceName,
         service || {},
       )
@@ -165,11 +168,11 @@ export const createSchemaBuilder = <Context = any, QueryContext = any>() => {
       model.setInterface()
       return model
     },
-    build: (buildMode: Context | FieldDefinition = null) =>
+    build: (buildMode: BuildMode | FieldDefinition = null) =>
       createSchema(
         isFieldDefinition(buildMode) ? buildMode : builder.fields(buildMode),
       ),
-    fields: (buildMode: Context | null = null) => {
+    fields: (buildMode: BuildMode | null = null) => {
       const pubSub = externalPubSub || new PubSub()
       const wrapped = setup(models, scalars, buildMode, filters, pubSub)
       // build all interfaces

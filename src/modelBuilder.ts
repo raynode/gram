@@ -31,16 +31,16 @@ const serviceToVisibility = (service: Service<any>): ModelVisibility => {
   }
 }
 
-export const createModelBuilder = <Context, Type, GQLType = Type>(
+export const createModelBuilder = <BuildMode, Type, GQLType = Type>(
   modelName: string,
   service: Service<Type, GQLType>,
-  buildModeFn?: ContextMutator<Context, Type, GQLType>,
+  buildModeFn?: ContextMutator<BuildMode, Type, GQLType>,
 ) => {
-  const attributes: Attributes<Context, Type> = {}
-  let contextMutation: ContextMutator<Context, Type, GQLType> = () => null
-  let listType: GraphQLType | ModelBuilder<Context, any> = null
+  const attributes: Attributes<BuildMode, Type> = {}
+  let contextMutation: ContextMutator<BuildMode, Type, GQLType> = () => null
+  let listType: GraphQLType | ModelBuilder<BuildMode, any> = null
   let isInterface: boolean = false
-  let resolver: ContextFn<Context, GraphQLResolverMap<GQLType>> = null
+  let resolver: ContextFn<BuildMode, GraphQLResolverMap<GQLType>> = null
   const interfaces: string[] = []
   const visibility = service
     ? serviceToVisibility(service)
@@ -55,7 +55,7 @@ export const createModelBuilder = <Context, Type, GQLType = Type>(
         deleteSubscription: false,
       }
 
-  const builder: ModelBuilder<Context, Type, GQLType> = {
+  const builder: ModelBuilder<BuildMode, Type, GQLType> = {
     type: MODELBUILDER,
     name: modelName,
     getInterfaces: () => interfaces,
@@ -68,19 +68,19 @@ export const createModelBuilder = <Context, Type, GQLType = Type>(
     attr: <AttributeType>(
       attributeName: string,
       type:
-        | ModelType<Context>
-        | ModelBuilder<Context, any>
-        | ContextFn<Context, GraphQLType>,
+        | ModelType<BuildMode>
+        | ModelBuilder<BuildMode, any>
+        | ContextFn<BuildMode, GraphQLType>,
     ) => {
       if (!type)
         throw new Error(
           `${modelName}.attr(${attributeName}) needs to provide either a GraphQLType or a ModelBuilder`,
         )
       return (attributes[attributeName] = createAttributeBuilder<
-        Context,
+        BuildMode,
         AttributeType,
         Type
-      >(attributeName, toContextFn<Context>(type)))
+      >(attributeName, toContextFn<BuildMode>(type)))
     },
     setup: buildMode => {
       const buildModeModel = createModel(

@@ -25,13 +25,13 @@ import {
   Wrapped,
 } from './types'
 
-export const isContextFn = <Context, Type>(
+export const isContextFn = <BuildMode, Type>(
   val: any,
-): val is ContextFn<Context, Type> => typeof val === 'function'
+): val is ContextFn<BuildMode, Type> => typeof val === 'function'
 
-export const extractData = <Context, Type>(
-  data: WithContext<Context, Type>,
-) => (buildMode: Wrapped<Context>) =>
+export const extractData = <BuildMode, Type>(
+  data: WithContext<BuildMode, Type>,
+) => (buildMode: Wrapped<BuildMode>) =>
   isContextFn(data) ? data(buildMode) : data
 
 export const record = (service: Record<string, any>) => ({
@@ -42,16 +42,16 @@ export const record = (service: Record<string, any>) => ({
 export const clearRecord = (record: Record<string, any>) =>
   pickBy(record, identity)
 
-export type FieldReducerFn<Context> = (
+export type FieldReducerFn<BuildMode> = (
   fields: GraphQLFieldConfigMap<any, any>,
-  model: ModelBuilder<Context, any>,
+  model: ModelBuilder<BuildMode, any>,
 ) => GraphQLFieldConfigMap<any, any>
 
-export const fieldsReducer = <Context>(
+export const fieldsReducer = <BuildMode>(
   reducer: (
-    buildModeModel: ContextModel<Context, any>,
+    buildModeModel: ContextModel<BuildMode, any>,
   ) => GraphQLFieldConfigMap<any, any> | GraphQLInputFieldConfigMap,
-) => (buildMode: Wrapped<Context>): FieldReducerFn<Context> => (
+) => (buildMode: Wrapped<BuildMode>): FieldReducerFn<BuildMode> => (
   fields,
   model,
 ) => ({ ...fields, ...clearRecord(reducer(model.build(buildMode))) })
@@ -59,13 +59,13 @@ export const fieldsReducer = <Context>(
 // this Type construct will ensure that the returned object will have the same keys as
 // the input object. It will also convert the properties from ModelBuilder to FieldReducer
 export const reduceFields = <
-  Context,
+  BuildMode,
   Reducers,
   Models,
   ReducerKeys extends keyof Reducers
 >(
-  models: Record<string, ModelBuilder<Context, any>>,
-  reducers: Record<ReducerKeys, FieldReducerFn<Context>>,
+  models: Record<string, ModelBuilder<BuildMode, any>>,
+  reducers: Record<ReducerKeys, FieldReducerFn<BuildMode>>,
   fields: Record<ReducerKeys, GraphQLFieldConfigMap<any, any>>,
 ): Record<ReducerKeys, GraphQLFieldConfigMap<any, any>> =>
   reduce(
@@ -77,16 +77,16 @@ export const reduceFields = <
     fields,
   )
 
-export type ToContextFnResult<Context> = ContextFn<
-  Context,
-  GraphQLType | ContextModel<Context, any>
+export type ToContextFnResult<BuildMode> = ContextFn<
+  BuildMode,
+  GraphQLType | ContextModel<BuildMode, any>
 >
-export const toContextFn = <Context>(
+export const toContextFn = <BuildMode>(
   type:
-    | ModelType<Context>
-    | ModelBuilder<Context, any>
-    | ContextFn<Context, GraphQLType>,
-): ToContextFnResult<Context> => {
+    | ModelType<BuildMode>
+    | ModelBuilder<BuildMode, any>
+    | ContextFn<BuildMode, GraphQLType>,
+): ToContextFnResult<BuildMode> => {
   if (typeof type === 'function') return type
   if (isType(type)) return () => type
   return buildMode => buildMode.getModel(type.name)
@@ -117,22 +117,25 @@ export const conditionalType = <Type extends GraphQLType>(
     ? GraphQLNonNull(type)
     : type
 
-export const memoizeContextModel = <Context = any, Result = any, Type = any>(
-  fn: (buildModeModel: ContextModel<Context, Type, any>) => Result,
+export const memoizeContextModel = <BuildMode = any, Result = any, Type = any>(
+  fn: (buildModeModel: ContextModel<BuildMode, Type, any>) => Result,
 ) =>
   memoize(
     fn,
-    (buildModeModel: ContextModel<Context, Type>) => buildModeModel.id,
+    (buildModeModel: ContextModel<BuildMode, Type>) => buildModeModel.id,
   )
 
-export const reduceContextFields = <Context, Type extends Record<string, any>>(
-  buildModeModel: ContextModel<Context, Type>,
+export const reduceContextFields = <
+  BuildMode,
+  Type extends Record<string, any>
+>(
+  buildModeModel: ContextModel<BuildMode, Type>,
   base: Type = null,
   reducer: (
     memo: Type,
-    attr: AttributeBuilder<Context, Type, any>,
+    attr: AttributeBuilder<BuildMode, Type, any>,
     type: GraphQLType,
-    field: ModelType<Context>,
+    field: ModelType<BuildMode>,
   ) => Type,
 ) =>
   buildModeModel
@@ -157,11 +160,11 @@ interface ContextModelFieldFnConfig {
   iterator: string
   condition: TypeCondition
 }
-export const createModelFieldFn = <Context>(
+export const createModelFieldFn = <BuildMode>(
   configFn: (
-    buildModeModel: ContextModel<Context, any>,
+    buildModeModel: ContextModel<BuildMode, any>,
   ) => ContextModelFieldFnConfig,
-) => (buildModeModel: ContextModel<Context, any>) => {
+) => (buildModeModel: ContextModel<BuildMode, any>) => {
   const { iterator, condition = 'none' } = configFn(buildModeModel)
   return {
     subscribe: () => buildModeModel.buildMode.pubSub.asyncIterator(iterator),
@@ -173,7 +176,7 @@ export const createModelFieldFn = <Context>(
   }
 }
 
-export const createInputType = <Context>(
+export const createInputType = <BuildMode>(
   field: DataType,
   nameFn: ContextModelFn<string>,
 ) =>

@@ -27,40 +27,40 @@ import * as DataTypes from './data-types'
 import { filter } from './input-types'
 import { toList } from './utils'
 
-const fieldBuilderFn = <Context>(
-  buildMode: Wrapped<Context>,
+const fieldBuilderFn = <BuildMode>(
+  buildMode: Wrapped<BuildMode>,
   resolvers: GraphQLResolverMap<any>,
 ) => <Type>(
   fields: GraphQLFieldConfigMap<any, any>,
-  attr: AttributeBuilder<Context, Type, any>,
+  attr: AttributeBuilder<BuildMode, Type, any>,
 ) => {
   fields[attr.name] = attr.build(buildMode)
   if (resolvers[attr.name]) fields[attr.name].resolve = resolvers[attr.name]
   return fields
 }
 
-const fieldBuilder = <Context>(
-  buildMode: Wrapped<Context>,
+const fieldBuilder = <BuildMode>(
+  buildMode: Wrapped<BuildMode>,
   resolvers: GraphQLResolverMap<any>,
 ) => <Type>(
-  fields: Array<AttributeBuilder<Context, Type, any>>,
+  fields: Array<AttributeBuilder<BuildMode, Type, any>>,
 ): GraphQLFieldConfigMap<any, any> =>
   reduce(fields, fieldBuilderFn(buildMode, resolvers), {})
 
-export const createModel = <Context, Type, GQLType = Type>(
-  model: ModelBuilder<Context, any>,
+export const createModel = <BuildMode, Type, GQLType = Type>(
+  model: ModelBuilder<BuildMode, any>,
   service: Service<Type, GQLType>,
-  buildMode: Wrapped<Context>,
+  buildMode: Wrapped<BuildMode>,
   visibility: ModelVisibility,
   resolvers: GraphQLResolverMap<GQLType>,
 ) => {
-  type Attribute = AttributeBuilder<Context, Type, any>
+  type Attribute = AttributeBuilder<BuildMode, Type, any>
   const buildFields = fieldBuilder(buildMode, resolvers)
   const fields: Attribute[] = []
   const getFields = () => buildFields(fields)
   let buildModeModelIsInterface: boolean = false
 
-  const buildModeModel: ContextModel<Context, Type, GQLType> = {
+  const buildModeModel: ContextModel<BuildMode, Type, GQLType> = {
     addField: (field: Attribute) => {
       fields.push(field)
       return field
