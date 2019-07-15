@@ -5,8 +5,9 @@ import {
   FieldType,
   GQLRecord,
   Resolvables,
-  Resolver,
 } from './types'
+
+import { IFieldResolver } from 'graphql-tools'
 
 import { typeToString } from './utils'
 
@@ -32,7 +33,7 @@ export const resolvablesCreator = <BuildMode, Context>(
       addResolver(
         typeName,
         name,
-        resolveBuildModeGenerator<Resolver<any, any>>(resolver),
+        resolveBuildModeGenerator<IFieldResolver<any, any>>(resolver),
       )
     } else {
       resolvables[typeName][name] = typeToString(type)

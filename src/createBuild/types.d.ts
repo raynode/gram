@@ -24,7 +24,6 @@ export interface Build<BuildMode> {
 }
 
 export type GQLRecord = Record<string, string>
-export type Resolver<Source, Context> = IFieldResolver<Source, Context>
 export type Resolvers = IResolvers
 export type BuildModeGenerator<BuildMode, Result> = (
   buildMode?: BuildMode,
@@ -41,22 +40,23 @@ export interface CreateableTypesRecord {
   type: Record<string, GQLRecord>
   interface: Record<string, GQLRecord>
   input: Record<string, GQLRecord>
+  enum: Record<string, string[]>
 }
 export type CreateableTypes = keyof CreateableTypesRecord
 
 export type AddResolvable = (<Source, Context, Type = FieldType>(
   name: string,
   type: Type,
-  resolver?: Resolver<Source, Context>,
+  resolver?: IFieldResolver<Source, Context>,
 ) => void) &
   (<BuildMode, Source, Context, Type = FieldType>(
     name: string,
     type: BuildModeGenerator<BuildMode, Type>,
-    resolver?: BuildModeGenerator<BuildMode, Resolver<Source, Context>>,
+    resolver?: BuildModeGenerator<BuildMode, IFieldResolver<Source, Context>>,
   ) => void)
 
 export type AddResolver<Context> = <Source>(
   base: string,
   name: string,
-  resolver: Resolver<Source, Context>,
+  resolver: IFieldResolver<Source, Context>,
 ) => void

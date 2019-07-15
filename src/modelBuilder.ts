@@ -128,6 +128,7 @@ export const createModelBuilder = <BuildMode, Type, GQLType = Type>(
       return builder
     },
     getAttributes: () => attributes,
+    getResolver: () => resolver,
   }
   return builder
 }

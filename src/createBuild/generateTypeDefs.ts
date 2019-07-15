@@ -39,7 +39,7 @@ export const generateTypeDefs = (
   types: CreateableTypesRecord,
 ): ITypeDefinitions => {
   if (isEmpty(resolvables.Query)) throw new Error('Query cannot be empty')
-
+  // console.log(types)
   return `
     ${generateCreateables('interface', types.interface)}
     ${generateCreateables('input', types.input)}

@@ -14,6 +14,8 @@ import {
 } from 'graphql'
 import { PubSub } from 'graphql-subscriptions'
 
+import { IFieldResolver } from 'graphql-tools'
+
 import { Names } from '../strategies/naming'
 import {
   ATTRIBUTEBUILDER,
@@ -180,6 +182,7 @@ export interface ModelBuilder<BuildMode, Type, GQLType = Type> extends Builder {
   resolve: <Attrs extends string>(
     resolver: ContextFn<BuildMode, GraphQLResolverMap<GQLType, Attrs>>,
   ) => this
+  getResolver: () => IFieldResolver<any, any>
   build: (
     buildMode: Wrapped<BuildMode>,
   ) => ContextModel<BuildMode, Type, GQLType>

@@ -47,6 +47,8 @@ import { SCHEMABUILDER } from './types/constants'
 import { isFieldDefinition } from './types/guards'
 import { extractData, reduceFields } from './utils'
 
+import { addModel, createBuild } from './createBuild'
+
 const wrapContext = <BuildMode>(
   buildMode: BuildMode | null,
   scalars: Record<string, GraphQLScalarType>,
@@ -175,10 +177,17 @@ export const createSchemaBuilder = <BuildMode = any, QueryContext = any>() => {
     fields: (buildMode: BuildMode | null = null) => {
       const pubSub = externalPubSub || new PubSub()
       const wrapped = setup(models, scalars, buildMode, filters, pubSub)
+
+      const build = addModel(createBuild(buildMode))
+
+      forEach(models, model => {
+        build.addModel(model)
+      })
+      console.log(build.toTypeDefs().typeDefs)
       // build all interfaces
-      filter(models, model => model.isInterface()).forEach(model =>
-        model.build(wrapped),
-      )
+      // filter(models, model => model.isInterface()).forEach(model =>
+      //   model.build(wrapped),
+      // )
       const query: any = queryDefinitions.reduce((memo, queryDefinition) => {
         const {
           args,

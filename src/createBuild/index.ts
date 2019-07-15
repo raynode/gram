@@ -1,4 +1,4 @@
-import { makeExecutableSchema } from 'graphql-tools'
+import { IFieldResolver, makeExecutableSchema } from 'graphql-tools'
 
 import { generateTypeDefs } from './generateTypeDefs'
 import { createAddType } from './method-addType'
@@ -8,12 +8,13 @@ import {
   CreateableTypesRecord,
   GQLRecord,
   Resolvables,
-  Resolver,
   Resolvers,
 } from './types'
 import { createBuildModeResolver, fieldsToGQLRecord } from './utils'
 
 import { GQLBUILDER } from '../types/constants'
+
+export * from './extension-model'
 
 export const createBuild = <BuildMode = null, Context = any>(
   buildMode?: BuildMode,
@@ -24,6 +25,7 @@ export const createBuild = <BuildMode = null, Context = any>(
     Subscription: {},
   }
   const types: CreateableTypesRecord = {
+    enum: {},
     input: {},
     interface: {},
     scalar: [],
@@ -33,7 +35,7 @@ export const createBuild = <BuildMode = null, Context = any>(
   const addResolver = <Source>(
     base: string,
     name: string,
-    resolver: Resolver<Source, Context>,
+    resolver: IFieldResolver<Source, Context>,
   ) => {
     resolvers[base] = resolvers[base] || {}
     resolvers[base][name] = resolver
@@ -46,13 +48,19 @@ export const createBuild = <BuildMode = null, Context = any>(
   )
 
   const buildModeResolver = createBuildModeResolver(buildMode)
+  const addInterfaceOrInputType = (typeName, createAble, config) =>
+    (types[createAble][typeName] = fieldsToGQLRecord(
+      buildModeResolver(config.fields),
+    ))
+
   const addType = createAddType(
     buildMode,
     typeName => types.scalar.push(typeName),
-    (typeName, createAble, fields) =>
-      (types[createAble][typeName] = fieldsToGQLRecord(
-        buildModeResolver(fields),
-      )),
+    addInterfaceOrInputType,
+    addInterfaceOrInputType,
+    (typeName, createAble, config) =>
+      (types[createAble][typeName] = buildModeResolver(config.values)),
+    addInterfaceOrInputType,
   )
 
   const builder: Build<BuildMode> = {
