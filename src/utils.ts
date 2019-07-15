@@ -153,7 +153,7 @@ interface ContextModelFieldFnConfig {
   iterator: string
   condition: TypeCondition
 }
-export const createContextModelFieldFn = <Context>(
+export const createModelFieldFn = <Context>(
   configFn: (
     contextModel: ContextModel<Context, any>,
   ) => ContextModelFieldFnConfig,

@@ -47,7 +47,7 @@ const fieldBuilder = <Context>(
 ): GraphQLFieldConfigMap<any, any> =>
   reduce(fields, fieldBuilderFn(context, resolvers), {})
 
-export const createContextModel = <Context, Type, GQLType = Type>(
+export const createModel = <Context, Type, GQLType = Type>(
   model: ModelBuilder<Context, any>,
   service: Service<Type, GQLType>,
   context: Wrapped<Context>,

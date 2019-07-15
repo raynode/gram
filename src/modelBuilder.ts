@@ -2,7 +2,7 @@ import { GraphQLType } from 'graphql'
 import { forEach, memoize } from 'lodash'
 
 import { createAttributeBuilder } from './attributeBuilder'
-import { createContextModel } from './createContextModel'
+import { createModel } from './createModel'
 import {
   AttributeBuilder,
   Attributes,
@@ -83,7 +83,7 @@ export const createModelBuilder = <Context, Type, GQLType = Type>(
       >(attributeName, toContextFn<Context>(type)))
     },
     setup: context => {
-      const contextModel = createContextModel(
+      const contextModel = createModel(
         builder,
         service,
         context,
