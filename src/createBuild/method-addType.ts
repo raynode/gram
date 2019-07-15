@@ -1,10 +1,4 @@
 import {
-  AddNonScalarTypeArgs,
-  AddScalarTypeArgs,
-  ScalarOrNonScalarTypeArgs,
-} from './method-types'
-
-import {
   BuildModeArgsGenerator,
   BuildModeGenerator,
   CreateableTypes,
@@ -28,23 +22,18 @@ export type AddScalarType = (
   type: 'scalar',
   fields?: never,
 ) => void
-export type AddNonScalarType = ((
+export type AddNonScalarType<BuildMode> = (
   typeName: string,
   type: Exclude<CreateableTypes, 'scalar'>,
-  fields: Fields,
-) => void) &
-  (<BuildMode>(
-    typeName: string,
-    type: Exclude<CreateableTypes, 'scalar'>,
-    fields: BuildModeGenerator<BuildMode, Fields>,
-  ) => void)
+  fields: Fields | BuildModeGenerator<BuildMode, Fields>,
+) => void
 
 export const createAddType = <BuildMode>(
   buildMode: BuildMode,
   addScalarType: AddScalarType,
-  addNonScalarType: AddNonScalarType,
+  addNonScalarType: AddNonScalarType<BuildMode>,
 ): AddScalarType &
-  AddNonScalarType &
+  AddNonScalarType<BuildMode> &
   BuildModeArgsGenerator<
     BuildMode,
     AddScalarTypeArgs | AddNonScalarTypeArgs

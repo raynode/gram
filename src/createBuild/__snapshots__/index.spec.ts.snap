@@ -87,9 +87,9 @@ Object {
   "addSubscription": [Function],
   "addType": [Function],
   "buildMode": undefined,
-  "builder": "Build",
   "toSchema": [Function],
   "toTypeDefs": [Function],
+  "type": "BUILDER:GQLBUILDER",
 }
 `;
 

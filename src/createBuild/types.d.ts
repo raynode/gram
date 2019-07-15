@@ -1,8 +1,27 @@
-import { GraphQLType } from 'graphql'
+import { GraphQLSchema, GraphQLType } from 'graphql'
 import { IFieldResolver, IResolvers, ITypeDefinitions } from 'graphql-tools'
+
+import { GQLBUILDER } from '../types/constants'
+
+import { createAddType } from './method-addType'
 
 // Context == GraphQLContext ({ user: {…}, db: DBConnection })
 // BuildMode == BuildMode of the build ('user' | 'admin')
+
+export interface TypeDefs {
+  typeDefs: ITypeDefinitions
+  resolvers: IResolvers
+}
+export interface Build<BuildMode> {
+  type: typeof GQLBUILDER
+  buildMode: BuildMode
+  addQuery: AddResolvable
+  addMutation: AddResolvable
+  addSubscription: AddResolvable
+  addType: ReturnType<typeof createAddType>
+  toSchema: () => GraphQLSchema
+  toTypeDefs: () => TypeDefs
+}
 
 export type GQLRecord = Record<string, string>
 export type Resolver<Source, Context> = IFieldResolver<Source, Context>
