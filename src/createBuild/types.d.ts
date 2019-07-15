@@ -1,6 +1,9 @@
 import { GraphQLType } from 'graphql'
 import { IFieldResolver, IResolvers, ITypeDefinitions } from 'graphql-tools'
 
+// Context == GraphQLContext ({ user: {…}, db: DBConnection })
+// BuildMode == BuildMode of the build ('user' | 'admin')
+
 export type GQLRecord = Record<string, string>
 export type Resolver<Source, Context> = IFieldResolver<Source, Context>
 export type Resolvers = IResolvers
@@ -21,3 +24,20 @@ export interface CreateableTypesRecord {
   input: Record<string, GQLRecord>
 }
 export type CreateableTypes = keyof CreateableTypesRecord
+
+export type AddResolvable = (<Source, Context, Type = FieldType>(
+  name: string,
+  type: Type,
+  resolver?: Resolver<Source, Context>,
+) => void) &
+  (<BuildMode, Source, Context, Type = FieldType>(
+    name: string,
+    type: BuildModeGenerator<BuildMode, Type>,
+    resolver?: BuildModeGenerator<BuildMode, Resolver<Source, Context>>,
+  ) => void)
+
+export type AddResolver<Context> = <Source>(
+  base: string,
+  name: string,
+  resolver: Resolver<Source, Context>,
+) => void

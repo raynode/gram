@@ -7,6 +7,8 @@ import {
 } from 'graphql-tools'
 import { isEmpty, map, reduce } from 'lodash'
 import {
+  AddResolvable,
+  AddResolver,
   BuildModeArgsGenerator,
   BuildModeGenerator,
   CreateableTypes,
@@ -19,11 +21,23 @@ import {
   Resolvers,
 } from './types'
 
-const isBuildModeGenerator = <BuildMode, Result>(
-  val: any,
-): val is BuildModeGenerator<BuildMode, Result> => typeof val === 'function'
+import {
+  AddNonScalarTypeArgs,
+  AddScalarTypeArgs,
+  ScalarOrNonScalarTypeArgs,
+} from './method-types'
 
-export const typeToString = <Type>(type: Type) => type.toString()
+import {
+  AddNonScalarType,
+  AddScalarType,
+  createAddType,
+} from './method-addType'
+
+import { generateTypeDefs } from './generateTypeDefs'
+
+import { isBuildModeGenerator } from './guards'
+
+import { fieldsToGQLRecord, typeToString } from './utils'
 
 const buildData = (data: GQLRecord) =>
   reduce(
@@ -35,58 +49,9 @@ const buildData = (data: GQLRecord) =>
     [],
   ).join('\n')
 
-const generateData = (typeName: Resolvables, data: GQLRecord) => `
-  type ${typeName} {
-    ${buildData(data)}
-  }
-`
-
-const generateNonEmpty = (typeName: Resolvables, data: GQLRecord) =>
-  isEmpty(data) ? '' : generateData(typeName, data)
-
-const generateCreateableType = (
-  createable: CreateableTypes,
-  typeName: string,
-  fields: GQLRecord,
-) => `
-  ${createable} ${typeName} {
-    ${buildData(fields)}
-  }
-`
-
-const generateCreateables = (
-  createable: CreateableTypes,
-  createables: Record<string, GQLRecord>,
-) =>
-  reduce(
-    createables,
-    (result, fields, typeName) => {
-      result.push(generateCreateableType(createable, typeName, fields))
-      return result
-    },
-    [],
-  ).join('\n')
-
 const createBuildModeResolver = <BuildMode>(buildMode: BuildMode) => <Result>(
   data: Result | BuildModeGenerator<BuildMode, Result>,
 ) => (isBuildModeGenerator<BuildMode, Result>(data) ? data(buildMode) : data)
-
-type AddResolvable = (<Source, Context, Type = FieldType>(
-  name: string,
-  type: Type,
-  resolver?: Resolver<Source, Context>,
-) => void) &
-  (<BuildMode, Source, Context, Type = FieldType>(
-    name: string,
-    type: BuildModeGenerator<BuildMode, Type>,
-    resolver?: BuildModeGenerator<BuildMode, Resolver<Source, Context>>,
-  ) => void)
-
-type AddResolver<Context> = <Source>(
-  base: string,
-  name: string,
-  resolver: Resolver<Source, Context>,
-) => void
 
 const resolvablesCreator = <BuildMode, Context>(
   buildMode: BuildMode,
@@ -110,33 +75,6 @@ const resolvablesCreator = <BuildMode, Context>(
     }
   }
 }
-
-export const generateTypeDefs = (
-  resolvables: Record<Resolvables, GQLRecord>,
-  types: CreateableTypesRecord,
-): ITypeDefinitions => {
-  if (isEmpty(resolvables.Query)) throw new Error('Query cannot be empty')
-
-  return `
-    ${generateCreateables('interface', types.interface)}
-    ${generateCreateables('input', types.input)}
-    ${generateCreateables('type', types.type)}
-    ${generateData('Query', resolvables.Query)}
-    ${generateNonEmpty('Mutation', resolvables.Mutation)}
-    ${generateNonEmpty('Subscription', resolvables.Subscription)}
-    ${types.scalar.map(name => `scalar ${name}`).join('\n')}
-  `
-}
-
-export type AddScalarTypeArgs = [string, 'scalar', never]
-export type AddNonScalarTypeArgs = [
-  string,
-  Exclude<CreateableTypes, 'scalar'>,
-  Fields
-]
-export type ScalarOrNonScalarTypeArgs =
-  | [string, 'scalar', Fields]
-  | [string, Exclude<CreateableTypes, 'scalar'>, never]
 
 export const createBuild = <BuildMode = null, Context = any>(
   buildMode?: BuildMode,
@@ -168,55 +106,20 @@ export const createBuild = <BuildMode = null, Context = any>(
     resolvers[base][name] = resolver
   }
 
-  type AddScalarType = (
-    typeName: string,
-    type: 'scalar',
-    fields?: never,
-  ) => void
-  type AddNonScalarType = ((
-    typeName: string,
-    type: Exclude<CreateableTypes, 'scalar'>,
-    fields: Fields,
-  ) => void) &
-    ((
-      typeName: string,
-      type: Exclude<CreateableTypes, 'scalar'>,
-      fields: BMGenerator<Fields>,
-    ) => void)
-
   const createResolvable = resolvablesCreator<BuildMode, Context>(
     buildMode,
     resolvables,
     addResolver,
   )
 
-  const addScalarType: AddScalarType = typeName => types.scalar.push(typeName)
-  const addNonScalarType: AddNonScalarType = (typeName, createAble, fields) =>
-    (types[createAble][typeName] = reduce(
-      resolveBuildModeGenerator<Fields>(fields),
-      (record, type, field) => {
-        record[field] = typeToString(type)
-        return record
-      },
-      {} as GQLRecord, // tslint:disable-line no-object-literal-type-assertion
-    ))
-
-  const addType: AddScalarType &
-    AddNonScalarType &
-    BuildModeArgsGenerator<
-      BuildMode,
-      AddScalarTypeArgs | AddNonScalarTypeArgs
-    > = (buildModeBenerator, ...args) => {
-    const [typeName, type, fields] = isBuildModeGenerator<
-      BuildMode,
-      AddScalarTypeArgs | AddNonScalarTypeArgs
-    >(buildModeBenerator)
-      ? buildModeBenerator(buildMode)
-      : [buildModeBenerator, ...args]
-    return type === 'scalar'
-      ? addScalarType(typeName, type)
-      : addNonScalarType(typeName, type, fields)
-  }
+  const addType = createAddType(
+    buildMode,
+    typeName => types.scalar.push(typeName),
+    (typeName, createAble, fields) =>
+      (types[createAble][typeName] = fieldsToGQLRecord(
+        resolveBuildModeGenerator<Fields>(fields),
+      )),
+  )
 
   const builder = {
     builder: 'Build',
