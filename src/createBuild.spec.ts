@@ -1,6 +1,19 @@
-import { graphql, GraphQLString } from 'graphql'
+import { graphql, GraphQLNonNull, GraphQLString, printSchema } from 'graphql'
 import { makeExecutableSchema } from 'graphql-tools'
-import { createBuild } from './createBuild'
+import { AddNonScalarTypeArgs, createBuild } from './createBuild'
+
+const initialPets = [
+  {
+    name: 'Fluffy',
+    kind: 'dog',
+    age: 5,
+    owner: 'Mark',
+  },
+]
+
+const data = {
+  pets: initialPets,
+}
 
 describe('createBuild', () => {
   it('should create a base object with methods to add everything for gql', () => {
@@ -20,6 +33,16 @@ describe('createBuild', () => {
     expect(result).toMatchSnapshot()
   })
 
+  it('should generate the schema directly', async () => {
+    const build = createBuild()
+    build.addQuery('test', GraphQLString, () => 'TEST')
+    const result = await graphql({
+      schema: build.toSchema(),
+      source: '{ test }',
+    })
+    expect(result).toMatchSnapshot()
+  })
+
   it('should accept a buildMode function', async () => {
     const build = createBuild()
     build.addQuery('test', buildMode => GraphQLString, () => () => 'TEST')
@@ -30,5 +53,84 @@ describe('createBuild', () => {
     })
     const result = await graphql({ schema, source: '{ test }' })
     expect(result).toMatchSnapshot()
+  })
+
+  it('should be able to accept a new scalar type', async () => {
+    const build = createBuild()
+    build.addType('MyScalar', 'scalar')
+    build.addQuery('myScalar', 'MyScalar', () => 'TEST')
+    const result = await graphql({
+      schema: build.toSchema(),
+      source: '{ test }',
+    })
+    expect(result).toMatchSnapshot()
+  })
+
+  it('should be able to accept a new object type', async () => {
+    const build = createBuild()
+    build.addType('Pet', 'type', {
+      name: GraphQLString,
+      age: 'Int!',
+    })
+    build.addQuery('myPets', '[Pet!]!', () => data.pets)
+    const result = await graphql({
+      schema: build.toSchema(),
+      source: '{ myPets { name age } }',
+    })
+    expect(result).toMatchSnapshot()
+  })
+
+  it('should have types that are different based on buildMode', async () => {
+    type BuildMode = 'admin' | 'user'
+    const adminBuild = createBuild<BuildMode>('admin')
+    const userBuild = createBuild<BuildMode>('user')
+
+    const petType = (buildMode: BuildMode) => ({
+      name: GraphQLString,
+      age: 'Int!',
+      ...(buildMode === 'admin' && {
+        owner: GraphQLNonNull(GraphQLString),
+      }),
+    })
+
+    adminBuild.addType('Pet', 'type', petType)
+    userBuild.addType('Pet', 'type', petType)
+    adminBuild.addQuery('myPets', '[Pet!]!', () => data.pets)
+    userBuild.addQuery('myPets', '[Pet!]!', () => data.pets)
+    expect(adminBuild.toTypeDefs().typeDefs).toMatchSnapshot()
+    expect(userBuild.toTypeDefs().typeDefs).toMatchSnapshot()
+  })
+
+  it('should accept build mode generators on type level', async () => {
+    type BuildMode = 'admin' | 'user'
+    const adminBuild = createBuild<BuildMode>('admin')
+    const userBuild = createBuild<BuildMode>('user')
+
+    const petType = (buildMode: BuildMode) => ({
+      name: GraphQLString,
+      age: 'Int!',
+      ...(buildMode === 'admin' && {
+        owner: GraphQLNonNull(GraphQLString),
+      }),
+    })
+
+    const Pet = (buildMode: BuildMode): AddNonScalarTypeArgs => [
+      'Pet',
+      'type',
+      {
+        name: GraphQLString,
+        age: 'Int!',
+        ...(buildMode === 'admin' && {
+          owner: GraphQLNonNull(GraphQLString),
+        }),
+      },
+    ]
+
+    adminBuild.addType(Pet)
+    userBuild.addType(Pet)
+    adminBuild.addQuery('myPets', '[Pet!]!', () => data.pets)
+    userBuild.addQuery('myPets', '[Pet!]!', () => data.pets)
+    expect(adminBuild.toTypeDefs().typeDefs).toMatchSnapshot()
+    expect(userBuild.toTypeDefs().typeDefs).toMatchSnapshot()
   })
 })

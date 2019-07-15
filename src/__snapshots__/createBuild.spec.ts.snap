@@ -8,6 +8,70 @@ Object {
 }
 `;
 
+exports[`createBuild should accept build mode generators on type level 1`] = `
+"
+    
+    
+    
+  type Pet {
+    name: String
+age: Int!
+owner: String!
+  }
+
+    
+  type Query {
+    myPets: [Pet!]!
+  }
+
+    
+    
+    
+  "
+`;
+
+exports[`createBuild should accept build mode generators on type level 2`] = `
+"
+    
+    
+    
+  type Pet {
+    name: String
+age: Int!
+  }
+
+    
+  type Query {
+    myPets: [Pet!]!
+  }
+
+    
+    
+    
+  "
+`;
+
+exports[`createBuild should be able to accept a new object type 1`] = `
+Object {
+  "data": Object {
+    "myPets": Array [
+      Object {
+        "age": 5,
+        "name": "Fluffy",
+      },
+    ],
+  },
+}
+`;
+
+exports[`createBuild should be able to accept a new scalar type 1`] = `
+Object {
+  "errors": Array [
+    [GraphQLError: Cannot query field "test" on type "Query".],
+  ],
+}
+`;
+
 exports[`createBuild should be able to create a simple graphql interface 1`] = `
 Object {
   "data": Object {
@@ -27,4 +91,55 @@ Object {
   "toSchema": [Function],
   "toTypeDefs": [Function],
 }
+`;
+
+exports[`createBuild should generate the schema directly 1`] = `
+Object {
+  "data": Object {
+    "test": "TEST",
+  },
+}
+`;
+
+exports[`createBuild should have types that are different based on buildMode 1`] = `
+"
+    
+    
+    
+  type Pet {
+    name: String
+age: Int!
+owner: String!
+  }
+
+    
+  type Query {
+    myPets: [Pet!]!
+  }
+
+    
+    
+    
+  "
+`;
+
+exports[`createBuild should have types that are different based on buildMode 2`] = `
+"
+    
+    
+    
+  type Pet {
+    name: String
+age: Int!
+  }
+
+    
+  type Query {
+    myPets: [Pet!]!
+  }
+
+    
+    
+    
+  "
 `;
