@@ -1,6 +1,6 @@
 import { graphql, GraphQLNonNull, GraphQLString, printSchema } from 'graphql'
 import { makeExecutableSchema } from 'graphql-tools'
-import { AddNonScalarTypeArgs, createBuild } from './createBuild'
+import { AddNonScalarTypeArgs, createBuild } from '.'
 
 const initialPets = [
   {

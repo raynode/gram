@@ -6,25 +6,18 @@ import {
   makeExecutableSchema,
 } from 'graphql-tools'
 import { isEmpty, map, reduce } from 'lodash'
-
-type GQLRecord = Record<string, string>
-type Resolver<Source, Context> = IFieldResolver<Source, Context>
-type Resolvers = IResolvers
-type BuildModeGenerator<BuildMode, Result> = (buildMode?: BuildMode) => Result
-type BuildModeArgsGenerator<BuildMode, Args, Result = void> = (
-  buildModeGenerator: BuildModeGenerator<BuildMode, Args>,
-) => Result
-type FieldType = string | GraphQLType
-type Fields = Record<string, FieldType>
-
-type Resolvables = 'Query' | 'Mutation' | 'Subscription'
-interface CreateableTypesRecord {
-  scalar: string[]
-  type: Record<string, GQLRecord>
-  interface: Record<string, GQLRecord>
-  input: Record<string, GQLRecord>
-}
-type CreateableTypes = keyof CreateableTypesRecord
+import {
+  BuildModeArgsGenerator,
+  BuildModeGenerator,
+  CreateableTypes,
+  CreateableTypesRecord,
+  Fields,
+  FieldType,
+  GQLRecord,
+  Resolvables,
+  Resolver,
+  Resolvers,
+} from './types'
 
 const isBuildModeGenerator = <BuildMode, Result>(
   val: any,
