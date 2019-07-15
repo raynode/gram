@@ -17,10 +17,10 @@ const sanitizeEnumValue = memoize((value: string) =>
     .replace(/(^\d)/, '_$1'),
 )
 
-const buildOrderEnumValues = memoizeContextModel(contextModel =>
+const buildOrderEnumValues = memoizeContextModel(buildModeModel =>
   mapKeys(
     flatten(
-      contextModel
+      buildModeModel
         .getFields()
         .map(attr => attr.name)
         .map(sanitizeEnumValue)
@@ -31,9 +31,9 @@ const buildOrderEnumValues = memoizeContextModel(contextModel =>
 )
 
 export const order = memoizeContextModel(
-  contextModel =>
+  buildModeModel =>
     new GraphQLEnumType({
-      name: contextModel.names.types.orderType,
-      values: buildOrderEnumValues(contextModel),
+      name: buildModeModel.names.types.orderType,
+      values: buildOrderEnumValues(buildModeModel),
     }),
 )

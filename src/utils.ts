@@ -31,7 +31,8 @@ export const isContextFn = <Context, Type>(
 
 export const extractData = <Context, Type>(
   data: WithContext<Context, Type>,
-) => (context: Wrapped<Context>) => (isContextFn(data) ? data(context) : data)
+) => (buildMode: Wrapped<Context>) =>
+  isContextFn(data) ? data(buildMode) : data
 
 export const record = (service: Record<string, any>) => ({
   exists: (key: string) =>
@@ -48,12 +49,12 @@ export type FieldReducerFn<Context> = (
 
 export const fieldsReducer = <Context>(
   reducer: (
-    contextModel: ContextModel<Context, any>,
+    buildModeModel: ContextModel<Context, any>,
   ) => GraphQLFieldConfigMap<any, any> | GraphQLInputFieldConfigMap,
-) => (context: Wrapped<Context>): FieldReducerFn<Context> => (
+) => (buildMode: Wrapped<Context>): FieldReducerFn<Context> => (
   fields,
   model,
-) => ({ ...fields, ...clearRecord(reducer(model.build(context))) })
+) => ({ ...fields, ...clearRecord(reducer(model.build(buildMode))) })
 
 // this Type construct will ensure that the returned object will have the same keys as
 // the input object. It will also convert the properties from ModelBuilder to FieldReducer
@@ -88,7 +89,7 @@ export const toContextFn = <Context>(
 ): ToContextFnResult<Context> => {
   if (typeof type === 'function') return type
   if (isType(type)) return () => type
-  return context => context.getModel(type.name)
+  return buildMode => buildMode.getModel(type.name)
 }
 
 export type TypeCondition = 'nonnull' | 'list' | 'none'
@@ -117,12 +118,15 @@ export const conditionalType = <Type extends GraphQLType>(
     : type
 
 export const memoizeContextModel = <Context = any, Result = any, Type = any>(
-  fn: (contextModel: ContextModel<Context, Type, any>) => Result,
+  fn: (buildModeModel: ContextModel<Context, Type, any>) => Result,
 ) =>
-  memoize(fn, (contextModel: ContextModel<Context, Type>) => contextModel.id)
+  memoize(
+    fn,
+    (buildModeModel: ContextModel<Context, Type>) => buildModeModel.id,
+  )
 
 export const reduceContextFields = <Context, Type extends Record<string, any>>(
-  contextModel: ContextModel<Context, Type>,
+  buildModeModel: ContextModel<Context, Type>,
   base: Type = null,
   reducer: (
     memo: Type,
@@ -131,15 +135,15 @@ export const reduceContextFields = <Context, Type extends Record<string, any>>(
     field: ModelType<Context>,
   ) => Type,
 ) =>
-  contextModel
+  buildModeModel
     .getFields()
     .reduce(
       (memo: Type, attr) =>
         reducer(
           memo,
           attr,
-          buildType(attr, contextModel.context),
-          attr.field(contextModel.context),
+          buildType(attr, buildModeModel.buildMode),
+          attr.field(buildModeModel.buildMode),
         ),
       base || {},
     )
@@ -155,14 +159,17 @@ interface ContextModelFieldFnConfig {
 }
 export const createModelFieldFn = <Context>(
   configFn: (
-    contextModel: ContextModel<Context, any>,
+    buildModeModel: ContextModel<Context, any>,
   ) => ContextModelFieldFnConfig,
-) => (contextModel: ContextModel<Context, any>) => {
-  const { iterator, condition = 'none' } = configFn(contextModel)
+) => (buildModeModel: ContextModel<Context, any>) => {
+  const { iterator, condition = 'none' } = configFn(buildModeModel)
   return {
-    subscribe: () => contextModel.context.pubSub.asyncIterator(iterator),
+    subscribe: () => buildModeModel.buildMode.pubSub.asyncIterator(iterator),
     resolve: ({ node }) => node,
-    type: conditionalType(contextModel.getType() as GraphQLInputType, condition),
+    type: conditionalType(
+      buildModeModel.getType() as GraphQLInputType,
+      condition,
+    ),
   }
 }
 
@@ -171,10 +178,10 @@ export const createInputType = <Context>(
   nameFn: ContextModelFn<string>,
 ) =>
   memoizeContextModel(
-    contextModel =>
+    buildModeModel =>
       new GraphQLInputObjectType({
-        name: nameFn(contextModel),
+        name: nameFn(buildModeModel),
         fields: () =>
-          contextModel.dataFields(field) as GraphQLInputFieldConfigMap,
+          buildModeModel.dataFields(field) as GraphQLInputFieldConfigMap,
       }),
   )

@@ -34,7 +34,7 @@ const serviceToVisibility = (service: Service<any>): ModelVisibility => {
 export const createModelBuilder = <Context, Type, GQLType = Type>(
   modelName: string,
   service: Service<Type, GQLType>,
-  contextFn?: ContextMutator<Context, Type, GQLType>,
+  buildModeFn?: ContextMutator<Context, Type, GQLType>,
 ) => {
   const attributes: Attributes<Context, Type> = {}
   let contextMutation: ContextMutator<Context, Type, GQLType> = () => null
@@ -82,39 +82,40 @@ export const createModelBuilder = <Context, Type, GQLType = Type>(
         Type
       >(attributeName, toContextFn<Context>(type)))
     },
-    setup: context => {
-      const contextModel = createModel(
+    setup: buildMode => {
+      const buildModeModel = createModel(
         builder,
         service,
-        context,
+        buildMode,
         visibility,
-        resolver ? resolver(context) : {},
+        resolver ? resolver(buildMode) : {},
       )
-      if (contextFn) contextFn(contextModel, context)
-      if (isInterface) contextModel.setInterface()
-      context.addModel(modelName, contextModel)
+      if (buildModeFn) buildModeFn(buildModeModel, buildMode)
+      if (isInterface) buildModeModel.setInterface()
+      buildMode.addModel(modelName, buildModeModel)
     },
     build: memoize(
-      context => {
-        const contextModel = context.getModel<Type, GQLType>(modelName)
-        forEach(attributes, attr => contextModel.addField(attr))
+      buildMode => {
+        const buildModeModel = buildMode.getModel<Type, GQLType>(modelName)
+        forEach(attributes, attr => buildModeModel.addField(attr))
         interfaces
-          .map(name => context.getBaseModel(name))
+          .map(name => buildMode.getBaseModel(name))
           .forEach(model => {
             forEach(model.getAttributes(), (attr, name) => {
-              if (!attributes.hasOwnProperty(name)) contextModel.addField(attr)
+              if (!attributes.hasOwnProperty(name))
+                buildModeModel.addField(attr)
             })
           })
-        contextMutation(contextModel, context)
-        return contextModel
+        contextMutation(buildModeModel, buildMode)
+        return buildModeModel
       },
-      context => context.id,
+      buildMode => buildMode.id,
     ),
     resolve: modelResolver => {
       resolver = modelResolver
       return builder
     },
-    context: mutator => {
+    buildMode: mutator => {
       contextMutation = mutator
       return builder
     },

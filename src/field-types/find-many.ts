@@ -2,19 +2,19 @@ import { GraphQLNonNull, GraphQLOutputType } from 'graphql'
 import { order, page, where } from '../input-types'
 import { memoizeContextModel } from '../utils'
 
-export const findMany = memoizeContextModel(contextModel => ({
+export const findMany = memoizeContextModel(buildModeModel => ({
   args: {
-    [contextModel.names.arguments.order]: { type: order(contextModel) },
-    [contextModel.names.arguments.page]: { type: page(contextModel) },
-    [contextModel.names.arguments.where]: {
-      type: GraphQLNonNull(where(contextModel)),
+    [buildModeModel.names.arguments.order]: { type: order(buildModeModel) },
+    [buildModeModel.names.arguments.page]: { type: page(buildModeModel) },
+    [buildModeModel.names.arguments.where]: {
+      type: GraphQLNonNull(where(buildModeModel)),
     },
   },
-  type: contextModel.getListType() as GraphQLOutputType,
-  resolve: (_, args, context) =>
-    contextModel.service.findMany({
-      order: args[contextModel.names.arguments.order] || null,
-      page: args[contextModel.names.arguments.page] || null,
-      where: args[contextModel.names.arguments.where],
+  type: buildModeModel.getListType() as GraphQLOutputType,
+  resolve: (_, args, buildMode) =>
+    buildModeModel.service.findMany({
+      order: args[buildModeModel.names.arguments.order] || null,
+      page: args[buildModeModel.names.arguments.page] || null,
+      where: args[buildModeModel.names.arguments.where],
     }),
 }))

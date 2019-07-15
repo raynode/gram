@@ -48,20 +48,20 @@ import { isFieldDefinition } from './types/guards'
 import { extractData, reduceFields } from './utils'
 
 const wrapContext = <Context>(
-  context: Context | null,
+  buildMode: Context | null,
   scalars: Record<string, GraphQLScalarType>,
   models: Models<Context>,
   filters: FilterMiddleware[],
   pubSub: PubSub,
 ): Wrapped<Context> => {
-  const contextModels: Record<string, ContextModel<Context, any>> = {}
+  const buildModeModels: Record<string, ContextModel<Context, any>> = {}
   return {
     id: uuid(),
-    context,
+    buildMode,
     filterStrategy: createFilterStrategy(filters),
-    addModel: (name, model) => (contextModels[name] = model),
+    addModel: (name, model) => (buildModeModels[name] = model),
     getBaseModel: name => models[name],
-    getModel: name => contextModels[name],
+    getModel: name => buildModeModels[name],
     getScalar: name => scalars[name],
     pubSub,
   }
@@ -69,9 +69,9 @@ const wrapContext = <Context>(
 
 const addNodeAttrs = <Context>(model: ModelBuilder<Context, any>) => {
   model.attr('id', GraphQLID)
-  model.attr('createdAt', context => context.getScalar('DateTime'))
-  model.attr('updatedAt', context => context.getScalar('DateTime'))
-  model.attr('deletedAt', context => context.getScalar('DateTime'))
+  model.attr('createdAt', buildMode => buildMode.getScalar('DateTime'))
+  model.attr('updatedAt', buildMode => buildMode.getScalar('DateTime'))
+  model.attr('deletedAt', buildMode => buildMode.getScalar('DateTime'))
   return model
 }
 
@@ -104,11 +104,11 @@ type Models<Context> = Record<string, ModelBuilder<Context, any, any>>
 const setup = <Context>(
   models: Models<Context>,
   scalars: Record<string, GraphQLScalarType>,
-  context: Context | null,
+  buildMode: Context | null,
   filters: FilterMiddleware[],
   pubSub: PubSub = new PubSub(),
 ) => {
-  const wrapped = wrapContext(context, scalars, models, filters, pubSub)
+  const wrapped = wrapContext(buildMode, scalars, models, filters, pubSub)
   forEach(models, model => model.setup(wrapped))
   return wrapped
 }
@@ -165,13 +165,13 @@ export const createSchemaBuilder = <Context = any, QueryContext = any>() => {
       model.setInterface()
       return model
     },
-    build: (context: Context | FieldDefinition = null) =>
+    build: (buildMode: Context | FieldDefinition = null) =>
       createSchema(
-        isFieldDefinition(context) ? context : builder.fields(context),
+        isFieldDefinition(buildMode) ? buildMode : builder.fields(buildMode),
       ),
-    fields: (context: Context | null = null) => {
+    fields: (buildMode: Context | null = null) => {
       const pubSub = externalPubSub || new PubSub()
-      const wrapped = setup(models, scalars, context, filters, pubSub)
+      const wrapped = setup(models, scalars, buildMode, filters, pubSub)
       // build all interfaces
       filter(models, model => model.isInterface()).forEach(model =>
         model.build(wrapped),
@@ -181,11 +181,11 @@ export const createSchemaBuilder = <Context = any, QueryContext = any>() => {
           args,
           name,
           resolver: resolve,
-          type: contextType,
+          type: buildModeType,
         } = extractData(queryDefinition)(wrapped)
-        const type = isType(contextType)
-          ? contextType
-          : wrapped.getModel(contextType.name).getType()
+        const type = isType(buildModeType)
+          ? buildModeType
+          : wrapped.getModel(buildModeType.name).getType()
         memo[name] = { name, type, args, resolve }
         return memo
       }, {})

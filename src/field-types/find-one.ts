@@ -2,17 +2,17 @@ import { GraphQLNonNull, GraphQLOutputType } from 'graphql'
 import { order, where } from '../input-types'
 import { memoizeContextModel } from '../utils'
 
-export const findOne = memoizeContextModel(contextModel => ({
+export const findOne = memoizeContextModel(buildModeModel => ({
   args: {
-    [contextModel.names.arguments.where]: {
-      type: GraphQLNonNull(where(contextModel)),
+    [buildModeModel.names.arguments.where]: {
+      type: GraphQLNonNull(where(buildModeModel)),
     },
-    [contextModel.names.arguments.order]: { type: order(contextModel) },
+    [buildModeModel.names.arguments.order]: { type: order(buildModeModel) },
   },
-  type: contextModel.getType() as GraphQLOutputType,
-  resolve: (_, args, context) =>
-    contextModel.service.findOne({
-      where: args[contextModel.names.arguments.where],
-      order: args[contextModel.names.arguments.order] || null,
+  type: buildModeModel.getType() as GraphQLOutputType,
+  resolve: (_, args, buildMode) =>
+    buildModeModel.service.findOne({
+      where: args[buildModeModel.names.arguments.where],
+      order: args[buildModeModel.names.arguments.order] || null,
     }),
 }))

@@ -12,7 +12,7 @@ interface Node {
 }
 
 type Query {
-  context: String
+  buildMode: String
   me: User
 }
 
@@ -38,7 +38,7 @@ interface Node {
 }
 
 type Query {
-  context: String
+  buildMode: String
   me: User
 }
 

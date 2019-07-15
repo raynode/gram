@@ -9,8 +9,8 @@ import {
   reduceContextFields,
 } from '../utils'
 
-export const create = memoizeContextModel(contextModel =>
-  reduceContextFields(contextModel, {}, (create, attr, type, field) => ({
+export const create = memoizeContextModel(buildModeModel =>
+  reduceContextFields(buildModeModel, {}, (create, attr, type, field) => ({
     ...create,
     [attr.name]: {
       type: isType(field)

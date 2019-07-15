@@ -72,7 +72,7 @@ export interface ContextModel<BuildMode, Type, GQLType = Type> {
     field: AttributeBuilder<BuildMode, Type, AttributeType>,
   ) => void
   baseFilters: () => GraphQLInputFieldConfigMap
-  context: Wrapped<BuildMode>
+  buildMode: Wrapped<BuildMode>
   dataFields: (
     type: DataType,
   ) => GraphQLInputFieldConfigMap | GraphQLFieldConfigMap<any, any>
@@ -101,24 +101,24 @@ export interface Wrapped<BuildMode> {
     model: ContextModel<BuildMode, Type, GQLType>,
   ) => void
   filterStrategy: FilterStrategy
-  context: BuildMode | null
+  buildMode: BuildMode | null
   getScalar: (key: string) => GraphQLScalarType
   pubSub: PubSub
 }
 
 export type ContextModelFn<Result> = <BuildMode>(
-  contextModel: ContextModel<BuildMode, any, any>,
+  buildModeModel: ContextModel<BuildMode, any, any>,
 ) => Result
 
 export type ContextFn<BuildMode, Result = boolean> = (
-  context: Wrapped<BuildMode>,
+  buildMode: Wrapped<BuildMode>,
 ) => Result
 export type ContextMutator<BuildMode, Type, GQLType> = (
   model: ContextModel<BuildMode, Type, GQLType>,
-  context: Wrapped<BuildMode>,
+  buildMode: Wrapped<BuildMode>,
 ) => void
 export type ContextModelFieldFn<Type, GQLType> = <BuildMode>(
-  contextModel: ContextModel<BuildMode, Type, GQLType>,
+  buildModeModel: ContextModel<BuildMode, Type, GQLType>,
 ) => Type
 
 export type WithContext<BuildMode, Type> = Type | ContextFn<BuildMode, Type>
@@ -139,7 +139,7 @@ export interface QueryTypeDefinition<
 // GraphQLFieldResolver<TSource, TContext, TArgs>
 
 export interface SchemaBuilder<BuildMode, QueryContext = any> extends Builder {
-  build: (context?: BuildMode | FieldDefinition) => GraphQLSchema
+  build: (buildMode?: BuildMode | FieldDefinition) => GraphQLSchema
   interface: <Type>(
     interfaceName: string,
     service?: Service<Type>,
@@ -148,7 +148,7 @@ export interface SchemaBuilder<BuildMode, QueryContext = any> extends Builder {
     modelName: string,
     service?: Service<Type, GQLType>,
   ) => ModelBuilder<BuildMode, Type, GQLType>
-  fields: (context: BuildMode | null) => FieldDefinition
+  fields: (buildMode: BuildMode | null) => FieldDefinition
   models: Record<string, ModelBuilder<BuildMode, any>>
   type: typeof SCHEMABUILDER
   setScalar: <Type extends GraphQLScalarType>(key: string, type: Type) => Type
@@ -181,9 +181,11 @@ export interface ModelBuilder<BuildMode, Type, GQLType = Type> extends Builder {
     resolver: ContextFn<BuildMode, GraphQLResolverMap<GQLType, Attrs>>,
   ) => this
   build: (
-    context: Wrapped<BuildMode>,
+    buildMode: Wrapped<BuildMode>,
   ) => ContextModel<BuildMode, Type, GQLType>
-  context: (contextMutation: ContextMutator<BuildMode, Type, GQLType>) => this
+  buildMode: (
+    buildModeMutation: ContextMutator<BuildMode, Type, GQLType>,
+  ) => this
   getAttributes: () => Attributes<BuildMode, Type>
   getInterfaces: () => string[]
   getListType: () => GraphQLType | ModelBuilder<BuildMode, any>
@@ -205,7 +207,7 @@ export interface AttributeBuilder<BuildMode, Type, AttributeType>
   resolve: (resolver: GraphQLFieldResolver<Type, any>) => this
   isList: (isList?: boolean) => this
   isNotNullable: (isNotNullable?: boolean) => this
-  // contextType: ContextFn<BuildMode, ModelType<BuildMode>>
+  // buildModeType: ContextFn<BuildMode, ModelType<BuildMode>>
   build: ContextFn<BuildMode, GraphQLFieldConfig<any, any>>
   type: typeof ATTRIBUTEBUILDER
 }

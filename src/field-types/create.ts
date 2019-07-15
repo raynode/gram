@@ -2,20 +2,23 @@ import { GraphQLInputType, GraphQLNonNull } from 'graphql'
 import { create as createInput } from '../input-types'
 import { memoizeContextModel } from '../utils'
 
-export const create = memoizeContextModel(contextModel => ({
+export const create = memoizeContextModel(buildModeModel => ({
   args: {
-    [contextModel.names.arguments.data]: {
-      type: GraphQLNonNull(createInput(contextModel)),
+    [buildModeModel.names.arguments.data]: {
+      type: GraphQLNonNull(createInput(buildModeModel)),
     },
   },
-  type: contextModel.getType() as GraphQLInputType,
-  resolve: (_, args, context) => {
-    const node = contextModel.service.create({
-      data: args[contextModel.names.arguments.data],
+  type: buildModeModel.getType() as GraphQLInputType,
+  resolve: (_, args, buildMode) => {
+    const node = buildModeModel.service.create({
+      data: args[buildModeModel.names.arguments.data],
     })
-    contextModel.context.pubSub.publish(contextModel.names.events.create, {
-      node,
-    })
+    buildModeModel.buildMode.pubSub.publish(
+      buildModeModel.names.events.create,
+      {
+        node,
+      },
+    )
     return node
   },
 }))

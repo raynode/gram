@@ -28,77 +28,80 @@ import { filter } from './input-types'
 import { toList } from './utils'
 
 const fieldBuilderFn = <Context>(
-  context: Wrapped<Context>,
+  buildMode: Wrapped<Context>,
   resolvers: GraphQLResolverMap<any>,
 ) => <Type>(
   fields: GraphQLFieldConfigMap<any, any>,
   attr: AttributeBuilder<Context, Type, any>,
 ) => {
-  fields[attr.name] = attr.build(context)
+  fields[attr.name] = attr.build(buildMode)
   if (resolvers[attr.name]) fields[attr.name].resolve = resolvers[attr.name]
   return fields
 }
 
 const fieldBuilder = <Context>(
-  context: Wrapped<Context>,
+  buildMode: Wrapped<Context>,
   resolvers: GraphQLResolverMap<any>,
 ) => <Type>(
   fields: Array<AttributeBuilder<Context, Type, any>>,
 ): GraphQLFieldConfigMap<any, any> =>
-  reduce(fields, fieldBuilderFn(context, resolvers), {})
+  reduce(fields, fieldBuilderFn(buildMode, resolvers), {})
 
 export const createModel = <Context, Type, GQLType = Type>(
   model: ModelBuilder<Context, any>,
   service: Service<Type, GQLType>,
-  context: Wrapped<Context>,
+  buildMode: Wrapped<Context>,
   visibility: ModelVisibility,
   resolvers: GraphQLResolverMap<GQLType>,
 ) => {
   type Attribute = AttributeBuilder<Context, Type, any>
-  const buildFields = fieldBuilder(context, resolvers)
+  const buildFields = fieldBuilder(buildMode, resolvers)
   const fields: Attribute[] = []
   const getFields = () => buildFields(fields)
-  let contextModelIsInterface: boolean = false
+  let buildModeModelIsInterface: boolean = false
 
-  const contextModel: ContextModel<Context, Type, GQLType> = {
+  const buildModeModel: ContextModel<Context, Type, GQLType> = {
     addField: (field: Attribute) => {
       fields.push(field)
       return field
     },
     baseFilters: memoize(() => ({
-      AND: { type: GraphQLList(GraphQLNonNull(filter(contextModel))) },
-      OR: { type: GraphQLList(GraphQLNonNull(filter(contextModel))) },
-      NOT: { type: filter(contextModel) },
+      AND: { type: GraphQLList(GraphQLNonNull(filter(buildModeModel))) },
+      OR: { type: GraphQLList(GraphQLNonNull(filter(buildModeModel))) },
+      NOT: { type: filter(buildModeModel) },
     })),
-    context,
+    buildMode,
     dataFields: memoize(type => {
       switch (type) {
         case 'create':
-          return DataTypes.create(contextModel)
+          return DataTypes.create(buildModeModel)
         case 'data':
-          return DataTypes.data(contextModel)
+          return DataTypes.data(buildModeModel)
         case 'filter':
-          return DataTypes.filter(contextModel)
+          return DataTypes.filter(buildModeModel)
         case 'list':
-          return DataTypes.list(contextModel)
+          return DataTypes.list(buildModeModel)
         case 'page':
-          return DataTypes.page(contextModel)
+          return DataTypes.page(buildModeModel)
         case 'where':
-          return DataTypes.where(contextModel)
+          return DataTypes.where(buildModeModel)
       }
     }),
     getFields: () => fields,
     getListType: memoize(
       () =>
         new GraphQLObjectType({
-          name: contextModel.names.types.listType,
+          name: buildModeModel.names.types.listType,
           fields: () =>
-            contextModel.dataFields('list') as GraphQLFieldConfigMap<any, any>,
-          interfaces: (): any => [context.getModel('List').getType()],
+            buildModeModel.dataFields('list') as GraphQLFieldConfigMap<
+              any,
+              any
+            >,
+          interfaces: (): any => [buildMode.getModel('List').getType()],
         }),
     ),
     getType: memoize(() =>
-      contextModelIsInterface
+      buildModeModelIsInterface
         ? new GraphQLInterfaceType({
             name: model.name,
             fields: getFields,
@@ -110,20 +113,20 @@ export const createModel = <Context, Type, GQLType = Type>(
               const interfaces = model.getInterfaces()
               return model
                 .getInterfaces()
-                .map(context.getModel)
+                .map(buildMode.getModel)
                 .map(model => model.getType())
             },
           }),
     ),
     id: uuid(),
-    isInterface: () => contextModelIsInterface,
+    isInterface: () => buildModeModelIsInterface,
     name: model.name,
     names: defaultNamingStrategy(model.name),
     service,
     setInterface: () => {
-      contextModelIsInterface = true
+      buildModeModelIsInterface = true
     },
     visibility: { ...visibility },
   }
-  return contextModel
+  return buildModeModel
 }

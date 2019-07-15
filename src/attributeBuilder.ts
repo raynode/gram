@@ -18,10 +18,10 @@ import { toList } from './utils'
 
 export const buildType = <Context>(
   attr: AttributeBuilder<Context, any, any>,
-  context: Wrapped<Context>,
+  buildMode: Wrapped<Context>,
 ): GraphQLOutputType => {
-  const type = attr.field(context)
-  const gqlType = isType(type) ? type : context.getModel(type.name).getType()
+  const type = attr.field(buildMode)
+  const gqlType = isType(type) ? type : buildMode.getModel(type.name).getType()
   if (attr.listType) return toList(gqlType) as GraphQLOutputType
   if (!attr.nullable) return GraphQLNonNull(gqlType)
   return gqlType as GraphQLOutputType
@@ -49,8 +49,8 @@ export const createAttributeBuilder = <Context, Type, AttributeType>(
       builder.nullable = !isNotNullable
       return builder
     },
-    build: context => ({
-      type: buildType<Context>(builder, context),
+    build: buildMode => ({
+      type: buildType<Context>(builder, buildMode),
       resolve,
     }),
     type: ATTRIBUTEBUILDER,
