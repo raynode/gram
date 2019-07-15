@@ -8,12 +8,13 @@
     "build": "rimraf lib && tsc --p ./tsconfig.build.json",
     "coveralls": "cat ./coverage/lcov.info | ./node_modules/.bin/coveralls",
     "dev": "npm run test:watch",
-    "prepare": "npm run build",
+    "prepare": "npm run snyk-protect; npm run build",
     "test": "npm run test:coverage",
     "test-only": "jest",
     "test:coverage": "jest --coverage",
     "test:watch": "jest --watch",
-    "semantic-release": "semantic-release"
+    "semantic-release": "semantic-release",
+    "snyk-protect": "snyk protect"
   },
   "repository": {
     "type": "git",
@@ -44,7 +45,8 @@
     "graphql-subscriptions": "^1.1.0",
     "graphql-type-json": "^0.3.0",
     "inflection": "^1.12.0",
-    "lodash": "^4.17.11"
+    "lodash": "^4.17.11",
+    "snyk": "^1.189.0"
   },
   "peerDependencies": {
     "graphql": "^14.3.1"
@@ -57,9 +59,9 @@
     "@types/uuid": "^3.4.4",
     "coveralls": "^3.0.4",
     "graphql": "^14.3.1",
-    "husky": "^2.4.0",
+    "husky": "^3.0.0",
     "jest": "^24.8.0",
-    "lint-staged": "^8.2.0",
+    "lint-staged": "^9.0.0",
     "prettier": "^1.18.2",
     "rimraf": "^2.6.3",
     "ts-jest": "^24.0.2",
@@ -67,5 +69,6 @@
     "tslint": "^5.17.0",
     "typescript": "^3.5.1",
     "semantic-release": "^15.13.12"
-  }
+  },
+  "snyk": true
 }
