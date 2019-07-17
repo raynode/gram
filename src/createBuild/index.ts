@@ -4,6 +4,7 @@ import { generateTypeDefs } from './generateTypeDefs'
 import { createAddType } from './method-addType'
 import { resolvablesCreator } from './method-resolvablesCreator'
 import {
+  AddResolver,
   Build,
   CreateableTypesRecord,
   GQLRecord,
@@ -32,10 +33,10 @@ export const createBuild = <BuildMode = null, Context = any>(
     type: {},
   }
   const resolvers: Resolvers = {}
-  const addResolver = <Source>(
-    base: string,
-    name: string,
-    resolver: IFieldResolver<Source, Context>,
+  const addResolver: AddResolver<Context> = (
+    base,
+    name,
+    { args, resolver },
   ) => {
     resolvers[base] = resolvers[base] || {}
     resolvers[base][name] = resolver

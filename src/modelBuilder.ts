@@ -129,6 +129,8 @@ export const createModelBuilder = <BuildMode, Type, GQLType = Type>(
     },
     getAttributes: () => attributes,
     getResolver: () => resolver,
+    getVisibility: () => visibility,
+    getService: () => service,
   }
   return builder
 }

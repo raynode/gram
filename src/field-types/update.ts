@@ -12,7 +12,7 @@ export const update = memoizeContextModel(buildModeModel => ({
     },
   },
   type: toList(buildModeModel.getType()) as GraphQLInputType,
-  resolve: (_, args, buildMode) => {
+  resolve: (_, args, context) => {
     const node = buildModeModel.service.update({
       data: args[buildModeModel.names.arguments.data],
       where: args[buildModeModel.names.arguments.where],

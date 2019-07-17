@@ -9,7 +9,7 @@ export const create = memoizeContextModel(buildModeModel => ({
     },
   },
   type: buildModeModel.getType() as GraphQLInputType,
-  resolve: (_, args, buildMode) => {
+  resolve: (_, args, context) => {
     const node = buildModeModel.service.create({
       data: args[buildModeModel.names.arguments.data],
     })

@@ -99,7 +99,7 @@ export const createAddType = <BuildMode>(
   addObjectType: AddObjectType<BuildMode>,
 ): AddType<BuildMode> & AddArgsGenerator<BuildMode> => (
   buildModeBenerator,
-  ...args,
+  ...args
 ) => {
   const typeInformation = isBuildModeGenerator<BuildMode, AddArgs<BuildMode>>(
     buildModeBenerator,

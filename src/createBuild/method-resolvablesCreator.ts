@@ -1,5 +1,6 @@
 import {
   AddResolvable,
+  AddResolvableConfig,
   AddResolver,
   BuildModeGenerator,
   FieldType,
@@ -25,19 +26,25 @@ export const resolvablesCreator = <BuildMode, Context>(
   addResolver: AddResolver<Context>,
 ) => {
   const resolveBuildModeGenerator = createBuildModeResolver(buildMode)
-  return (typeName: Resolvables): AddResolvable => (name, type, resolver) => {
+  return <Source, Context, Type = FieldType>(
+    typeName: Resolvables,
+  ): AddResolvable => (name: string, type: any, configOrResolver = {}) => {
+    const { args = {}, resolver = null } =
+      typeof configOrResolver === 'function'
+        ? { args: {}, resolver: configOrResolver }
+        : {
+            args: resolveBuildModeGenerator(configOrResolver.args),
+            resolver: resolveBuildModeGenerator(configOrResolver.resolver),
+          }
+    const config = { args, resolver }
     if (isBuildModeGenerator<BuildMode, FieldType>(type)) {
       resolvables[typeName][name] = typeToString(
         resolveBuildModeGenerator(type),
       )
-      addResolver(
-        typeName,
-        name,
-        resolveBuildModeGenerator<IFieldResolver<any, any>>(resolver),
-      )
+      addResolver(typeName, name, config)
     } else {
       resolvables[typeName][name] = typeToString(type)
-      addResolver(typeName, name, resolver)
+      addResolver(typeName, name, config)
     }
   }
 }

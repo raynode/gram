@@ -11,7 +11,7 @@ export const findMany = memoizeContextModel(buildModeModel => ({
     },
   },
   type: buildModeModel.getListType() as GraphQLOutputType,
-  resolve: (_, args, buildMode) =>
+  resolve: (_, args, context) =>
     buildModeModel.service.findMany({
       order: args[buildModeModel.names.arguments.order] || null,
       page: args[buildModeModel.names.arguments.page] || null,

@@ -57,19 +57,23 @@ export interface CreateableTypesRecord {
 }
 export type CreateableTypes = keyof CreateableTypesRecord
 
-export type AddResolvable = (<Source, Context, Type = FieldType>(
+export interface AddResolvableConfig<Source, Context, Resolver> {
+  args?: GQLRecord
+  resolver?: Resolver
+}
+export type AddResolvable = (<Source, Context>(
   name: string,
-  type: Type,
-  resolver?: IFieldResolver<Source, Context>,
+  type: FieldType,
+  config?: any,
 ) => void) &
-  (<BuildMode, Source, Context, Type = FieldType>(
+  (<BuildMode, Source, Context, FieldType>(
     name: string,
-    type: BuildModeGenerator<BuildMode, Type>,
-    resolver?: BuildModeGenerator<BuildMode, IFieldResolver<Source, Context>>,
+    type: BuildModeGenerator<BuildMode, FieldType>,
+    config?: any,
   ) => void)
 
 export type AddResolver<Context> = <Source>(
   base: string,
   name: string,
-  resolver: IFieldResolver<Source, Context>,
+  config: AddResolvableConfig<Source, Context, IFieldResolver<Source, Context>>,
 ) => void

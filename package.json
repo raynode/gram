@@ -46,30 +46,30 @@
     "graphql-tools": "^4.0.5",
     "graphql-type-json": "^0.3.0",
     "inflection": "^1.12.0",
-    "lodash": "^4.17.11",
-    "snyk": "^1.189.0"
+    "lodash": "^4.17.14",
+    "snyk": "^1.193.2"
   },
   "peerDependencies": {
-    "graphql": "^14.3.1"
+    "graphql": "^14.4.2"
   },
   "devDependencies": {
-    "@types/graphql": "^14.2.0",
+    "@types/graphql": "^14.2.2",
     "@types/inflection": "^1.5.28",
-    "@types/jest": "^24.0.13",
-    "@types/lodash": "^4.14.134",
-    "@types/uuid": "^3.4.4",
-    "coveralls": "^3.0.4",
-    "graphql": "^14.3.1",
+    "@types/jest": "^24.0.15",
+    "@types/lodash": "^4.14.136",
+    "@types/uuid": "^3.4.5",
+    "coveralls": "^3.0.5",
+    "graphql": "^14.4.2",
     "husky": "^3.0.0",
     "jest": "^24.8.0",
-    "lint-staged": "^9.0.0",
+    "lint-staged": "^9.2.0",
     "prettier": "^1.18.2",
     "rimraf": "^2.6.3",
     "ts-jest": "^24.0.2",
-    "ts-node": "^8.2.0",
-    "tslint": "^5.17.0",
-    "typescript": "^3.5.1",
-    "semantic-release": "^15.13.12"
+    "ts-node": "^8.3.0",
+    "tslint": "^5.18.0",
+    "typescript": "^3.5.3",
+    "semantic-release": "^15.13.18"
   },
   "snyk": true
 }

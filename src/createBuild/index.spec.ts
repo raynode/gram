@@ -46,7 +46,9 @@ describe('createBuild', () => {
 
   it('should accept a buildMode function', async () => {
     const build = createBuild()
-    build.addQuery('test', buildMode => GraphQLString, () => () => 'TEST')
+    build.addQuery('test', buildMode => GraphQLString, {
+      resolver: () => () => 'TEST',
+    })
     const { typeDefs, resolvers } = build.toTypeDefs()
     const schema = makeExecutableSchema({
       typeDefs,

@@ -10,9 +10,24 @@ export const findOne = memoizeContextModel(buildModeModel => ({
     [buildModeModel.names.arguments.order]: { type: order(buildModeModel) },
   },
   type: buildModeModel.getType() as GraphQLOutputType,
-  resolve: (_, args, buildMode) =>
+  resolve: (_, args, context) =>
     buildModeModel.service.findOne({
       where: args[buildModeModel.names.arguments.where],
       order: args[buildModeModel.names.arguments.order] || null,
     }),
 }))
+
+export const findOneTypeDef = (names, where, order, type) => ({
+  // args: {
+  //   [buildModeModel.names.arguments.where]: {
+  //     type: GraphQLNonNull(where(buildModeModel)),
+  //   },
+  //   [buildModeModel.names.arguments.order]: { type: order(buildModeModel) },
+  // },
+  // type: buildModeModel.getType() as GraphQLOutputType,
+  // resolve: (_, args, context) =>
+  //   buildModeModel.service.findOne({
+  //     where: args[buildModeModel.names.arguments.where],
+  //     order: args[buildModeModel.names.arguments.order] || null,
+  //   }),
+})
