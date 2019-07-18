@@ -16,32 +16,6 @@ export interface WithAddModel<BuildMode, Context>
   ) => void
 }
 
-// export const reduceContextFields = <
-//   BuildMode,
-//   Type extends Record<string, any>
-// >(
-//   buildModeModel: ContextModel<BuildMode, Type>,
-//   base: Type = null,
-//   reducer: (
-//     memo: Type,
-//     attr: AttributeBuilder<BuildMode, Type, any>,
-//     type: GraphQLType,
-//     field: ModelType<BuildMode>,
-//   ) => Type,
-// ) =>
-//   buildModeModel
-//     .getFields()
-//     .reduce(
-//       (memo: Type, attr) =>
-//         reducer(
-//           memo,
-//           attr,
-//           buildType(attr, buildModeModel.buildMode),
-//           attr.field(buildModeModel.buildMode),
-//         ),
-//       base || {},
-//     )
-
 const fakeWrapped = <BuildMode>(buildMode: BuildMode) =>
   ({
     id: 'string',
