@@ -178,7 +178,7 @@ export const createSchemaBuilder = <BuildMode = any, QueryContext = any>() => {
       const pubSub = externalPubSub || new PubSub()
       const wrapped = setup(models, scalars, buildMode, filters, pubSub)
 
-      const build = addModel(createBuild(buildMode))
+      const build = addModel(createBuild<BuildMode, QueryContext>(buildMode))
 
       forEach(models, model => {
         build.addModel(model)

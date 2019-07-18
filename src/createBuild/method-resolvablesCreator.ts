@@ -26,9 +26,11 @@ export const resolvablesCreator = <BuildMode, Context>(
   addResolver: AddResolver<Context>,
 ) => {
   const resolveBuildModeGenerator = createBuildModeResolver(buildMode)
-  return <Source, Context, Type = FieldType>(
-    typeName: Resolvables,
-  ): AddResolvable => (name: string, type: any, configOrResolver = {}) => {
+  return (typeName: Resolvables): AddResolvable<BuildMode, Context> => (
+    name: string,
+    type: any,
+    configOrResolver = {},
+  ) => {
     const { args = {}, resolver = null } =
       typeof configOrResolver === 'function'
         ? { args: {}, resolver: configOrResolver }

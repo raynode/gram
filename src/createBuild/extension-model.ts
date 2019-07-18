@@ -9,7 +9,8 @@ import * as DataTypes from '../data-types'
 import { defaultNamingStrategy } from '../strategies/naming'
 import { AttributeBuilder, ModelBuilder } from '../types'
 
-export interface WithAddModel<BuildMode> extends Build<BuildMode> {
+export interface WithAddModel<BuildMode, Context>
+  extends Build<BuildMode, Context> {
   addModel: <Type, GQLType = Type>(
     model: ModelBuilder<BuildMode, Type, GQLType>,
   ) => void
@@ -80,8 +81,10 @@ const getAttributeFields = <BuildMode, Type, GQLType>(
     {},
   )
 
-export const addModel = <BuildMode>(baseBuild: Build<BuildMode>) => {
-  const build = baseBuild as WithAddModel<BuildMode>
+export const addModel = <BuildMode, Context>(
+  baseBuild: Build<BuildMode, Context>,
+) => {
+  const build = baseBuild as WithAddModel<BuildMode, Context>
   build.addModel = modelBuilder => {
     const resolver: IFieldResolver<any, any> = modelBuilder.getResolver()
 

@@ -12,12 +12,12 @@ export interface TypeDefs {
   typeDefs: ITypeDefinitions
   resolvers: IResolvers
 }
-export interface Build<BuildMode> {
+export interface Build<BuildMode, Context> {
   type: typeof GQLBUILDER
   buildMode: BuildMode
-  addQuery: AddResolvable
-  addMutation: AddResolvable
-  addSubscription: AddResolvable
+  addQuery: AddResolvable<BuildMode, Context>
+  addMutation: AddResolvable<BuildMode, Context>
+  addSubscription: AddResolvable<BuildMode, Context>
   addType: ReturnType<typeof createAddType>
   toSchema: () => GraphQLSchema
   toTypeDefs: () => TypeDefs
@@ -61,12 +61,12 @@ export interface AddResolvableConfig<Source, Context, Resolver> {
   args?: GQLRecord
   resolver?: Resolver
 }
-export type AddResolvable = (<Source, Context>(
+export type AddResolvable<BuildMode, Context> = (<Source>(
   name: string,
   type: FieldType,
   config?: any,
 ) => void) &
-  (<BuildMode, Source, Context, FieldType>(
+  (<Source>(
     name: string,
     type: BuildModeGenerator<BuildMode, FieldType>,
     config?: any,

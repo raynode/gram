@@ -1,6 +1,6 @@
 import { GraphQLEnumType } from 'graphql'
 import { flatten, mapKeys, memoize, upperFirst } from 'lodash'
-import { memoizeContextModel } from '../utils'
+import { createInputType, memoizeContextModel } from 'utils'
 
 const specialCharsMap = new Map([
   ['¼', 'frac14'],
@@ -28,6 +28,31 @@ const buildOrderEnumValues = memoizeContextModel(buildModeModel =>
     ).map(value => ({ value })),
     'value',
   ),
+)
+
+export const create = createInputType(
+  'create',
+  buildModeModel => buildModeModel.names.types.createType,
+)
+
+export const data = createInputType(
+  'data',
+  buildModeModel => buildModeModel.names.types.dataType,
+)
+
+export const filter = createInputType(
+  'filter',
+  buildModeModel => buildModeModel.names.types.filterType,
+)
+
+export const page = createInputType(
+  'page',
+  buildModeModel => buildModeModel.names.types.pageType,
+)
+
+export const where = createInputType(
+  'where',
+  buildModeModel => buildModeModel.names.types.whereType,
 )
 
 export const order = memoizeContextModel(
