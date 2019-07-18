@@ -25,6 +25,8 @@ import {
   Wrapped,
 } from './types'
 
+import { Names } from './strategies/naming'
+
 export const isContextFn = <BuildMode, Type>(
   val: any,
 ): val is ContextFn<BuildMode, Type> => typeof val === 'function'
@@ -176,14 +178,21 @@ export const createModelFieldFn = <BuildMode>(
   }
 }
 
-export const createInputType = <BuildMode>(
+export const createInputType = <
+  BuildMode,
+  Key extends keyof Names,
+  Name extends keyof Names[Key]
+>(
   field: DataType,
-  nameFn: ContextModelFn<string>,
+  nameType: Key,
+  name: Name,
 ) =>
   memoizeContextModel(
     buildModeModel =>
       new GraphQLInputObjectType({
-        name: nameFn(buildModeModel),
+        name: (buildModeModel.names[nameType] as Record<any, string>)[
+          name
+        ] as string,
         fields: () =>
           buildModeModel.dataFields(field) as GraphQLInputFieldConfigMap,
       }),

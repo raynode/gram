@@ -30,31 +30,11 @@ const buildOrderEnumValues = memoizeContextModel(buildModeModel =>
   ),
 )
 
-export const create = createInputType(
-  'create',
-  buildModeModel => buildModeModel.names.types.createType,
-)
-
-export const data = createInputType(
-  'data',
-  buildModeModel => buildModeModel.names.types.dataType,
-)
-
-export const filter = createInputType(
-  'filter',
-  buildModeModel => buildModeModel.names.types.filterType,
-)
-
-export const page = createInputType(
-  'page',
-  buildModeModel => buildModeModel.names.types.pageType,
-)
-
-export const where = createInputType(
-  'where',
-  buildModeModel => buildModeModel.names.types.whereType,
-)
-
+export const create = createInputType('create', 'types', 'createType')
+export const data = createInputType('data', 'types', 'dataType')
+export const filter = createInputType('filter', 'types', 'filterType')
+export const page = createInputType('page', 'types', 'pageType')
+export const where = createInputType('where', 'types', 'whereType')
 export const order = memoizeContextModel(
   buildModeModel =>
     new GraphQLEnumType({
