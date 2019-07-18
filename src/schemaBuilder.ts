@@ -178,16 +178,10 @@ export const createSchemaBuilder = <BuildMode = any, QueryContext = any>() => {
       const pubSub = externalPubSub || new PubSub()
       const wrapped = setup(models, scalars, buildMode, filters, pubSub)
 
-      const build = addModel(createBuild<BuildMode, QueryContext>(buildMode))
-
-      forEach(models, model => {
-        build.addModel(model)
-      })
-      console.log(build.toTypeDefs().typeDefs)
       // build all interfaces
-      // filter(models, model => model.isInterface()).forEach(model =>
-      //   model.build(wrapped),
-      // )
+      filter(models, model => model.isInterface()).forEach(model =>
+        model.build(wrapped),
+      )
       const query: any = queryDefinitions.reduce((memo, queryDefinition) => {
         const {
           args,
@@ -202,7 +196,8 @@ export const createSchemaBuilder = <BuildMode = any, QueryContext = any>() => {
         return memo
       }, {})
       // create the query, mutation and subscription fields
-      return reduceFields(
+
+      const fields = reduceFields(
         models,
         {
           query: queryFieldsReducer(wrapped),
@@ -215,6 +210,15 @@ export const createSchemaBuilder = <BuildMode = any, QueryContext = any>() => {
           subscription: {},
         },
       )
+
+      const build = addModel(
+        createBuild<BuildMode, QueryContext>(buildMode),
+        wrapped,
+      )
+      forEach(models, build.addModel)
+      console.log(build.toTypeDefs().typeDefs)
+
+      return fields
     },
     setScalar: (key, type) => {
       scalars[key] = type

@@ -97,15 +97,12 @@ export const createModelBuilder = <BuildMode, Type, GQLType = Type>(
     build: memoize(
       buildMode => {
         const buildModeModel = buildMode.getModel<Type, GQLType>(modelName)
-        forEach(attributes, attr => buildModeModel.addField(attr))
-        interfaces
-          .map(name => buildMode.getBaseModel(name))
-          .forEach(model => {
-            forEach(model.getAttributes(), (attr, name) => {
-              if (!attributes.hasOwnProperty(name))
-                buildModeModel.addField(attr)
-            })
+        forEach(attributes, buildModeModel.addField)
+        interfaces.map(buildMode.getBaseModel).forEach(model => {
+          forEach(model.getAttributes(), (attr, name) => {
+            if (!attributes.hasOwnProperty(name)) buildModeModel.addField(attr)
           })
+        })
         contextMutation(buildModeModel, buildMode)
         return buildModeModel
       },
