@@ -89,6 +89,7 @@ Object {
   "addSubscription": [Function],
   "addType": [Function],
   "buildMode": undefined,
+  "getState": [Function],
   "toSchema": [Function],
   "toTypeDefs": [Function],
   "type": "BUILDER:GQLBUILDER",
@@ -99,6 +100,14 @@ exports[`createBuild should generate the schema directly 1`] = `
 Object {
   "data": Object {
     "test": "TEST",
+  },
+}
+`;
+
+exports[`createBuild should handle args in addQuery 1`] = `
+Object {
+  "data": Object {
+    "test": "My-Test",
   },
 }
 `;

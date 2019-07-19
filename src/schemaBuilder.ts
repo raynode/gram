@@ -171,9 +171,9 @@ export const createSchemaBuilder = <BuildMode = any, QueryContext = any>() => {
       return model
     },
     build: (buildMode: BuildMode | FieldDefinition = null) =>
-      createSchema(
-        isFieldDefinition(buildMode) ? buildMode : builder.fields(buildMode),
-      ),
+      isFieldDefinition(buildMode)
+        ? createSchema(buildMode)
+        : (builder.fields(buildMode) as any).toSchema(),
     fields: (buildMode: BuildMode | null = null) => {
       const pubSub = externalPubSub || new PubSub()
       const wrapped = setup(models, scalars, buildMode, filters, pubSub)
@@ -216,9 +216,9 @@ export const createSchemaBuilder = <BuildMode = any, QueryContext = any>() => {
         wrapped,
       )
       forEach(models, build.addModel)
-      console.log(build.toTypeDefs().typeDefs)
+      forEach(scalars, scalar => build.addType(scalar.toString(), 'scalar'))
 
-      return fields
+      return build as any
     },
     setScalar: (key, type) => {
       scalars[key] = type

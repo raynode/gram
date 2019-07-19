@@ -6,11 +6,13 @@ import {
   FieldType,
   GQLRecord,
   Resolvables,
+  ResolvablesRecord,
+  SimpleFieldType,
 } from './types'
 
+import { isType } from 'graphql'
 import { IFieldResolver } from 'graphql-tools'
-
-import { typeToString } from './utils'
+import { simpleFieldTypeToFieldType } from './utils'
 
 import { isBuildModeGenerator } from './guards'
 
@@ -22,13 +24,13 @@ export const createBuildModeResolver = <BuildMode>(buildMode: BuildMode) => <
 
 export const resolvablesCreator = <BuildMode, Context>(
   buildMode: BuildMode,
-  resolvables: Record<Resolvables, GQLRecord>,
+  resolvables: ResolvablesRecord,
   addResolver: AddResolver<Context>,
 ) => {
   const resolveBuildModeGenerator = createBuildModeResolver(buildMode)
   return (typeName: Resolvables): AddResolvable<BuildMode, Context> => (
     name: string,
-    type: any,
+    simpleFieldType: any,
     configOrResolver = {},
   ) => {
     const { args = {}, resolver = null } =
@@ -38,15 +40,9 @@ export const resolvablesCreator = <BuildMode, Context>(
             args: resolveBuildModeGenerator(configOrResolver.args),
             resolver: resolveBuildModeGenerator(configOrResolver.resolver),
           }
-    const config = { args, resolver }
-    if (isBuildModeGenerator<BuildMode, FieldType>(type)) {
-      resolvables[typeName][name] = typeToString(
-        resolveBuildModeGenerator(type),
-      )
-      addResolver(typeName, name, config)
-    } else {
-      resolvables[typeName][name] = typeToString(type)
-      addResolver(typeName, name, config)
-    }
+    resolvables[typeName].fields[name] = simpleFieldTypeToFieldType(
+      resolveBuildModeGenerator<SimpleFieldType>(simpleFieldType),
+    )
+    addResolver(typeName, name, { args, resolver })
   }
 }

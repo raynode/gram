@@ -9,9 +9,14 @@ import {
   CreateableTypesRecord,
   GQLRecord,
   Resolvables,
+  ResolvablesRecord,
   Resolvers,
 } from './types'
-import { createBuildModeResolver, fieldsToGQLRecord } from './utils'
+import {
+  convertSimpleFieldsToFields,
+  createBuildModeResolver,
+  fieldsToGQLRecord,
+} from './utils'
 
 import { GQLBUILDER } from '../types/constants'
 
@@ -20,10 +25,16 @@ export * from './extension-model'
 export const createBuild = <BuildMode = null, Context = any>(
   buildMode?: BuildMode,
 ) => {
-  const resolvables: Record<Resolvables, GQLRecord> = {
-    Mutation: {},
-    Query: {},
-    Subscription: {},
+  const resolvables: ResolvablesRecord = {
+    Mutation: {
+      fields: {},
+    },
+    Query: {
+      fields: {},
+    },
+    Subscription: {
+      fields: {},
+    },
   }
   const types: CreateableTypesRecord = {
     enum: {},
@@ -33,6 +44,11 @@ export const createBuild = <BuildMode = null, Context = any>(
     type: {},
   }
   const resolvers: Resolvers = {}
+  const state = {
+    resolvables,
+    types,
+    resolvers,
+  }
   const addResolver: AddResolver<Context> = (
     base,
     name,
@@ -51,7 +67,8 @@ export const createBuild = <BuildMode = null, Context = any>(
   const buildModeResolver = createBuildModeResolver(buildMode)
   const addInterfaceOrInputType = (typeName, createAble, config) =>
     (types[createAble][typeName] = {
-      fields: fieldsToGQLRecord(buildModeResolver(config.fields)),
+      ...config,
+      fields: convertSimpleFieldsToFields(buildModeResolver(config.fields)),
     })
 
   const addType = createAddType(
@@ -63,7 +80,7 @@ export const createBuild = <BuildMode = null, Context = any>(
       (types.enum[typeName] = { values: buildModeResolver(config.values) }),
     (typeName, createAble, config) =>
       (types.type[typeName] = {
-        fields: fieldsToGQLRecord(buildModeResolver(config.fields)),
+        fields: convertSimpleFieldsToFields(buildModeResolver(config.fields)),
         interface: buildModeResolver(config.interface),
       }),
   )
@@ -80,6 +97,7 @@ export const createBuild = <BuildMode = null, Context = any>(
       typeDefs: generateTypeDefs(resolvables, types),
       resolvers,
     }),
+    getState: () => state,
   }
   return builder
 }

@@ -21,9 +21,15 @@ export interface Build<BuildMode, Context> {
   addType: ReturnType<typeof createAddType>
   toSchema: () => GraphQLSchema
   toTypeDefs: () => TypeDefs
+  getState: () => any
 }
 
-export type GQLRecord = Record<string, string>
+export interface CreateableTypeConfig {
+  fields: Fields
+  interface?: string
+}
+
+export type GQLRecord = Record<string, string | GraphQLType>
 export type Resolvers = IResolvers
 export type BuildModeGenerator<BuildMode, Result> = (
   buildMode?: BuildMode,
@@ -31,20 +37,22 @@ export type BuildModeGenerator<BuildMode, Result> = (
 export type BuildModeArgsGenerator<BuildMode, Args, Result = void> = (
   buildModeGenerator: BuildModeGenerator<BuildMode, Args>,
 ) => Result
-export type FieldType = string | GraphQLType
+export interface FieldType {
+  args?: GQLRecord
+  type: string | GraphQLType
+}
+export type SimpleFieldType = string | GraphQLType | FieldType
 export type Fields = Record<string, FieldType>
 
 export type Resolvables = 'Query' | 'Mutation' | 'Subscription'
-export interface ObjectTypesRecordConfig {
-  fields: GQLRecord
+export type ResolvablesRecord = Record<Resolvables, CreateableTypeConfig>
+export interface ObjectTypesRecordConfig extends CreateableTypeConfig {
   interface: string
 }
-export interface InterfaceTypesRecordConfig {
-  fields: GQLRecord
-}
-export interface InputTypesRecordConfig {
-  fields: GQLRecord
-}
+// tslint:disable-next-line:no-empty-interface
+export interface InterfaceTypesRecordConfig extends CreateableTypeConfig {}
+// tslint:disable-next-line:no-empty-interface
+export interface InputTypesRecordConfig extends CreateableTypeConfig {}
 export interface EnumTypesRecordConfig {
   values: string[]
 }
@@ -63,12 +71,12 @@ export interface AddResolvableConfig<Source, Context, Resolver> {
 }
 export type AddResolvable<BuildMode, Context> = (<Source>(
   name: string,
-  type: FieldType,
+  type: SimpleFieldType,
   config?: any,
 ) => void) &
   (<Source>(
     name: string,
-    type: BuildModeGenerator<BuildMode, FieldType>,
+    type: BuildModeGenerator<BuildMode, SimpleFieldType>,
     config?: any,
   ) => void)
 

@@ -1,31 +1,49 @@
-import { reduce } from 'lodash'
+import { isType } from 'graphql'
+import { isEmpty, map, reduce } from 'lodash'
 import { isBuildModeGenerator } from './guards'
-import { BuildModeGenerator, Fields, GQLRecord } from './types'
+import {
+  BuildModeGenerator,
+  Fields,
+  FieldType,
+  GQLRecord,
+  SimpleFieldType,
+} from './types'
 
-export const typeToString = <Type>(type: Type) => type.toString()
-
-export const reduceRecord = (gqlData: GQLRecord) =>
+export const reduceRecord = (fields: Fields) =>
   reduce(
-    gqlData,
-    (list, type, name) => {
-      list.push(`${name}: ${type}`)
+    fields,
+    (list, { args = {}, type }, name) => {
+      const parameters = isEmpty(args)
+        ? ''
+        : `(${map(args, (type, arg) => `${arg}: ${type}`)})`
+      list.push(`${name}${parameters}: ${type}`)
       return list
     },
     [],
   ).join('\n    ')
-
-export const fieldsToGQLRecord = (fields: Fields) =>
-  reduce(
-    fields,
-    (record, type, field) => {
-      record[field] = typeToString(type)
-      return record
-    },
-    {} as GQLRecord, // tslint:disable-line no-object-literal-type-assertion
-  )
 
 export const createBuildModeResolver = <BuildMode>(buildMode: BuildMode) => <
   Result
 >(
   data: Result | BuildModeGenerator<BuildMode, Result>,
 ) => (isBuildModeGenerator<BuildMode, Result>(data) ? data(buildMode) : data)
+
+export const simpleFieldTypeToFieldType = (
+  simpleType: SimpleFieldType,
+): FieldType => {
+  if (isType(simpleType)) return { type: simpleType.toString() }
+  if (typeof simpleType === 'string') return { type: simpleType }
+  return simpleType
+}
+
+export const convertSimpleFieldsToFields = (
+  simpleFields: Record<string, SimpleFieldType>,
+): Fields =>
+  reduce(
+    simpleFields,
+    (record, simpleField, name) => {
+      record[name] = simpleFieldTypeToFieldType(simpleField)
+      return record
+    },
+    {},
+  )

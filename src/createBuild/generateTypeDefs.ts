@@ -1,27 +1,35 @@
 import { ITypeDefinitions } from 'graphql-tools'
 import { isEmpty, map, reduce } from 'lodash'
 import {
+  CreateableTypeConfig,
   CreateableTypes,
   CreateableTypesRecord,
   EnumTypesRecordConfig,
   GQLRecord,
   Resolvables,
+  ResolvablesRecord,
 } from './types'
 import { reduceRecord } from './utils'
 
 const generateCreateableType = (
   createable: string,
   typeName: string,
-  fields: GQLRecord,
-  interfaceName?: string,
+  config: CreateableTypeConfig,
 ) => `
-  ${createable} ${typeName} ${interfaceName ? `extends ${interfaceName} ` : ''}{
-    ${reduceRecord(fields)}
+  ${createable} ${typeName} ${
+  config.interface ? `implements ${config.interface} ` : ''
+}{
+    ${reduceRecord(config.fields)}
   }
 `
 
-const generateNonEmpty = (typeName: Resolvables, data: GQLRecord) =>
-  isEmpty(data) ? '' : generateCreateableType('type', typeName, data)
+const generateNonEmpty = (
+  typeName: Resolvables,
+  entries: CreateableTypeConfig,
+) =>
+  isEmpty(entries.fields)
+    ? ''
+    : generateCreateableType('type', typeName, entries)
 
 const generateEnums = (enums: Record<string, EnumTypesRecordConfig>) =>
   map(
@@ -33,32 +41,19 @@ const generateScalars = (scalar: string[]) =>
   scalar.map(name => `scalar ${name}`).join('\n')
 const generateFields = (
   createable: string,
-  createables: Record<
-    string,
-    {
-      fields: GQLRecord;
-      interface?: string;
-    }
-  >,
+  createables: Record<string, CreateableTypeConfig>,
 ) =>
   reduce(
     createables,
     (result, config, typeName) => {
-      result.push(
-        generateCreateableType(
-          createable,
-          typeName,
-          config.fields,
-          config.interface,
-        ),
-      )
+      result.push(generateCreateableType(createable, typeName, config))
       return result
     },
     [],
   ).join('\n')
 
 export const generateTypeDefs = (
-  resolvables: Record<Resolvables, GQLRecord>,
+  resolvables: ResolvablesRecord,
   types: CreateableTypesRecord,
 ): ITypeDefinitions => {
   if (isEmpty(resolvables.Query)) throw new Error('Query cannot be empty')

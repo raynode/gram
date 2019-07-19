@@ -44,6 +44,25 @@ describe('createBuild', () => {
     expect(result).toMatchSnapshot()
   })
 
+  it('should handle args in addQuery', async () => {
+    const build = createBuild()
+    build.addQuery(
+      'test',
+      {
+        args: {
+          name: GraphQLNonNull(GraphQLString),
+        },
+        type: GraphQLString,
+      },
+      (_, { name }) => name,
+    )
+    const result = await graphql({
+      schema: build.toSchema(),
+      source: '{ test(name:"My-Test") }',
+    })
+    expect(result).toMatchSnapshot()
+  })
+
   it('should accept a buildMode function', async () => {
     const build = createBuild()
     build.addQuery('test', buildMode => GraphQLString, {
@@ -139,7 +158,6 @@ describe('createBuild', () => {
     build.addType('State', 'enum', {
       values: ['IDLE', 'WORKING', 'CLEANUP'],
     })
-    console.log(build.toTypeDefs().typeDefs)
     expect(build.toTypeDefs().typeDefs).toMatchSnapshot()
   })
 })

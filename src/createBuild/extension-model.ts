@@ -96,7 +96,7 @@ export const addModel = <BuildMode, Context>(
     const typeConfig = {
       fields: getAttributeFields(build.buildMode, modelBuilder, wrapped),
     }
-    console.log(typeConfig.fields)
+
     if (type === 'interface')
       build.addType(modelBuilder.name, 'interface', typeConfig)
     else
@@ -134,6 +134,13 @@ export const addModel = <BuildMode, Context>(
         list(modelBuilder.name),
         service.findMany,
       )
+    if (visibility.createMutation)
+      build.addMutation(names.fields.create, modelBuilder.name, {
+        args: {
+          data: names.types.createType,
+        },
+        resolver: service.create,
+      })
   }
   return build
 }

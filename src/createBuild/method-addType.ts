@@ -3,6 +3,7 @@ import {
   BuildModeGenerator,
   CreateableTypes,
   Fields,
+  SimpleFieldType,
 } from './types'
 
 import { isBuildModeGenerator } from './guards'
@@ -10,7 +11,10 @@ import { isBuildModeGenerator } from './guards'
 export type Definable<BuildMode, Data> =
   | Data
   | BuildModeGenerator<BuildMode, Data>
-export type DefinableFields<BuildMode> = Definable<BuildMode, Fields>
+export type DefinableFields<BuildMode> = Definable<
+  BuildMode,
+  Record<string, SimpleFieldType>
+>
 
 export type AddScalarArgsType = [string, 'scalar', never]
 export type AddInterfaceArgsType<BuildMode> = [
