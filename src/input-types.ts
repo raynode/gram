@@ -2,12 +2,12 @@ import { GraphQLEnumType } from 'graphql'
 import { flatten, mapKeys, memoize, upperFirst } from 'lodash'
 import { createInputType, memoizeContextModel } from 'utils'
 
-const specialCharsMap = new Map([
+export const specialCharsMap = new Map([
   ['¼', 'frac14'],
   ['½', 'frac12'],
   ['¾', 'frac34'],
 ])
-const sanitizeEnumValue = memoize((value: string) =>
+export const sanitizeEnumValue = memoize((value: string) =>
   value
     .trim()
     .replace(/([^_a-zA-Z0-9])/g, (_, p) => specialCharsMap.get(p) || ' ')
@@ -17,7 +17,7 @@ const sanitizeEnumValue = memoize((value: string) =>
     .replace(/(^\d)/, '_$1'),
 )
 
-const buildOrderEnumValues = memoizeContextModel(buildModeModel =>
+export const buildOrderEnumValues = memoizeContextModel(buildModeModel =>
   mapKeys(
     flatten(
       buildModeModel

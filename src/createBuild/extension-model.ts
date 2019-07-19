@@ -13,6 +13,7 @@ import { isBuildModeGenerator } from './guards'
 import { Build, GQLRecord } from './types'
 
 import * as DataTypes from '../data-types'
+import { buildOrderEnumValues } from '../input-types'
 import { defaultNamingStrategy, Names } from '../strategies/naming'
 import {
   AttributeBuilder,
@@ -108,9 +109,11 @@ export const addModel = <BuildMode, Context>(
     addInput('types', 'createType', 'create')
     addInput('types', 'dataType', 'data')
     addInput('types', 'filterType', 'filter')
-    addInput('types', 'orderType', 'order')
     addInput('types', 'whereType', 'where')
 
+    build.addType(model.names.types.orderType, 'enum', {
+      values: Object.keys(buildOrderEnumValues(model)),
+    })
     // queries = {
     //   [buildModeModel.names.fields.findOne]:
     //     buildModeModel.visibility.findOneQuery &&
