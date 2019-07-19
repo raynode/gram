@@ -85,7 +85,7 @@ describe('createBuild', () => {
     expect(result).toMatchSnapshot()
   })
 
-  it('should have types that are different based on buildMode', async () => {
+  it('should have types that are different based on buildMode', () => {
     type BuildMode = 'admin' | 'user'
     const adminBuild = createBuild<BuildMode>('admin')
     const userBuild = createBuild<BuildMode>('user')
@@ -106,7 +106,7 @@ describe('createBuild', () => {
     expect(userBuild.toTypeDefs().typeDefs).toMatchSnapshot()
   })
 
-  it('should accept build mode generators on type level', async () => {
+  it('should accept build mode generators on type level', () => {
     type BuildMode = 'admin' | 'user'
     const adminBuild = createBuild<BuildMode>('admin')
     const userBuild = createBuild<BuildMode>('user')
@@ -131,5 +131,15 @@ describe('createBuild', () => {
     userBuild.addQuery('myPets', '[Pet!]!', () => data.pets)
     expect(adminBuild.toTypeDefs().typeDefs).toMatchSnapshot()
     expect(userBuild.toTypeDefs().typeDefs).toMatchSnapshot()
+  })
+
+  it('should render enums correctly', () => {
+    const build = createBuild()
+    build.addQuery('currentState', 'State')
+    build.addType('State', 'enum', {
+      values: ['IDLE', 'WORKING', 'CLEANUP'],
+    })
+    console.log(build.toTypeDefs().typeDefs)
+    expect(build.toTypeDefs().typeDefs).toMatchSnapshot()
   })
 })

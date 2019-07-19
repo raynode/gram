@@ -20,6 +20,7 @@ exports[`createBuild should accept build mode generators on type level 1`] = `
   }
 
     
+    
   type Query {
     myPets: [Pet!]!
   }
@@ -40,6 +41,7 @@ exports[`createBuild should accept build mode generators on type level 2`] = `
     age: Int!
   }
 
+    
     
   type Query {
     myPets: [Pet!]!
@@ -113,6 +115,7 @@ exports[`createBuild should have types that are different based on buildMode 1`]
   }
 
     
+    
   type Query {
     myPets: [Pet!]!
   }
@@ -134,8 +137,26 @@ exports[`createBuild should have types that are different based on buildMode 2`]
   }
 
     
+    
   type Query {
     myPets: [Pet!]!
+  }
+
+    
+    
+    
+  "
+`;
+
+exports[`createBuild should render enums correctly 1`] = `
+"
+    
+    
+    
+    enum State { IDLE WORKING CLEANUP }
+    
+  type Query {
+    currentState: State
   }
 
     

@@ -1,8 +1,9 @@
 import { ITypeDefinitions } from 'graphql-tools'
-import { isEmpty, reduce } from 'lodash'
+import { isEmpty, map, reduce } from 'lodash'
 import {
   CreateableTypes,
   CreateableTypesRecord,
+  EnumTypesRecordConfig,
   GQLRecord,
   Resolvables,
 } from './types'
@@ -22,6 +23,14 @@ const generateCreateableType = (
 const generateNonEmpty = (typeName: Resolvables, data: GQLRecord) =>
   isEmpty(data) ? '' : generateCreateableType('type', typeName, data)
 
+const generateEnums = (enums: Record<string, EnumTypesRecordConfig>) =>
+  map(
+    enums,
+    (config, enumName) =>
+      `enum ${enumName} { ${config.values.map(value => `${value}`).join(' ')} }`,
+  ).join('\n')
+const generateScalars = (scalar: string[]) =>
+  scalar.map(name => `scalar ${name}`).join('\n')
 const generateFields = (
   createable: string,
   createables: Record<
@@ -58,9 +67,10 @@ export const generateTypeDefs = (
     ${generateFields('interface', types.interface)}
     ${generateFields('input', types.input)}
     ${generateFields('type', types.type)}
+    ${generateEnums(types.enum)}
     ${generateCreateableType('type', 'Query', resolvables.Query)}
     ${generateNonEmpty('Mutation', resolvables.Mutation)}
     ${generateNonEmpty('Subscription', resolvables.Subscription)}
-    ${types.scalar.map(name => `scalar ${name}`).join('\n')}
+    ${generateScalars(types.scalar)}
   `
 }
