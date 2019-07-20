@@ -152,7 +152,7 @@ export const createSchemaBuilder = <BuildMode = any, QueryContext = any>() => {
     models,
     model: <Type, GQLType = Type>(
       modelName: string,
-      service: Service<Type, GQLType>,
+      service: Service<Type, GQLType, QueryContext>,
     ) => {
       const model = createModelBuilder<BuildMode, Type, GQLType>(
         modelName,
@@ -161,7 +161,10 @@ export const createSchemaBuilder = <BuildMode = any, QueryContext = any>() => {
       models[modelName] = model
       return model.interface('Node')
     },
-    interface: <Type>(interfaceName: string, service: Service<Type>) => {
+    interface: <Type>(
+      interfaceName: string,
+      service: Service<Type, Type, QueryContext>,
+    ) => {
       const model = createModelBuilder<BuildMode, Type>(
         interfaceName,
         service || {},
@@ -217,6 +220,8 @@ export const createSchemaBuilder = <BuildMode = any, QueryContext = any>() => {
       )
       forEach(models, build.addModel)
       forEach(scalars, scalar => build.addType(scalar.toString(), 'scalar'))
+
+      const result = build.toTypeDefs()
 
       return build as any
     },

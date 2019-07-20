@@ -11,8 +11,11 @@ export const findOne = memoizeContextModel(buildModeModel => ({
   },
   type: buildModeModel.getType() as GraphQLOutputType,
   resolve: (_, args, context) =>
-    buildModeModel.service.findOne({
-      where: args[buildModeModel.names.arguments.where],
-      order: args[buildModeModel.names.arguments.order] || null,
-    }),
+    buildModeModel.service.findOne(
+      {
+        where: args[buildModeModel.names.arguments.where],
+        order: args[buildModeModel.names.arguments.order] || null,
+      },
+      context,
+    ),
 }))

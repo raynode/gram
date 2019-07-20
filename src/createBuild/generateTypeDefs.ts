@@ -15,13 +15,16 @@ const generateCreateableType = (
   createable: string,
   typeName: string,
   config: CreateableTypeConfig,
-) => `
+) => {
+  // console.log(typeName, config.fields)
+  return `
   ${createable} ${typeName} ${
-  config.interface ? `implements ${config.interface} ` : ''
-}{
+    config.interface ? `implements ${config.interface} ` : ''
+  }{
     ${reduceRecord(config.fields)}
   }
 `
+}
 
 const generateNonEmpty = (
   typeName: Resolvables,
@@ -37,8 +40,10 @@ const generateEnums = (enums: Record<string, EnumTypesRecordConfig>) =>
     (config, enumName) =>
       `enum ${enumName} { ${config.values.map(value => `${value}`).join(' ')} }`,
   ).join('\n')
+
 const generateScalars = (scalar: string[]) =>
   scalar.map(name => `scalar ${name}`).join('\n')
+
 const generateFields = (
   createable: string,
   createables: Record<string, CreateableTypeConfig>,

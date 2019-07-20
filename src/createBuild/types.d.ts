@@ -68,6 +68,8 @@ export type CreateableTypes = keyof CreateableTypesRecord
 export interface AddResolvableConfig<Source, Context, Resolver> {
   args?: GQLRecord
   resolver?: Resolver
+  subscribe?: () => any
+  resolve?: () => any
 }
 export type AddResolvable<BuildMode, Context> = (<Source>(
   name: string,

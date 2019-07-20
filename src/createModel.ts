@@ -49,7 +49,7 @@ const fieldBuilder = <BuildMode>(
 
 export const createModel = <BuildMode, Type, GQLType = Type>(
   model: ModelBuilder<BuildMode, any>,
-  service: Service<Type, GQLType>,
+  service: Service<Type, GQLType, any>,
   buildMode: Wrapped<BuildMode>,
   visibility: ModelVisibility,
   resolvers: GraphQLResolverMap<GQLType>,

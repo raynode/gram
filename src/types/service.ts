@@ -58,10 +58,13 @@ export interface RemoveArgs<Type> {
   where: Where<Type>
 }
 
-export interface Service<Type, GQLType = Type> {
-  findOne?: (args: FindOneArgs<GQLType>) => Promise<Type>
-  findMany?: (args: FindOneMany<GQLType>) => Promise<Paged<Type>>
-  create?: (args: CreateArgs<GQLType>) => Promise<Type>
-  update?: (args: UpdateArgs<GQLType>) => Promise<Type[]>
-  remove?: (args: RemoveArgs<GQLType>) => Promise<Type[]>
+export interface Service<Type, GQLType = Type, Context = any> {
+  findOne?: (args: FindOneArgs<GQLType>, context: Context) => Promise<Type>
+  findMany?: (
+    args: FindOneMany<GQLType>,
+    context: Context,
+  ) => Promise<Paged<Type>>
+  create?: (args: CreateArgs<GQLType>, context: Context) => Promise<Type>
+  update?: (args: UpdateArgs<GQLType>, context: Context) => Promise<Type[]>
+  remove?: (args: RemoveArgs<GQLType>, context: Context) => Promise<Type[]>
 }

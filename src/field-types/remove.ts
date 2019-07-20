@@ -10,9 +10,12 @@ export const remove = memoizeContextModel(buildModeModel => ({
   },
   type: toList(buildModeModel.getType()) as GraphQLInputType,
   resolve: (_, args, context) => {
-    const node = buildModeModel.service.remove({
-      where: args[buildModeModel.names.arguments.where],
-    })
+    const node = buildModeModel.service.remove(
+      {
+        where: args[buildModeModel.names.arguments.where],
+      },
+      context,
+    )
     buildModeModel.buildMode.pubSub.publish(
       buildModeModel.names.events.delete,
       {

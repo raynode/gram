@@ -10,7 +10,7 @@ import {
 
 import { toList } from 'utils'
 import { createSchemaBuilder } from './schemaBuilder'
-import { ModelBuilder, NodeType, SchemaBuilder, Service } from './types'
+import { ModelBuilder, NodeType, SchemaBuilder } from './types'
 
 import {
   Account,

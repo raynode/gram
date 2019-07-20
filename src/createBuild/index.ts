@@ -12,11 +12,7 @@ import {
   ResolvablesRecord,
   Resolvers,
 } from './types'
-import {
-  convertSimpleFieldsToFields,
-  createBuildModeResolver,
-  fieldsToGQLRecord,
-} from './utils'
+import { convertSimpleFieldsToFields, createBuildModeResolver } from './utils'
 
 import { GQLBUILDER } from '../types/constants'
 
@@ -92,7 +88,13 @@ export const createBuild = <BuildMode = null, Context = any>(
     addMutation: createResolvable('Mutation'),
     addSubscription: createResolvable('Subscription'),
     addType,
-    toSchema: () => makeExecutableSchema(builder.toTypeDefs()),
+    toSchema: () =>
+      makeExecutableSchema({
+        ...builder.toTypeDefs(),
+        resolverValidationOptions: {
+          requireResolversForResolveType: false,
+        },
+      }),
     toTypeDefs: () => ({
       typeDefs: generateTypeDefs(resolvables, types),
       resolvers,

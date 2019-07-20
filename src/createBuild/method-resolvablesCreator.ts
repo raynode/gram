@@ -40,9 +40,11 @@ export const resolvablesCreator = <BuildMode, Context>(
             args: resolveBuildModeGenerator(configOrResolver.args),
             resolver: resolveBuildModeGenerator(configOrResolver.resolver),
           }
-    resolvables[typeName].fields[name] = simpleFieldTypeToFieldType(
+    const fieldType = simpleFieldTypeToFieldType(
       resolveBuildModeGenerator<SimpleFieldType>(simpleFieldType),
     )
-    addResolver(typeName, name, { args, resolver })
+    if (!fieldType.args && args) fieldType.args = args
+    resolvables[typeName].fields[name] = fieldType
+    if (resolver) addResolver(typeName, name, { resolver })
   }
 }

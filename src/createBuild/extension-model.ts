@@ -92,6 +92,10 @@ export const addModel = <BuildMode, Context>(
     const resolver: IFieldResolver<any, any> = modelBuilder.getResolver()
     const model = wrapped.getModel(modelBuilder.name)
 
+    const visibility = modelBuilder.getVisibility()
+    const names = defaultNamingStrategy(modelBuilder.name)
+    const service = modelBuilder.getService()
+    const pubSub = wrapped.pubSub
     const type = modelBuilder.isInterface() ? 'interface' : 'type'
     const typeConfig = {
       fields: getAttributeFields(build.buildMode, modelBuilder, wrapped),
@@ -99,48 +103,157 @@ export const addModel = <BuildMode, Context>(
 
     if (type === 'interface')
       build.addType(modelBuilder.name, 'interface', typeConfig)
-    else
+    else {
       build.addType(modelBuilder.name, 'type', {
         ...typeConfig,
         interface: modelBuilder.getInterfaces()[0],
       })
+      build.addType(names.types.listType, 'type', {
+        fields: {
+          page: 'Page',
+          nodes: list(modelBuilder.name),
+        },
+        interface: 'List',
+      })
+    }
+
+    // function that connects mutations with pub sub
+    const publishResult = <Root, Args, Context, Result>(
+      event: string,
+      resolver: (root: Root, args: Args, context: Context) => Promise<Result>,
+    ) => async (root: Root, args: Args, context: Context) => {
+      const result = await resolver(root, args, context)
+      pubSub.publish(event, { node: result })
+      return result
+    }
 
     const addInput = createModelInputTypesAdder(build, model)
     addInput('types', 'createType', 'create')
     addInput('types', 'dataType', 'data')
     addInput('types', 'filterType', 'filter')
     addInput('types', 'whereType', 'where')
+    addInput('types', 'pageType', 'page')
 
     build.addType(model.names.types.orderType, 'enum', {
       values: Object.keys(buildOrderEnumValues(model)),
     })
-    // queries = {
-    //   [buildModeModel.names.fields.findOne]:
-    //     buildModeModel.visibility.findOneQuery &&
-    //     fieldTypes.findOne(buildModeModel),
-    //   [buildModeModel.names.fields.findMany]:
-    //     buildModeModel.visibility.findManyQuery &&
-    //     fieldTypes.findMany(buildModeModel),
-    // }
-    const visibility = modelBuilder.getVisibility()
-    const names = defaultNamingStrategy(modelBuilder.name)
-    const service = modelBuilder.getService()
 
     if (visibility.findOneQuery)
-      build.addQuery(names.fields.findOne, modelBuilder.name, service.findOne)
+      build.addQuery(names.fields.findOne, modelBuilder.name, {
+        args: {
+          [names.arguments.where]: nonNull(names.types.whereType),
+          [names.arguments.order]: names.types.orderType,
+        },
+        resolver: (_, args = {}, context) =>
+          service.findOne(
+            {
+              order: args[names.arguments.order] || null,
+              where: args[names.arguments.where],
+            },
+            context,
+          ),
+      })
+
     if (visibility.findManyQuery)
-      build.addQuery(
-        names.fields.findMany,
-        list(modelBuilder.name),
-        service.findMany,
-      )
+      build.addQuery(names.fields.findMany, names.types.listType, {
+        args: {
+          [names.arguments.order]: names.types.orderType,
+          [names.arguments.page]: names.types.pageType,
+          [names.arguments.where]: nonNull(names.types.whereType),
+        },
+        resolver: (_, args = {}, context) =>
+          service.findMany(
+            {
+              order: args[names.arguments.order] || null,
+              page: args[names.arguments.page] || null,
+              where: args[names.arguments.where],
+            },
+            context,
+          ),
+      })
+
     if (visibility.createMutation)
       build.addMutation(names.fields.create, modelBuilder.name, {
         args: {
-          data: names.types.createType,
+          [names.arguments.data]: nonNull(names.types.createType),
         },
-        resolver: service.create,
+        resolver: publishResult(names.events.create, (_, args = {}, context) =>
+          service.create(
+            {
+              data: args[names.arguments.data],
+            },
+            context,
+          ),
+        ),
       })
+
+    if (visibility.updateMutation)
+      build.addMutation(names.fields.update, list(modelBuilder.name), {
+        args: {
+          [names.arguments.data]: nonNull(names.types.dataType),
+          [names.arguments.where]: nonNull(names.types.whereType),
+        },
+        resolver: publishResult(names.events.update, (_, args = {}, context) =>
+          service.update(
+            {
+              data: args[names.arguments.data],
+              where: args[names.arguments.where],
+            },
+            context,
+          ),
+        ),
+      })
+
+    if (visibility.deleteMutation)
+      build.addMutation(names.fields.delete, list(modelBuilder.name), {
+        args: {
+          [names.arguments.where]: nonNull(names.types.whereType),
+        },
+        resolver: publishResult(names.events.delete, (_, args = {}, context) =>
+          service.remove(
+            {
+              where: args[names.arguments.where],
+            },
+            context,
+          ),
+        ),
+      })
+
+    if (visibility.createSubscription)
+      build.addSubscription(
+        names.events.create,
+        {
+          type: nonNull(modelBuilder.name),
+        },
+        {
+          resolve: ({ node }) => node,
+          subscribe: () => pubSub.asyncIterator(names.events.create),
+        },
+      )
+
+    if (visibility.updateSubscription)
+      build.addSubscription(
+        names.events.update,
+        {
+          type: list(modelBuilder.name),
+        },
+        {
+          resolve: ({ node }) => node,
+          subscribe: () => pubSub.asyncIterator(names.events.update),
+        },
+      )
+
+    if (visibility.deleteSubscription)
+      build.addSubscription(
+        names.events.delete,
+        {
+          type: list(modelBuilder.name),
+        },
+        {
+          resolve: ({ node }) => node,
+          subscribe: () => pubSub.asyncIterator(names.events.delete),
+        },
+      )
   }
   return build
 }
