@@ -143,11 +143,7 @@ describe('example', () => {
   it('should create an account for the user', async () => {
     const schema = builder.build(0)
 
-    const {
-      data: {
-        getUser: { id },
-      },
-    } = await graphql(
+    const getUserResult = await graphql(
       schema,
       `
         {
@@ -158,7 +154,11 @@ describe('example', () => {
       `,
       null,
     )
-
+    const {
+      data: {
+        getUser: { id },
+      },
+    } = getUserResult
     const query = `mutation($id: ID!) {
       createAccount(data: {
         name: "New Account"
@@ -173,7 +173,11 @@ describe('example', () => {
       }
     }`
 
-    const { data } = await graphql(schema, query, null, null, { id })
+    const createAccountResult = await graphql(schema, query, null, null, {
+      id,
+    })
+
+    const { data } = createAccountResult
     expect(data).toHaveProperty('createAccount')
     expect(data.createAccount).toHaveProperty('id')
     const { id: accountId, user } = data.createAccount

@@ -15,8 +15,13 @@ export interface TypeDefs {
 export interface Build<BuildMode, Context> {
   type: typeof GQLBUILDER
   buildMode: BuildMode
-  addQuery: AddResolvable<BuildMode, Context>
   addMutation: AddResolvable<BuildMode, Context>
+  addQuery: AddResolvable<BuildMode, Context>
+  addResolver: <Source>(
+    base: string,
+    name: string,
+    resolver: AddResolvableConfig<Source, Context>,
+  ) => void
   addSubscription: AddResolvable<BuildMode, Context>
   addType: ReturnType<typeof createAddType>
   toSchema: () => GraphQLSchema

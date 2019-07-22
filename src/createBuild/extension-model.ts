@@ -6,7 +6,7 @@ import {
   isType,
 } from 'graphql'
 import { IFieldResolver } from 'graphql-tools'
-import { reduce } from 'lodash'
+import { forEach, reduce } from 'lodash'
 import { v4 as uuid } from 'uuid'
 
 import { isBuildModeGenerator } from './guards'
@@ -91,17 +91,22 @@ export const addModel = <BuildMode, Context>(
   build.addModel = modelBuilder => {
     const resolver = modelBuilder.getResolver(wrapped)
     const model = modelBuilder.build(wrapped)
-    // const model = wrapped.getModel(modelBuilder.name)
 
     const visibility = modelBuilder.getVisibility()
     const names = defaultNamingStrategy(modelBuilder.name)
     const service = modelBuilder.getService()
     const pubSub = wrapped.pubSub
     const type = modelBuilder.isInterface() ? 'interface' : 'type'
+    const fields = model.getFields()
     const typeConfig = {
-      fields: getAttributeFields(build.buildMode, model.getFields(), wrapped),
+      fields: getAttributeFields(build.buildMode, fields, wrapped),
       resolver,
     }
+    forEach(fields, field => {
+      const resolver = field.getResolver()
+      if (resolver) build.addResolver(model.name, field.name, { resolver })
+    })
+
     const integratedModel = ['Page', 'Node', 'List'].includes(model.name)
 
     if (type === 'interface')

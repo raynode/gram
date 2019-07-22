@@ -1,10 +1,10 @@
 import {
-  GraphQLFieldResolver,
   GraphQLNonNull,
   GraphQLOutputType,
   GraphQLType,
   isType,
 } from 'graphql'
+import { IFieldResolver } from 'graphql-tools'
 import {
   AttributeBuilder,
   ContextFn,
@@ -31,16 +31,17 @@ export const createAttributeBuilder = <BuildMode, Type, AttributeType>(
   name: string,
   field: ContextFn<BuildMode, ModelType<BuildMode>>,
 ): AttributeBuilder<BuildMode, Type, AttributeType> => {
-  let resolve: GraphQLFieldResolver<Type, BuildMode>
+  let resolve: IFieldResolver<Type, any>
   const builder: AttributeBuilder<BuildMode, Type, AttributeType> = {
     name,
     field,
     nullable: true,
     listType: false,
-    resolve: (resolveFn: GraphQLFieldResolver<Type, BuildMode>) => {
+    resolve: <Context>(resolveFn: IFieldResolver<Type, Context>) => {
       resolve = resolveFn
       return builder
     },
+    getResolver: () => resolve,
     isList: (isList = true) => {
       builder.listType = true
       return builder

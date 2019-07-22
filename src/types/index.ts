@@ -215,6 +215,7 @@ export interface AttributeBuilder<BuildMode, Type, AttributeType>
   nullable: boolean
   listType: boolean
   resolve: (resolver: GraphQLFieldResolver<Type, any>) => this
+  getResolver: <Context>() => IFieldResolver<Type, Context>
   isList: (isList?: boolean) => this
   isNotNullable: (isNotNullable?: boolean) => this
   // buildModeType: ContextFn<BuildMode, ModelType<BuildMode>>

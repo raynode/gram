@@ -89,6 +89,7 @@ exports[`createBuild should create a base object with methods to add everything 
 Object {
   "addMutation": [Function],
   "addQuery": [Function],
+  "addResolver": [Function],
   "addSubscription": [Function],
   "addType": [Function],
   "buildMode": undefined,

@@ -103,8 +103,9 @@ export const createBuild = <BuildMode = null, Context = any>(
   const builder: Build<BuildMode, Context> = {
     type: GQLBUILDER,
     buildMode,
-    addQuery: createResolvable('Query'),
     addMutation: createResolvable('Mutation'),
+    addQuery: createResolvable('Query'),
+    addResolver,
     addSubscription: createResolvable('Subscription'),
     addType,
     toSchema: () =>
