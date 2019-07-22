@@ -9,7 +9,9 @@ import {
   SimpleFieldType,
 } from './types'
 
-export const reduceRecord = (fields: Fields) =>
+export const reduceRecord = <Source, Context>(
+  fields: Fields<Source, Context>,
+) =>
   reduce(
     fields,
     (list, { args = {}, type }, name) => {
@@ -28,17 +30,17 @@ export const createBuildModeResolver = <BuildMode>(buildMode: BuildMode) => <
   data: Result | BuildModeGenerator<BuildMode, Result>,
 ) => (isBuildModeGenerator<BuildMode, Result>(data) ? data(buildMode) : data)
 
-export const simpleFieldTypeToFieldType = (
-  simpleType: SimpleFieldType,
-): FieldType => {
+export const simpleFieldTypeToFieldType = <Source, Context>(
+  simpleType: SimpleFieldType<Source, Context>,
+): FieldType<Source, Context> => {
   if (isType(simpleType)) return { type: simpleType.toString() }
   if (typeof simpleType === 'string') return { type: simpleType }
   return simpleType
 }
 
-export const convertSimpleFieldsToFields = (
-  simpleFields: Record<string, SimpleFieldType>,
-): Fields =>
+export const convertSimpleFieldsToFields = <Source, Context>(
+  simpleFields: Record<string, SimpleFieldType<Source, Context>>,
+): Fields<Source, Context> =>
   reduce(
     simpleFields,
     (record, simpleField, name) => {
