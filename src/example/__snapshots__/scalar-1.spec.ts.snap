@@ -4,7 +4,7 @@ exports[`testing the example 3 should build the example code 1`] = `
 "type Animal implements Node {
   name: String
   tame: Boolean
-  date-of-birth: DateTime
+  dateOfBirth: DateTime
   feed: EatingType
   id: ID
   createdAt: DateTime
@@ -73,10 +73,19 @@ input AnimalWhere {
   id_not_in: [ID!]
 }
 
-\\"\\"\\"Use JavaScript Date object for date/time fields.\\"\\"\\"
+input CreateAnimalData {
+  name: String
+  tame: Boolean
+  dateOfBirth: DateTime
+  feed: EatingType
+  id: ID
+  createdAt: DateTime
+  updatedAt: DateTime
+  deletedAt: DateTime
+}
+
 scalar DateTime
 
-\\"\\"\\"What is this animal eating\\"\\"\\"
 scalar EatingType
 
 interface List {
@@ -100,6 +109,17 @@ type Page {
 type Query {
   getAnimal(where: AnimalWhere!, order: AnimalSortOrder): Animal
   getAnimals(order: AnimalSortOrder, page: AnimalPage, where: AnimalWhere!): Animals
+}
+
+input UpdateAnimalData {
+  name: String
+  tame: Boolean
+  dateOfBirth: DateTime
+  feed: EatingType
+  id: ID
+  createdAt: DateTime
+  updatedAt: DateTime
+  deletedAt: DateTime
 }
 "
 `;
@@ -108,7 +128,7 @@ exports[`testing the example 3 should handle new filters 1`] = `
 "type Animal implements Node {
   name: String
   tame: Boolean
-  date-of-birth: DateTime
+  dateOfBirth: DateTime
   feed: EatingType
   id: ID
   createdAt: DateTime
@@ -185,10 +205,19 @@ input AnimalWhere {
   id_not_in: [ID!]
 }
 
-\\"\\"\\"Use JavaScript Date object for date/time fields.\\"\\"\\"
+input CreateAnimalData {
+  name: String
+  tame: Boolean
+  dateOfBirth: DateTime
+  feed: EatingType
+  id: ID
+  createdAt: DateTime
+  updatedAt: DateTime
+  deletedAt: DateTime
+}
+
 scalar DateTime
 
-\\"\\"\\"What is this animal eating\\"\\"\\"
 scalar EatingType
 
 interface List {
@@ -212,6 +241,17 @@ type Page {
 type Query {
   getAnimal(where: AnimalWhere!, order: AnimalSortOrder): Animal
   getAnimals(order: AnimalSortOrder, page: AnimalPage, where: AnimalWhere!): Animals
+}
+
+input UpdateAnimalData {
+  name: String
+  tame: Boolean
+  dateOfBirth: DateTime
+  feed: EatingType
+  id: ID
+  createdAt: DateTime
+  updatedAt: DateTime
+  deletedAt: DateTime
 }
 "
 `;

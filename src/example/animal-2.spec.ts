@@ -36,17 +36,23 @@ const Animals: Service<Animal> = {
 const createAnimalService = <Type extends Animal>(
   type: AnimalTypes,
 ): Service<Type> => ({
-  findOne: async ({ order, where }) =>
-    Animals.findOne({
-      order,
-      where: { ...where, type },
-    }) as Promise<Type>,
-  findMany: async ({ order, page, where }) =>
-    Animals.findMany({
-      order,
-      page,
-      where: { ...where, type },
-    }) as Promise<Paged<Type>>,
+  findOne: async ({ order, where }, context) =>
+    Animals.findOne(
+      {
+        order,
+        where: { ...where, type },
+      },
+      context,
+    ) as Promise<Type>,
+  findMany: async ({ order, page, where }, context) =>
+    Animals.findMany(
+      {
+        order,
+        page,
+        where: { ...where, type },
+      },
+      context,
+    ) as Promise<Paged<Type>>,
 })
 
 const Cats = createAnimalService<Cat>(AnimalTypes.Cat)

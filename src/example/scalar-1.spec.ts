@@ -55,7 +55,7 @@ describe('testing the example 3', () => {
     // is it a tame animal
     animal.attr('tame', GraphQLBoolean)
     // age of the animal
-    animal.attr('date-of-birth', DateTime)
+    animal.attr('dateOfBirth', DateTime)
     // feeding type of the animal
     animal.attr('feed', EatingType)
 
@@ -82,7 +82,7 @@ describe('testing the example 3', () => {
     // is it a tame animal
     animal.attr('tame', GraphQLBoolean)
     // age of the animal
-    animal.attr('date-of-birth', DateTime)
+    animal.attr('dateOfBirth', DateTime)
     // feeding type of the animal
     animal.attr('feed', EatingType)
 
