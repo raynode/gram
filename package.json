@@ -46,8 +46,8 @@
     "graphql-tools": "^4.0.5",
     "graphql-type-json": "^0.3.0",
     "inflection": "^1.12.0",
-    "lodash": "^4.17.14",
-    "snyk": "^1.193.2"
+    "lodash": "^4.17.15",
+    "snyk": "^1.195.1"
   },
   "peerDependencies": {
     "graphql": "^14.4.2"
@@ -60,7 +60,7 @@
     "@types/uuid": "^3.4.5",
     "coveralls": "^3.0.5",
     "graphql": "^14.4.2",
-    "husky": "^3.0.0",
+    "husky": "^3.0.1",
     "jest": "^24.8.0",
     "lint-staged": "^9.2.0",
     "prettier": "^1.18.2",
