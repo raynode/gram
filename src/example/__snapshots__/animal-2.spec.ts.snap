@@ -7,7 +7,53 @@ exports[`testing the example 2 should build the example code 1`] = `
   age: Int
 }
 
-type Cat implements Node & Animal {
+input AnimalFilter {
+  AND: [AnimalFilter!]
+  OR: [AnimalFilter!]
+  NOT: AnimalFilter
+  name: String
+  name_not: String
+  name_in: [String!]
+  name_not_in: [String!]
+  tame: Boolean
+  tame_not: Boolean
+  age: Int
+  age_not: Int
+  age_lt: Int
+  age_gt: Int
+}
+
+input AnimalPage {
+  limit: Int
+  offset: Int
+}
+
+enum AnimalSortOrder {
+  name_ASC
+  name_DESC
+  tame_ASC
+  tame_DESC
+  age_ASC
+  age_DESC
+}
+
+input AnimalWhere {
+  AND: [AnimalFilter!]
+  OR: [AnimalFilter!]
+  NOT: AnimalFilter
+  name: String
+  name_not: String
+  name_in: [String!]
+  name_not_in: [String!]
+  tame: Boolean
+  tame_not: Boolean
+  age: Int
+  age_not: Int
+  age_lt: Int
+  age_gt: Int
+}
+
+type Cat implements Node {
   id: ID
   createdAt: DateTime
   updatedAt: DateTime
@@ -84,7 +130,22 @@ input CatWhere {
   age_gt: Int
 }
 
-\\"\\"\\"Use JavaScript Date object for date/time fields.\\"\\"\\"
+input CreateAnimalData {
+  name: String
+  tame: Boolean
+  age: Int
+}
+
+input CreateCatData {
+  id: ID
+  createdAt: DateTime
+  updatedAt: DateTime
+  deletedAt: DateTime
+  name: String
+  tame: Boolean
+  age: Int
+}
+
 scalar DateTime
 
 interface List {
@@ -108,6 +169,22 @@ type Page {
 type Query {
   getCat(where: CatWhere!, order: CatSortOrder): Cat
   getCats(order: CatSortOrder, page: CatPage, where: CatWhere!): Cats
+}
+
+input UpdateAnimalData {
+  name: String
+  tame: Boolean
+  age: Int
+}
+
+input UpdateCatData {
+  id: ID
+  createdAt: DateTime
+  updatedAt: DateTime
+  deletedAt: DateTime
+  name: String
+  tame: Boolean
+  age: Int
 }
 "
 `;

@@ -16,6 +16,8 @@ import { PubSub } from 'graphql-subscriptions'
 
 import { IFieldResolver } from 'graphql-tools'
 
+import { WithAddModel } from '../createBuild/extension-model'
+
 import { Names } from '../strategies/naming'
 import {
   ATTRIBUTEBUILDER,
@@ -135,7 +137,7 @@ export interface QueryTypeDefinition<
 > {
   name: string
   args?: Args
-  type: GraphQLType | ModelBuilder<BuildMode, Type>
+  type: string | GraphQLType | ModelBuilder<BuildMode, Type>
   resolver: GraphQLFieldResolver<null, QueryContext, Args>
 }
 // GraphQLFieldResolver<TSource, TContext, TArgs>
@@ -150,12 +152,13 @@ export interface SchemaBuilder<BuildMode, QueryContext = any> extends Builder {
     modelName: string,
     service?: Service<Type, GQLType>,
   ) => ModelBuilder<BuildMode, Type, GQLType>
-  fields: (buildMode: BuildMode | null) => FieldDefinition
+  fields: (buildMode?: BuildMode) => FieldDefinition
   models: Record<string, ModelBuilder<BuildMode, any>>
   type: typeof SCHEMABUILDER
   setScalar: <Type extends GraphQLScalarType>(key: string, type: Type) => Type
   getScalar: (key: string) => GraphQLScalarType
   addFilter: (check: FilterCheckFn, filter: FilterFn) => this
+  createBuild: (buildMode?: BuildMode) => WithAddModel<BuildMode, QueryContext>
   addQuery: <Type>(
     definition: WithContext<
       BuildMode,
@@ -168,7 +171,7 @@ export interface SchemaBuilder<BuildMode, QueryContext = any> extends Builder {
 
 export type GraphQLResolverMap<GQLType, Attrs extends string = string> = Record<
   Attrs,
-  GraphQLFieldResolver<GQLType, any, any>
+  IFieldResolver<GQLType, any>
 >
 
 export interface ModelBuilder<BuildMode, Type, GQLType = Type> extends Builder {
@@ -180,9 +183,11 @@ export interface ModelBuilder<BuildMode, Type, GQLType = Type> extends Builder {
       | ContextFn<BuildMode, GraphQLType>,
   ) => AttributeBuilder<BuildMode, Type, AttributeType>
   resolve: <Attrs extends string>(
-    resolver: ContextFn<BuildMode, GraphQLResolverMap<GQLType, Attrs>>,
+    resolver: ContextFn<BuildMode, Record<string, IFieldResolver<GQLType, any>>>,
   ) => this
-  getResolver: () => IFieldResolver<any, any>
+  getResolver: (
+    buildMode: Wrapped<BuildMode>,
+  ) => Record<string, IFieldResolver<GQLType, any>>
   build: (
     buildMode: Wrapped<BuildMode>,
   ) => ContextModel<BuildMode, Type, GQLType>

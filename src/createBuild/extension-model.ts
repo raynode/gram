@@ -47,13 +47,13 @@ const buildAttribute = <BuildMode>(
 
 const getAttributeFields = <BuildMode, Type, GQLType>(
   buildMode: BuildMode,
-  modelBuilder: ModelBuilder<BuildMode, Type, GQLType>,
+  attributes: Array<AttributeBuilder<BuildMode, any, any>>,
   wrapped: Wrapped<BuildMode>,
 ) =>
   reduce(
-    modelBuilder.getAttributes(),
-    (fields, attr, name) => {
-      fields[name] = buildAttribute(buildMode, attr, wrapped)
+    attributes,
+    (fields, attr) => {
+      fields[attr.name] = buildAttribute(buildMode, attr, wrapped)
       return fields
     },
     {},
@@ -89,8 +89,9 @@ export const addModel = <BuildMode, Context>(
 ) => {
   const build = baseBuild as WithAddModel<BuildMode, Context>
   build.addModel = modelBuilder => {
-    const resolver: IFieldResolver<any, any> = modelBuilder.getResolver()
-    const model = wrapped.getModel(modelBuilder.name)
+    const resolver = modelBuilder.getResolver(wrapped)
+    const model = modelBuilder.build(wrapped)
+    // const model = wrapped.getModel(modelBuilder.name)
 
     const visibility = modelBuilder.getVisibility()
     const names = defaultNamingStrategy(modelBuilder.name)
@@ -98,8 +99,10 @@ export const addModel = <BuildMode, Context>(
     const pubSub = wrapped.pubSub
     const type = modelBuilder.isInterface() ? 'interface' : 'type'
     const typeConfig = {
-      fields: getAttributeFields(build.buildMode, modelBuilder, wrapped),
+      fields: getAttributeFields(build.buildMode, model.getFields(), wrapped),
+      resolver,
     }
+    const integratedModel = ['Page', 'Node', 'List'].includes(model.name)
 
     if (type === 'interface')
       build.addType(modelBuilder.name, 'interface', typeConfig)
@@ -108,14 +111,18 @@ export const addModel = <BuildMode, Context>(
         ...typeConfig,
         interface: modelBuilder.getInterfaces()[0],
       })
-      build.addType(names.types.listType, 'type', {
-        fields: {
-          page: 'Page',
-          nodes: list(modelBuilder.name),
-        },
-        interface: 'List',
-      })
+
+      if (!integratedModel)
+        build.addType(names.types.listType, 'type', {
+          fields: {
+            page: 'Page',
+            nodes: list(modelBuilder.name),
+          },
+          interface: 'List',
+        })
     }
+
+    if (integratedModel) return
 
     // function that connects mutations with pub sub
     const publishResult = <Root, Args, Context, Result>(
@@ -188,7 +195,8 @@ export const addModel = <BuildMode, Context>(
       })
 
     if (visibility.updateMutation)
-      build.addMutation(names.fields.update, list(modelBuilder.name), {
+      build.addMutation(names.fields.update, {
+        type: list(modelBuilder.name),
         args: {
           [names.arguments.data]: nonNull(names.types.dataType),
           [names.arguments.where]: nonNull(names.types.whereType),

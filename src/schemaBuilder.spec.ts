@@ -67,8 +67,8 @@ describe('example', () => {
     // will add input types for "REFERENCE"
     account
       .attr('user', builder.models.User)
-      .resolve(account =>
-        Users.findOne({ where: { id: account.userId }, order: null }),
+      .resolve((account, _, context) =>
+        Users.findOne({ where: { id: account.userId }, order: null }, context),
       )
       .isNotNullable()
     // add accounts to the user model

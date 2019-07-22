@@ -6,6 +6,10 @@ exports[`testing the example 1 should build the example code 1`] = `
   name: String
   tame: Boolean
   age: Int
+  id: ID
+  createdAt: DateTime
+  updatedAt: DateTime
+  deletedAt: DateTime
 }
 
 input AnimalFilter {
@@ -96,53 +100,11 @@ input CreateAnimalData {
   deletedAt: DateTime
 }
 
-input CreateListData {
-  page: PageWhere
-  nodes: NodeWhere
-}
-
-input CreateNodeData {
-  id: ID
-  createdAt: DateTime
-  updatedAt: DateTime
-  deletedAt: DateTime
-}
-
-input CreatePageData {
-  page: Int
-  limit: Int
-  offset: Int
-}
-
 scalar DateTime
 
 interface List {
   page: Page
   nodes: [Node!]!
-}
-
-input ListFilter {
-  AND: [ListFilter!]
-  OR: [ListFilter!]
-  NOT: ListFilter
-}
-
-input ListPage {
-  limit: Int
-  offset: Int
-}
-
-enum ListSortOrder {
-  page_ASC
-  page_DESC
-  nodes_ASC
-  nodes_DESC
-}
-
-input ListWhere {
-  AND: [ListFilter!]
-  OR: [ListFilter!]
-  NOT: ListFilter
 }
 
 type Mutation {
@@ -158,101 +120,10 @@ interface Node {
   deletedAt: DateTime
 }
 
-input NodeFilter {
-  AND: [NodeFilter!]
-  OR: [NodeFilter!]
-  NOT: NodeFilter
-  id: ID
-  id_not: ID
-  id_in: [ID!]
-  id_not_in: [ID!]
-}
-
-input NodePage {
-  limit: Int
-  offset: Int
-}
-
-enum NodeSortOrder {
-  id_ASC
-  id_DESC
-  createdAt_ASC
-  createdAt_DESC
-  updatedAt_ASC
-  updatedAt_DESC
-  deletedAt_ASC
-  deletedAt_DESC
-}
-
-input NodeWhere {
-  AND: [NodeFilter!]
-  OR: [NodeFilter!]
-  NOT: NodeFilter
-  id: ID
-  id_not: ID
-  id_in: [ID!]
-  id_not_in: [ID!]
-}
-
 type Page {
   page: Int
   limit: Int
   offset: Int
-}
-
-input PageFilter {
-  AND: [PageFilter!]
-  OR: [PageFilter!]
-  NOT: PageFilter
-  page: Int
-  page_not: Int
-  page_lt: Int
-  page_gt: Int
-  limit: Int
-  limit_not: Int
-  limit_lt: Int
-  limit_gt: Int
-  offset: Int
-  offset_not: Int
-  offset_lt: Int
-  offset_gt: Int
-}
-
-input PagePage {
-  limit: Int
-  offset: Int
-}
-
-type Pages implements List {
-  page: Page
-  nodes: [Page!]!
-}
-
-enum PageSortOrder {
-  page_ASC
-  page_DESC
-  limit_ASC
-  limit_DESC
-  offset_ASC
-  offset_DESC
-}
-
-input PageWhere {
-  AND: [PageFilter!]
-  OR: [PageFilter!]
-  NOT: PageFilter
-  page: Int
-  page_not: Int
-  page_lt: Int
-  page_gt: Int
-  limit: Int
-  limit_not: Int
-  limit_lt: Int
-  limit_gt: Int
-  offset: Int
-  offset_not: Int
-  offset_lt: Int
-  offset_gt: Int
 }
 
 type Query {
@@ -275,24 +146,6 @@ input UpdateAnimalData {
   createdAt: DateTime
   updatedAt: DateTime
   deletedAt: DateTime
-}
-
-input UpdateListData {
-  page: PageWhere
-  nodes: NodeWhere
-}
-
-input UpdateNodeData {
-  id: ID
-  createdAt: DateTime
-  updatedAt: DateTime
-  deletedAt: DateTime
-}
-
-input UpdatePageData {
-  page: Int
-  limit: Int
-  offset: Int
 }
 "
 `;

@@ -176,7 +176,7 @@ export const createSchemaBuilder = <BuildMode = any, QueryContext = any>() => {
     build: (buildMode: BuildMode | FieldDefinition = null) =>
       isFieldDefinition(buildMode)
         ? createSchema(buildMode)
-        : (builder.fields(buildMode) as any).toSchema(),
+        : builder.createBuild(buildMode).toSchema(),
     fields: (buildMode: BuildMode | null = null) => {
       const pubSub = externalPubSub || new PubSub()
       const wrapped = setup(models, scalars, buildMode, filters, pubSub)
@@ -194,13 +194,19 @@ export const createSchemaBuilder = <BuildMode = any, QueryContext = any>() => {
         } = extractData(queryDefinition)(wrapped)
         const type = isType(buildModeType)
           ? buildModeType
-          : wrapped.getModel(buildModeType.name).getType()
+          : wrapped
+              .getModel(
+                typeof buildModeType === 'string'
+                  ? buildModeType
+                  : buildModeType.name,
+              )
+              .getType()
         memo[name] = { name, type, args, resolve }
         return memo
       }, {})
       // create the query, mutation and subscription fields
 
-      const fields = reduceFields(
+      return reduceFields(
         models,
         {
           query: queryFieldsReducer(wrapped),
@@ -213,6 +219,19 @@ export const createSchemaBuilder = <BuildMode = any, QueryContext = any>() => {
           subscription: {},
         },
       )
+    },
+    createBuild: buildMode => {
+      const pubSub = externalPubSub || new PubSub()
+      const wrapped = setup(models, scalars, buildMode, filters, pubSub)
+
+      // build all interfaces
+      filter(models, model => model.isInterface()).forEach(model =>
+        model.build(wrapped),
+      )
+
+      const query = queryFieldsReducer(wrapped)
+      const mutation = mutationFieldsReducer(wrapped)
+      const subscription = subscriptionFieldsReducer(wrapped)
 
       const build = addModel(
         createBuild<BuildMode, QueryContext>(buildMode),
@@ -221,9 +240,22 @@ export const createSchemaBuilder = <BuildMode = any, QueryContext = any>() => {
       forEach(models, build.addModel)
       forEach(scalars, scalar => build.addType(scalar.toString(), 'scalar'))
 
-      const result = build.toTypeDefs()
+      forEach(queryDefinitions, queryDefinition => {
+        const { name, args, type, resolver } =
+          typeof queryDefinition === 'function'
+            ? queryDefinition(wrapped)
+            : queryDefinition
+        const typeName = isType(type)
+          ? type.toString()
+          : typeof type === 'string'
+          ? type
+          : type.name
+        build.addQuery(name, { args, type: typeName }, resolver)
+      })
 
-      return build as any
+      // const result = build.toTypeDefs()
+      // console.log((result.resolvers.Query as any))
+      return build
     },
     setScalar: (key, type) => {
       scalars[key] = type

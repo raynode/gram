@@ -1,3 +1,5 @@
+import { IFieldResolver } from 'graphql-tools'
+import { isBuildModeGenerator } from './guards'
 import {
   BuildModeArgsGenerator,
   BuildModeGenerator,
@@ -6,110 +8,121 @@ import {
   SimpleFieldType,
 } from './types'
 
-import { isBuildModeGenerator } from './guards'
-
 export type Definable<BuildMode, Data> =
   | Data
   | BuildModeGenerator<BuildMode, Data>
-export type DefinableFields<BuildMode> = Definable<
+export type DefinableFields<BuildMode, Source, Context> = Definable<
   BuildMode,
-  Record<string, SimpleFieldType>
+  Record<string, SimpleFieldType<Source, Context>>
 >
 
 export type AddScalarArgsType = [string, 'scalar', never]
-export type AddInterfaceArgsType<BuildMode> = [
+export type AddInterfaceArgsType<BuildMode, Source, Context> = [
   string,
   'interface',
-  { fields: DefinableFields<BuildMode> }
+  {
+    fields: DefinableFields<BuildMode, Source, Context>;
+    resolver?: Record<string, IFieldResolver<Source, Context>>;
+  }
 ]
-export type AddInputArgsType<BuildMode> = [
+export type AddInputArgsType<BuildMode, Source, Context> = [
   string,
   'input',
-  { fields: DefinableFields<BuildMode> }
+  {
+    fields: DefinableFields<BuildMode, Source, Context>;
+    resolver?: Record<string, IFieldResolver<Source, Context>>;
+  }
 ]
-export type AddEnumArgsType<BuildMode> = [
+export type AddEnumArgsType<BuildMode, Source, Context> = [
   string,
   'enum',
   { values: Definable<BuildMode, string[]> }
 ]
-export type AddObjectArgsType<BuildMode> = [
+export type AddObjectArgsType<BuildMode, Source, Context> = [
   string,
   'type',
   {
-    fields: DefinableFields<BuildMode>;
+    fields: DefinableFields<BuildMode, Source, Context>;
     interface?: Definable<BuildMode, string>;
+    resolver?: Record<string, IFieldResolver<Source, Context>>;
   }
 ]
 
-export type AddArgs<BuildMode> =
+export type AddArgs<BuildMode, Source, Context> =
   | AddScalarArgsType
-  | AddInterfaceArgsType<BuildMode>
-  | AddInputArgsType<BuildMode>
-  | AddEnumArgsType<BuildMode>
-  | AddObjectArgsType<BuildMode>
+  | AddInterfaceArgsType<BuildMode, Source, Context>
+  | AddInputArgsType<BuildMode, Source, Context>
+  | AddEnumArgsType<BuildMode, Source, Context>
+  | AddObjectArgsType<BuildMode, Source, Context>
 
 export type AddScalarType = (
   typeName: string,
   type: 'scalar',
   config?: {},
 ) => void
-export type AddInterfaceType<BuildMode> = (
+export type AddInterfaceType<BuildMode, Source, Context> = (
   typeName: string,
   type: 'interface',
   config: {
-    fields: DefinableFields<BuildMode>;
+    fields: DefinableFields<BuildMode, Source, Context>;
+    resolver?: Record<string, IFieldResolver<Source, Context>>;
   },
 ) => void
-export type AddInputType<BuildMode> = (
+export type AddInputType<BuildMode, Source, Context> = (
   typeName: string,
   type: 'input',
   config: {
-    fields: DefinableFields<BuildMode>;
+    fields: DefinableFields<BuildMode, Source, Context>;
+    resolver?: Record<string, IFieldResolver<Source, Context>>;
   },
 ) => void
-export type AddEnumType<BuildMode> = (
+export type AddEnumType<BuildMode, Source, Context> = (
   typeName: string,
   type: 'enum',
   config: {
     values: Definable<BuildMode, string[]>;
   },
 ) => void
-export type AddObjectType<BuildMode> = (
+export type AddObjectType<BuildMode, Source, Context> = (
   typeName: string,
   type: 'type',
   config: {
-    fields: DefinableFields<BuildMode>;
+    fields: DefinableFields<BuildMode, Source, Context>;
     interface?: Definable<BuildMode, string>;
+    resolver?: Record<string, IFieldResolver<Source, Context>>;
   },
 ) => void
 
-export type AddType<BuildMode> = AddScalarType &
-  AddInterfaceType<BuildMode> &
-  AddInputType<BuildMode> &
-  AddEnumType<BuildMode> &
-  AddObjectType<BuildMode>
+export type AddType<BuildMode, Source, Context> = AddScalarType &
+  AddInterfaceType<BuildMode, Source, Context> &
+  AddInputType<BuildMode, Source, Context> &
+  AddEnumType<BuildMode, Source, Context> &
+  AddObjectType<BuildMode, Source, Context>
 
-export type AddArgsGenerator<BuildMode> = BuildModeArgsGenerator<
+export type AddArgsGenerator<
   BuildMode,
-  AddArgs<BuildMode>
->
+  Source,
+  Context
+> = BuildModeArgsGenerator<BuildMode, AddArgs<BuildMode, Source, Context>>
 
-export const createAddType = <BuildMode>(
+export const createAddType = <BuildMode, Source, Context>(
   buildMode: BuildMode,
   addScalarType: AddScalarType,
-  addInterfaceType: AddInterfaceType<BuildMode>,
-  addInputType: AddInputType<BuildMode>,
-  addEnumType: AddEnumType<BuildMode>,
-  addObjectType: AddObjectType<BuildMode>,
-): AddType<BuildMode> & AddArgsGenerator<BuildMode> => (
+  addInterfaceType: AddInterfaceType<BuildMode, Source, Context>,
+  addInputType: AddInputType<BuildMode, Source, Context>,
+  addEnumType: AddEnumType<BuildMode, Source, Context>,
+  addObjectType: AddObjectType<BuildMode, Source, Context>,
+): AddType<BuildMode, Source, Context> &
+  AddArgsGenerator<BuildMode, Source, Context> => (
   buildModeBenerator,
   ...args
 ) => {
-  const typeInformation = isBuildModeGenerator<BuildMode, AddArgs<BuildMode>>(
-    buildModeBenerator,
-  )
+  const typeInformation = isBuildModeGenerator<
+    BuildMode,
+    AddArgs<BuildMode, Source, Context>
+  >(buildModeBenerator)
     ? buildModeBenerator(buildMode)
-    : ([buildModeBenerator, ...args] as AddArgs<BuildMode>)
+    : ([buildModeBenerator, ...args] as AddArgs<BuildMode, Source, Context>)
   switch (typeInformation[1]) {
     case 'scalar':
       return addScalarType(...typeInformation)

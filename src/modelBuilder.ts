@@ -1,4 +1,5 @@
 import { GraphQLType } from 'graphql'
+import { IFieldResolver } from 'graphql-tools'
 import { forEach, memoize } from 'lodash'
 
 import { createAttributeBuilder } from './attributeBuilder'
@@ -40,7 +41,7 @@ export const createModelBuilder = <BuildMode, Type, GQLType = Type>(
   let contextMutation: ContextMutator<BuildMode, Type, GQLType> = () => null
   let listType: GraphQLType | ModelBuilder<BuildMode, any> = null
   let isInterface: boolean = false
-  let resolver: ContextFn<BuildMode, GraphQLResolverMap<GQLType>> = null
+  let resolver: ContextFn<BuildMode, IFieldResolver<GQLType, any>> = null
   const interfaces: string[] = []
   const visibility = service
     ? serviceToVisibility(service)
@@ -88,7 +89,7 @@ export const createModelBuilder = <BuildMode, Type, GQLType = Type>(
         service,
         buildMode,
         visibility,
-        resolver ? resolver(buildMode) : {},
+        resolver ? resolver(buildMode) : null,
       )
       if (buildModeFn) buildModeFn(buildModeModel, buildMode)
       if (isInterface) buildModeModel.setInterface()
@@ -125,7 +126,7 @@ export const createModelBuilder = <BuildMode, Type, GQLType = Type>(
       return builder
     },
     getAttributes: () => attributes,
-    getResolver: () => resolver,
+    getResolver: buildMode => (resolver ? resolver(buildMode) : null),
     getVisibility: () => visibility,
     getService: () => service,
   }

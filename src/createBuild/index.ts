@@ -1,9 +1,11 @@
 import { IFieldResolver, makeExecutableSchema } from 'graphql-tools'
 
+import { forEach } from 'lodash'
 import { generateTypeDefs } from './generateTypeDefs'
 import { createAddType } from './method-addType'
 import { resolvablesCreator } from './method-resolvablesCreator'
 import {
+  AddResolvableConfig,
   AddResolver,
   Build,
   CreateableTypesRecord,
@@ -21,7 +23,7 @@ export * from './extension-model'
 export const createBuild = <BuildMode = null, Context = any>(
   buildMode?: BuildMode,
 ) => {
-  const resolvables: ResolvablesRecord = {
+  const resolvables: ResolvablesRecord<any, Context> = {
     Mutation: {
       fields: {},
     },
@@ -32,7 +34,7 @@ export const createBuild = <BuildMode = null, Context = any>(
       fields: {},
     },
   }
-  const types: CreateableTypesRecord = {
+  const types: CreateableTypesRecord<any, Context> = {
     enum: {},
     input: {},
     interface: {},
@@ -54,7 +56,22 @@ export const createBuild = <BuildMode = null, Context = any>(
     resolvers[base][name] = resolver
   }
 
-  const createResolvable = resolvablesCreator<BuildMode, Context>(
+  const addResolvers = <Source>(
+    base: string,
+    resolvers: Record<
+      string,
+      IFieldResolver<Source, Context> | AddResolvableConfig<Source, Context>
+    >,
+  ) =>
+    forEach(resolvers, (resolver, name) =>
+      addResolver(
+        base,
+        name,
+        typeof resolver === 'function' ? { resolver } : resolver,
+      ),
+    )
+
+  const createResolvable = resolvablesCreator<BuildMode, any, Context>(
     buildMode,
     resolvables,
     addResolver,
@@ -67,18 +84,20 @@ export const createBuild = <BuildMode = null, Context = any>(
       fields: convertSimpleFieldsToFields(buildModeResolver(config.fields)),
     })
 
-  const addType = createAddType(
+  const addType = createAddType<BuildMode, any, Context>(
     buildMode,
     typeName => types.scalar.push(typeName),
     addInterfaceOrInputType,
     addInterfaceOrInputType,
     (typeName, createAble, config) =>
       (types.enum[typeName] = { values: buildModeResolver(config.values) }),
-    (typeName, createAble, config) =>
-      (types.type[typeName] = {
+    (typeName, createAble, config) => {
+      if (config.resolver) addResolvers(typeName, config.resolver)
+      return (types.type[typeName] = {
         fields: convertSimpleFieldsToFields(buildModeResolver(config.fields)),
         interface: buildModeResolver(config.interface),
-      }),
+      })
+    },
   )
 
   const builder: Build<BuildMode, Context> = {
