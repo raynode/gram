@@ -57,7 +57,7 @@ describe('testing the example 1', () => {
     expect(printSchema(builder.build())).toMatchSnapshot()
   })
 
-  it.only('should use the resolver when queried', async () => {
+  it('should use the resolver when queried', async () => {
     // initialize the database
     const birthdate = new Date()
     // create random age

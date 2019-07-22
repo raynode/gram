@@ -178,6 +178,8 @@ export const createSchemaBuilder = <BuildMode = any, QueryContext = any>() => {
         ? createSchema(buildMode)
         : builder.createBuild(buildMode).toSchema(),
     fields: (buildMode: BuildMode | null = null) => {
+      throw new Error('DO NOT USE THIS ANYMORE!')
+
       const pubSub = externalPubSub || new PubSub()
       const wrapped = setup(models, scalars, buildMode, filters, pubSub)
 
