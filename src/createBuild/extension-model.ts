@@ -98,9 +98,11 @@ export const addModel = <BuildMode, Context>(
     const pubSub = wrapped.pubSub
     const type = modelBuilder.isInterface() ? 'interface' : 'type'
     const fields = model.getFields()
+    const interfaces = modelBuilder.getInterfaces()
     const typeConfig = {
       fields: getAttributeFields(build.buildMode, fields, wrapped),
       resolver,
+      interface: (interfaces && interfaces.join('&')) || null,
     }
     forEach(fields, field => {
       const resolver = field.getResolver()
@@ -109,23 +111,16 @@ export const addModel = <BuildMode, Context>(
 
     const integratedModel = ['Page', 'Node', 'List'].includes(model.name)
 
-    if (type === 'interface')
-      build.addType(modelBuilder.name, 'interface', typeConfig)
-    else {
-      build.addType(modelBuilder.name, 'type', {
-        ...typeConfig,
-        interface: modelBuilder.getInterfaces()[0],
-      })
+    build.addType(modelBuilder.name, type as any, typeConfig)
 
-      if (!integratedModel)
-        build.addType(names.types.listType, 'type', {
-          fields: {
-            page: 'Page',
-            nodes: list(modelBuilder.name),
-          },
-          interface: 'List',
-        })
-    }
+    if (!integratedModel)
+      build.addType(names.types.listType, 'type', {
+        fields: {
+          page: 'Page',
+          nodes: list(modelBuilder.name),
+        },
+        interface: 'List',
+      })
 
     if (integratedModel) return
 

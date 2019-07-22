@@ -28,6 +28,11 @@ input AnimalPage {
   offset: Int
 }
 
+type Animals implements List {
+  page: Page
+  nodes: [Animal!]!
+}
+
 enum AnimalSortOrder {
   name_ASC
   name_DESC
@@ -53,7 +58,7 @@ input AnimalWhere {
   age_gt: Int
 }
 
-type Cat implements Node {
+type Cat implements Node & Animal {
   id: ID
   createdAt: DateTime
   updatedAt: DateTime
@@ -324,7 +329,32 @@ input CatWhere {
   age_gt: Int
 }
 
-\\"\\"\\"Use JavaScript Date object for date/time fields.\\"\\"\\"
+input CreateAnimalData {
+  name: String
+  tame: Boolean
+  age: Int
+}
+
+input CreateCatData {
+  id: ID
+  createdAt: DateTime
+  updatedAt: DateTime
+  deletedAt: DateTime
+  name: String
+  tame: Boolean
+  age: Int
+}
+
+input CreateDogData {
+  id: ID
+  createdAt: DateTime
+  updatedAt: DateTime
+  deletedAt: DateTime
+  name: String
+  tame: Boolean
+  age: Int
+}
+
 scalar DateTime
 
 type Dog implements Node & Animal {
@@ -429,6 +459,32 @@ type Query {
   getCats(order: CatSortOrder, page: CatPage, where: CatWhere!): Cats
   getDog(where: DogWhere!, order: DogSortOrder): Dog
   getDogs(order: DogSortOrder, page: DogPage, where: DogWhere!): Dogs
+}
+
+input UpdateAnimalData {
+  name: String
+  tame: Boolean
+  age: Int
+}
+
+input UpdateCatData {
+  id: ID
+  createdAt: DateTime
+  updatedAt: DateTime
+  deletedAt: DateTime
+  name: String
+  tame: Boolean
+  age: Int
+}
+
+input UpdateDogData {
+  id: ID
+  createdAt: DateTime
+  updatedAt: DateTime
+  deletedAt: DateTime
+  name: String
+  tame: Boolean
+  age: Int
 }
 "
 `;
