@@ -81,7 +81,7 @@ export const createModel = <BuildMode, Type, GQLType = Type>(
         case 'list':
           return DataTypes.list(buildModeModel)
         case 'page':
-          return DataTypes.page(buildModeModel)
+          return DataTypes.page()
         case 'where':
           return DataTypes.where(buildModeModel)
       }
