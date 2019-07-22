@@ -28,7 +28,6 @@ describe('testing the example 1', () => {
       schema,
       source: `{ random }`,
     })
-
     expect(printSchema(schema)).toMatchSnapshot()
     expect(result.data.random).toEqual(randomNumber)
   })

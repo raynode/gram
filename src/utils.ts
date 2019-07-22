@@ -25,13 +25,16 @@ import {
   Wrapped,
 } from './types'
 
-export const isContextFn = <Context, Type>(
-  val: any,
-): val is ContextFn<Context, Type> => typeof val === 'function'
+import { Names } from './strategies/naming'
 
-export const extractData = <Context, Type>(
-  data: WithContext<Context, Type>,
-) => (context: Wrapped<Context>) => (isContextFn(data) ? data(context) : data)
+export const isContextFn = <BuildMode, Type>(
+  val: any,
+): val is ContextFn<BuildMode, Type> => typeof val === 'function'
+
+export const extractData = <BuildMode, Type>(
+  data: WithContext<BuildMode, Type>,
+) => (buildMode: Wrapped<BuildMode>) =>
+  isContextFn(data) ? data(buildMode) : data
 
 export const record = (service: Record<string, any>) => ({
   exists: (key: string) =>
@@ -41,30 +44,30 @@ export const record = (service: Record<string, any>) => ({
 export const clearRecord = (record: Record<string, any>) =>
   pickBy(record, identity)
 
-export type FieldReducerFn<Context> = (
+export type FieldReducerFn<BuildMode> = (
   fields: GraphQLFieldConfigMap<any, any>,
-  model: ModelBuilder<Context, any>,
+  model: ModelBuilder<BuildMode, any>,
 ) => GraphQLFieldConfigMap<any, any>
 
-export const fieldsReducer = <Context>(
+export const fieldsReducer = <BuildMode>(
   reducer: (
-    contextModel: ContextModel<Context, any>,
+    buildModeModel: ContextModel<BuildMode, any>,
   ) => GraphQLFieldConfigMap<any, any> | GraphQLInputFieldConfigMap,
-) => (context: Wrapped<Context>): FieldReducerFn<Context> => (
+) => (buildMode: Wrapped<BuildMode>): FieldReducerFn<BuildMode> => (
   fields,
   model,
-) => ({ ...fields, ...clearRecord(reducer(model.build(context))) })
+) => ({ ...fields, ...clearRecord(reducer(model.build(buildMode))) })
 
 // this Type construct will ensure that the returned object will have the same keys as
 // the input object. It will also convert the properties from ModelBuilder to FieldReducer
 export const reduceFields = <
-  Context,
+  BuildMode,
   Reducers,
   Models,
   ReducerKeys extends keyof Reducers
 >(
-  models: Record<string, ModelBuilder<Context, any>>,
-  reducers: Record<ReducerKeys, FieldReducerFn<Context>>,
+  models: Record<string, ModelBuilder<BuildMode, any>>,
+  reducers: Record<ReducerKeys, FieldReducerFn<BuildMode>>,
   fields: Record<ReducerKeys, GraphQLFieldConfigMap<any, any>>,
 ): Record<ReducerKeys, GraphQLFieldConfigMap<any, any>> =>
   reduce(
@@ -76,19 +79,19 @@ export const reduceFields = <
     fields,
   )
 
-export type ToContextFnResult<Context> = ContextFn<
-  Context,
-  GraphQLType | ContextModel<Context, any>
+export type ToContextFnResult<BuildMode> = ContextFn<
+  BuildMode,
+  GraphQLType | ContextModel<BuildMode, any>
 >
-export const toContextFn = <Context>(
+export const toContextFn = <BuildMode>(
   type:
-    | ModelType<Context>
-    | ModelBuilder<Context, any>
-    | ContextFn<Context, GraphQLType>,
-): ToContextFnResult<Context> => {
+    | ModelType<BuildMode>
+    | ModelBuilder<BuildMode, any>
+    | ContextFn<BuildMode, GraphQLType>,
+): ToContextFnResult<BuildMode> => {
   if (typeof type === 'function') return type
   if (isType(type)) return () => type
-  return context => context.getModel(type.name)
+  return buildMode => buildMode.getModel(type.name)
 }
 
 export type TypeCondition = 'nonnull' | 'list' | 'none'
@@ -116,30 +119,36 @@ export const conditionalType = <Type extends GraphQLType>(
     ? GraphQLNonNull(type)
     : type
 
-export const memoizeContextModel = <Context = any, Result = any, Type = any>(
-  fn: (contextModel: ContextModel<Context, Type, any>) => Result,
+export const memoizeContextModel = <BuildMode = any, Result = any, Type = any>(
+  fn: (buildModeModel: ContextModel<BuildMode, Type, any>) => Result,
 ) =>
-  memoize(fn, (contextModel: ContextModel<Context, Type>) => contextModel.id)
+  memoize(
+    fn,
+    (buildModeModel: ContextModel<BuildMode, Type>) => buildModeModel.id,
+  )
 
-export const reduceContextFields = <Context, Type extends Record<string, any>>(
-  contextModel: ContextModel<Context, Type>,
+export const reduceContextFields = <
+  BuildMode,
+  Type extends Record<string, any>
+>(
+  buildModeModel: ContextModel<BuildMode, Type>,
   base: Type = null,
   reducer: (
     memo: Type,
-    attr: AttributeBuilder<Context, Type, any>,
+    attr: AttributeBuilder<BuildMode, Type, any>,
     type: GraphQLType,
-    field: ModelType<Context>,
+    field: ModelType<BuildMode>,
   ) => Type,
 ) =>
-  contextModel
+  buildModeModel
     .getFields()
     .reduce(
       (memo: Type, attr) =>
         reducer(
           memo,
           attr,
-          buildType(attr, contextModel.context),
-          attr.field(contextModel.context),
+          buildType(attr, buildModeModel.buildMode),
+          attr.field(buildModeModel.buildMode),
         ),
       base || {},
     )
@@ -153,28 +162,38 @@ interface ContextModelFieldFnConfig {
   iterator: string
   condition: TypeCondition
 }
-export const createContextModelFieldFn = <Context>(
+export const createModelFieldFn = <BuildMode>(
   configFn: (
-    contextModel: ContextModel<Context, any>,
+    buildModeModel: ContextModel<BuildMode, any>,
   ) => ContextModelFieldFnConfig,
-) => (contextModel: ContextModel<Context, any>) => {
-  const { iterator, condition = 'none' } = configFn(contextModel)
+) => (buildModeModel: ContextModel<BuildMode, any>) => {
+  const { iterator, condition = 'none' } = configFn(buildModeModel)
   return {
-    subscribe: () => contextModel.context.pubSub.asyncIterator(iterator),
+    subscribe: () => buildModeModel.buildMode.pubSub.asyncIterator(iterator),
     resolve: ({ node }) => node,
-    type: conditionalType(contextModel.getType() as GraphQLInputType, condition),
+    type: conditionalType(
+      buildModeModel.getType() as GraphQLInputType,
+      condition,
+    ),
   }
 }
 
-export const createInputType = <Context>(
+export const createInputType = <
+  BuildMode,
+  Key extends keyof Names,
+  Name extends keyof Names[Key]
+>(
   field: DataType,
-  nameFn: ContextModelFn<string>,
+  nameType: Key,
+  name: Name,
 ) =>
   memoizeContextModel(
-    contextModel =>
+    buildModeModel =>
       new GraphQLInputObjectType({
-        name: nameFn(contextModel),
+        name: (buildModeModel.names[nameType] as Record<any, string>)[
+          name
+        ] as string,
         fields: () =>
-          contextModel.dataFields(field) as GraphQLInputFieldConfigMap,
+          buildModeModel.dataFields(field) as GraphQLInputFieldConfigMap,
       }),
   )

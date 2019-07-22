@@ -57,7 +57,7 @@ describe('testing the example 1', () => {
     expect(printSchema(builder.build())).toMatchSnapshot()
   })
 
-  it('should use the resolver when queried', async () => {
+  it.only('should use the resolver when queried', async () => {
     // initialize the database
     const birthdate = new Date()
     // create random age
@@ -95,8 +95,11 @@ describe('testing the example 1', () => {
       },
     }))
 
+    const { resolvers } = builder.createBuild().toTypeDefs()
+    const schema = builder.build()
+
     const { data, errors } = await graphql({
-      schema: builder.build(),
+      schema,
       source: `{
         getAnimals(where: {}) {
           nodes {

@@ -1,8 +1,9 @@
 import { GraphQLType } from 'graphql'
+import { IFieldResolver } from 'graphql-tools'
 import { forEach, memoize } from 'lodash'
 
 import { createAttributeBuilder } from './attributeBuilder'
-import { createContextModel } from './createContextModel'
+import { createModel } from './createModel'
 import {
   AttributeBuilder,
   Attributes,
@@ -31,16 +32,19 @@ const serviceToVisibility = (service: Service<any>): ModelVisibility => {
   }
 }
 
-export const createModelBuilder = <Context, Type, GQLType = Type>(
+export const createModelBuilder = <BuildMode, Type, GQLType = Type>(
   modelName: string,
   service: Service<Type, GQLType>,
-  contextFn?: ContextMutator<Context, Type, GQLType>,
+  buildModeFn?: ContextMutator<BuildMode, Type, GQLType>,
 ) => {
-  const attributes: Attributes<Context, Type> = {}
-  let contextMutation: ContextMutator<Context, Type, GQLType> = () => null
-  let listType: GraphQLType | ModelBuilder<Context, any> = null
+  const attributes: Attributes<BuildMode, Type> = {}
+  let contextMutation: ContextMutator<BuildMode, Type, GQLType> = () => null
+  let listType: GraphQLType | ModelBuilder<BuildMode, any> = null
   let isInterface: boolean = false
-  let resolver: ContextFn<Context, GraphQLResolverMap<GQLType>> = null
+  let resolver: ContextFn<
+    BuildMode,
+    Record<string, IFieldResolver<GQLType, any>>
+  > = null
   const interfaces: string[] = []
   const visibility = service
     ? serviceToVisibility(service)
@@ -55,7 +59,7 @@ export const createModelBuilder = <Context, Type, GQLType = Type>(
         deleteSubscription: false,
       }
 
-  const builder: ModelBuilder<Context, Type, GQLType> = {
+  const builder: ModelBuilder<BuildMode, Type, GQLType> = {
     type: MODELBUILDER,
     name: modelName,
     getInterfaces: () => interfaces,
@@ -68,53 +72,51 @@ export const createModelBuilder = <Context, Type, GQLType = Type>(
     attr: <AttributeType>(
       attributeName: string,
       type:
-        | ModelType<Context>
-        | ModelBuilder<Context, any>
-        | ContextFn<Context, GraphQLType>,
+        | ModelType<BuildMode>
+        | ModelBuilder<BuildMode, any>
+        | ContextFn<BuildMode, GraphQLType>,
     ) => {
       if (!type)
         throw new Error(
           `${modelName}.attr(${attributeName}) needs to provide either a GraphQLType or a ModelBuilder`,
         )
       return (attributes[attributeName] = createAttributeBuilder<
-        Context,
+        BuildMode,
         AttributeType,
         Type
-      >(attributeName, toContextFn<Context>(type)))
+      >(attributeName, toContextFn<BuildMode>(type)))
     },
-    setup: context => {
-      const contextModel = createContextModel(
+    setup: buildMode => {
+      const buildModeModel = createModel(
         builder,
         service,
-        context,
+        buildMode,
         visibility,
-        resolver ? resolver(context) : {},
+        resolver ? resolver(buildMode) : null,
       )
-      if (contextFn) contextFn(contextModel, context)
-      if (isInterface) contextModel.setInterface()
-      context.addModel(modelName, contextModel)
+      if (buildModeFn) buildModeFn(buildModeModel, buildMode)
+      if (isInterface) buildModeModel.setInterface()
+      buildMode.addModel(modelName, buildModeModel)
     },
     build: memoize(
-      context => {
-        const contextModel = context.getModel<Type, GQLType>(modelName)
-        forEach(attributes, attr => contextModel.addField(attr))
-        interfaces
-          .map(name => context.getBaseModel(name))
-          .forEach(model => {
-            forEach(model.getAttributes(), (attr, name) => {
-              if (!attributes.hasOwnProperty(name)) contextModel.addField(attr)
-            })
+      buildMode => {
+        const buildModeModel = buildMode.getModel<Type, GQLType>(modelName)
+        forEach(attributes, buildModeModel.addField)
+        interfaces.map(buildMode.getBaseModel).forEach(model => {
+          forEach(model.getAttributes(), (attr, name) => {
+            if (!attributes.hasOwnProperty(name)) buildModeModel.addField(attr)
           })
-        contextMutation(contextModel, context)
-        return contextModel
+        })
+        contextMutation(buildModeModel, buildMode)
+        return buildModeModel
       },
-      context => context.id,
+      buildMode => buildMode.id,
     ),
     resolve: modelResolver => {
       resolver = modelResolver
       return builder
     },
-    context: mutator => {
+    buildMode: mutator => {
       contextMutation = mutator
       return builder
     },
@@ -127,6 +129,9 @@ export const createModelBuilder = <Context, Type, GQLType = Type>(
       return builder
     },
     getAttributes: () => attributes,
+    getResolver: buildMode => (resolver ? resolver(buildMode) : null),
+    getVisibility: () => visibility,
+    getService: () => service,
   }
   return builder
 }

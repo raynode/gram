@@ -100,7 +100,6 @@ input CreateAnimalData {
   deletedAt: DateTime
 }
 
-\\"\\"\\"Use JavaScript Date object for date/time fields.\\"\\"\\"
 scalar DateTime
 
 interface List {

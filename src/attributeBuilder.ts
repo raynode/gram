@@ -1,10 +1,10 @@
 import {
-  GraphQLFieldResolver,
   GraphQLNonNull,
   GraphQLOutputType,
   GraphQLType,
   isType,
 } from 'graphql'
+import { IFieldResolver } from 'graphql-tools'
 import {
   AttributeBuilder,
   ContextFn,
@@ -16,31 +16,32 @@ import {
 import { ATTRIBUTEBUILDER } from './types/constants'
 import { toList } from './utils'
 
-export const buildType = <Context>(
-  attr: AttributeBuilder<Context, any, any>,
-  context: Wrapped<Context>,
+export const buildType = <BuildMode>(
+  attr: AttributeBuilder<BuildMode, any, any>,
+  buildMode: Wrapped<BuildMode>,
 ): GraphQLOutputType => {
-  const type = attr.field(context)
-  const gqlType = isType(type) ? type : context.getModel(type.name).getType()
+  const type = attr.field(buildMode)
+  const gqlType = isType(type) ? type : buildMode.getModel(type.name).getType()
   if (attr.listType) return toList(gqlType) as GraphQLOutputType
   if (!attr.nullable) return GraphQLNonNull(gqlType)
   return gqlType as GraphQLOutputType
 }
 
-export const createAttributeBuilder = <Context, Type, AttributeType>(
+export const createAttributeBuilder = <BuildMode, Type, AttributeType>(
   name: string,
-  field: ContextFn<Context, ModelType<Context>>,
-): AttributeBuilder<Context, Type, AttributeType> => {
-  let resolve: GraphQLFieldResolver<Type, Context>
-  const builder: AttributeBuilder<Context, Type, AttributeType> = {
+  field: ContextFn<BuildMode, ModelType<BuildMode>>,
+): AttributeBuilder<BuildMode, Type, AttributeType> => {
+  let resolve: IFieldResolver<Type, any>
+  const builder: AttributeBuilder<BuildMode, Type, AttributeType> = {
     name,
     field,
     nullable: true,
     listType: false,
-    resolve: (resolveFn: GraphQLFieldResolver<Type, Context>) => {
+    resolve: <Context>(resolveFn: IFieldResolver<Type, Context>) => {
       resolve = resolveFn
       return builder
     },
+    getResolver: () => resolve,
     isList: (isList = true) => {
       builder.listType = true
       return builder
@@ -49,8 +50,8 @@ export const createAttributeBuilder = <Context, Type, AttributeType>(
       builder.nullable = !isNotNullable
       return builder
     },
-    build: context => ({
-      type: buildType<Context>(builder, context),
+    build: buildMode => ({
+      type: buildType<BuildMode>(builder, buildMode),
       resolve,
     }),
     type: ATTRIBUTEBUILDER,

@@ -47,38 +47,43 @@ import { SCHEMABUILDER } from './types/constants'
 import { isFieldDefinition } from './types/guards'
 import { extractData, reduceFields } from './utils'
 
-const wrapContext = <Context>(
-  context: Context | null,
+import { addModel, createBuild } from './createBuild'
+
+const wrapContext = <BuildMode>(
+  buildMode: BuildMode | null,
   scalars: Record<string, GraphQLScalarType>,
-  models: Models<Context>,
+  models: Models<BuildMode>,
   filters: FilterMiddleware[],
   pubSub: PubSub,
-): Wrapped<Context> => {
-  const contextModels: Record<string, ContextModel<Context, any>> = {}
+): Wrapped<BuildMode> => {
+  const buildModeModels: Record<string, ContextModel<BuildMode, any>> = {}
   return {
     id: uuid(),
-    context,
+    buildMode,
     filterStrategy: createFilterStrategy(filters),
-    addModel: (name, model) => (contextModels[name] = model),
+    addModel: (name, model) => (buildModeModels[name] = model),
     getBaseModel: name => models[name],
-    getModel: name => contextModels[name],
+    getModel: name => buildModeModels[name],
     getScalar: name => scalars[name],
     pubSub,
   }
 }
 
-const addNodeAttrs = <Context>(model: ModelBuilder<Context, any>) => {
+const addNodeAttrs = <BuildMode>(model: ModelBuilder<BuildMode, any>) => {
   model.attr('id', GraphQLID)
-  model.attr('createdAt', context => context.getScalar('DateTime'))
-  model.attr('updatedAt', context => context.getScalar('DateTime'))
-  model.attr('deletedAt', context => context.getScalar('DateTime'))
+  model.attr('createdAt', buildMode => buildMode.getScalar('DateTime'))
+  model.attr('updatedAt', buildMode => buildMode.getScalar('DateTime'))
+  model.attr('deletedAt', buildMode => buildMode.getScalar('DateTime'))
   return model
 }
 
-const createBaseModels = <Context>() => {
-  const node = createModelBuilder<Context, NodeType>('Node', {}).setInterface()
-  const page = createModelBuilder<Context, PageData>('Page', {})
-  const list = createModelBuilder<Context, ListType<NodeType>>(
+const createBaseModels = <BuildMode>() => {
+  const node = createModelBuilder<BuildMode, NodeType>(
+    'Node',
+    {},
+  ).setInterface()
+  const page = createModelBuilder<BuildMode, PageData>('Page', {})
+  const list = createModelBuilder<BuildMode, ListType<NodeType>>(
     'List',
     {},
   ).setInterface()
@@ -99,16 +104,16 @@ const createBaseModels = <Context>() => {
   }
 }
 
-type Models<Context> = Record<string, ModelBuilder<Context, any, any>>
+type Models<BuildMode> = Record<string, ModelBuilder<BuildMode, any, any>>
 
-const setup = <Context>(
-  models: Models<Context>,
+const setup = <BuildMode>(
+  models: Models<BuildMode>,
   scalars: Record<string, GraphQLScalarType>,
-  context: Context | null,
+  buildMode: BuildMode | null,
   filters: FilterMiddleware[],
   pubSub: PubSub = new PubSub(),
 ) => {
-  const wrapped = wrapContext(context, scalars, models, filters, pubSub)
+  const wrapped = wrapContext(buildMode, scalars, models, filters, pubSub)
   forEach(models, model => model.setup(wrapped))
   return wrapped
 }
@@ -133,31 +138,34 @@ export const createSchema = (definition: FieldDefinition) => {
   return new GraphQLSchema(schema)
 }
 
-export const createSchemaBuilder = <Context = any, QueryContext = any>() => {
-  const models: Models<Context> = createBaseModels<Context>()
+export const createSchemaBuilder = <BuildMode = any, QueryContext = any>() => {
+  const models: Models<BuildMode> = createBaseModels<BuildMode>()
   const scalars: Record<string, GraphQLScalarType> = { DateTime }
   const filters = defaultMiddlewares
   let externalPubSub: PubSub = null
   const queryDefinitions: Array<
-    WithContext<Context, QueryTypeDefinition<Context, any, QueryContext>>
+    WithContext<BuildMode, QueryTypeDefinition<BuildMode, any, QueryContext>>
   > = []
 
-  const builder: SchemaBuilder<Context, QueryContext> = {
+  const builder: SchemaBuilder<BuildMode, QueryContext> = {
     type: SCHEMABUILDER,
     models,
     model: <Type, GQLType = Type>(
       modelName: string,
-      service: Service<Type, GQLType>,
+      service: Service<Type, GQLType, QueryContext>,
     ) => {
-      const model = createModelBuilder<Context, Type, GQLType>(
+      const model = createModelBuilder<BuildMode, Type, GQLType>(
         modelName,
         service || {},
       )
       models[modelName] = model
       return model.interface('Node')
     },
-    interface: <Type>(interfaceName: string, service: Service<Type>) => {
-      const model = createModelBuilder<Context, Type>(
+    interface: <Type>(
+      interfaceName: string,
+      service: Service<Type, Type, QueryContext>,
+    ) => {
+      const model = createModelBuilder<BuildMode, Type>(
         interfaceName,
         service || {},
       )
@@ -165,13 +173,14 @@ export const createSchemaBuilder = <Context = any, QueryContext = any>() => {
       model.setInterface()
       return model
     },
-    build: (context: Context | FieldDefinition = null) =>
-      createSchema(
-        isFieldDefinition(context) ? context : builder.fields(context),
-      ),
-    fields: (context: Context | null = null) => {
+    build: (buildMode: BuildMode | FieldDefinition = null) =>
+      isFieldDefinition(buildMode)
+        ? createSchema(buildMode)
+        : builder.createBuild(buildMode).toSchema(),
+    fields: (buildMode: BuildMode | null = null) => {
       const pubSub = externalPubSub || new PubSub()
-      const wrapped = setup(models, scalars, context, filters, pubSub)
+      const wrapped = setup(models, scalars, buildMode, filters, pubSub)
+
       // build all interfaces
       filter(models, model => model.isInterface()).forEach(model =>
         model.build(wrapped),
@@ -181,15 +190,22 @@ export const createSchemaBuilder = <Context = any, QueryContext = any>() => {
           args,
           name,
           resolver: resolve,
-          type: contextType,
+          type: buildModeType,
         } = extractData(queryDefinition)(wrapped)
-        const type = isType(contextType)
-          ? contextType
-          : wrapped.getModel(contextType.name).getType()
+        const type = isType(buildModeType)
+          ? buildModeType
+          : wrapped
+              .getModel(
+                typeof buildModeType === 'string'
+                  ? buildModeType
+                  : buildModeType.name,
+              )
+              .getType()
         memo[name] = { name, type, args, resolve }
         return memo
       }, {})
       // create the query, mutation and subscription fields
+
       return reduceFields(
         models,
         {
@@ -203,6 +219,40 @@ export const createSchemaBuilder = <Context = any, QueryContext = any>() => {
           subscription: {},
         },
       )
+    },
+    createBuild: buildMode => {
+      const pubSub = externalPubSub || new PubSub()
+      const wrapped = setup(models, scalars, buildMode, filters, pubSub)
+
+      // build all interfaces
+      filter(models, model => model.isInterface()).forEach(model =>
+        model.build(wrapped),
+      )
+
+      const query = queryFieldsReducer(wrapped)
+      const mutation = mutationFieldsReducer(wrapped)
+      const subscription = subscriptionFieldsReducer(wrapped)
+
+      const build = addModel(
+        createBuild<BuildMode, QueryContext>(buildMode),
+        wrapped,
+      )
+      forEach(models, build.addModel)
+      forEach(scalars, scalar => build.addType(scalar.toString(), 'scalar'))
+
+      forEach(queryDefinitions, queryDefinition => {
+        const { name, args, type, resolver } =
+          typeof queryDefinition === 'function'
+            ? queryDefinition(wrapped)
+            : queryDefinition
+        const typeName = isType(type)
+          ? type.toString()
+          : typeof type === 'string'
+          ? type
+          : type.name
+        build.addQuery(name, { args, type: typeName }, resolver)
+      })
+      return build
     },
     setScalar: (key, type) => {
       scalars[key] = type

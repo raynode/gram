@@ -1,0 +1,179 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`createBuild should accept a buildMode function 1`] = `
+Object {
+  "data": Object {
+    "test": null,
+  },
+  "errors": Array [
+    [GraphQLError: String cannot represent value: [function]],
+  ],
+}
+`;
+
+exports[`createBuild should accept build mode generators on type level 1`] = `
+"
+    
+    
+    
+  type Pet {
+    name: String
+    age: Int!
+    owner: String!
+  }
+
+    
+    
+  type Query {
+    myPets: [Pet!]!
+  }
+
+    
+    
+    
+  "
+`;
+
+exports[`createBuild should accept build mode generators on type level 2`] = `
+"
+    
+    
+    
+  type Pet {
+    name: String
+    age: Int!
+  }
+
+    
+    
+  type Query {
+    myPets: [Pet!]!
+  }
+
+    
+    
+    
+  "
+`;
+
+exports[`createBuild should be able to accept a new object type 1`] = `
+Object {
+  "data": Object {
+    "myPets": Array [
+      Object {
+        "age": 5,
+        "name": "Fluffy",
+      },
+    ],
+  },
+}
+`;
+
+exports[`createBuild should be able to accept a new scalar type 1`] = `
+Object {
+  "data": Object {
+    "myScalar": "TEST",
+  },
+}
+`;
+
+exports[`createBuild should be able to create a simple graphql interface 1`] = `
+Object {
+  "data": Object {
+    "test": "TEST",
+  },
+}
+`;
+
+exports[`createBuild should create a base object with methods to add everything for gql 1`] = `
+Object {
+  "addMutation": [Function],
+  "addQuery": [Function],
+  "addResolver": [Function],
+  "addSubscription": [Function],
+  "addType": [Function],
+  "buildMode": undefined,
+  "getState": [Function],
+  "toSchema": [Function],
+  "toTypeDefs": [Function],
+  "type": "BUILDER:GQLBUILDER",
+}
+`;
+
+exports[`createBuild should generate the schema directly 1`] = `
+Object {
+  "data": Object {
+    "test": "TEST",
+  },
+}
+`;
+
+exports[`createBuild should handle args in addQuery 1`] = `
+Object {
+  "data": Object {
+    "test": "My-Test",
+  },
+}
+`;
+
+exports[`createBuild should have types that are different based on buildMode 1`] = `
+"
+    
+    
+    
+  type Pet {
+    name: String
+    age: Int!
+    owner: String!
+  }
+
+    
+    
+  type Query {
+    myPets: [Pet!]!
+  }
+
+    
+    
+    
+  "
+`;
+
+exports[`createBuild should have types that are different based on buildMode 2`] = `
+"
+    
+    
+    
+  type Pet {
+    name: String
+    age: Int!
+  }
+
+    
+    
+  type Query {
+    myPets: [Pet!]!
+  }
+
+    
+    
+    
+  "
+`;
+
+exports[`createBuild should render enums correctly 1`] = `
+"
+    
+    
+    
+    enum State { IDLE WORKING CLEANUP }
+    
+  type Query {
+    currentState: State
+  }
+
+    
+    
+    
+  "
+`;

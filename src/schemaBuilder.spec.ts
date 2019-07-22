@@ -10,7 +10,7 @@ import {
 
 import { toList } from 'utils'
 import { createSchemaBuilder } from './schemaBuilder'
-import { ModelBuilder, NodeType, SchemaBuilder, Service } from './types'
+import { ModelBuilder, NodeType, SchemaBuilder } from './types'
 
 import {
   Account,
@@ -67,8 +67,8 @@ describe('example', () => {
     // will add input types for "REFERENCE"
     account
       .attr('user', builder.models.User)
-      .resolve(account =>
-        Users.findOne({ where: { id: account.userId }, order: null }),
+      .resolve((account, _, context) =>
+        Users.findOne({ where: { id: account.userId }, order: null }, context),
       )
       .isNotNullable()
     // add accounts to the user model
@@ -143,11 +143,7 @@ describe('example', () => {
   it('should create an account for the user', async () => {
     const schema = builder.build(0)
 
-    const {
-      data: {
-        getUser: { id },
-      },
-    } = await graphql(
+    const getUserResult = await graphql(
       schema,
       `
         {
@@ -158,7 +154,11 @@ describe('example', () => {
       `,
       null,
     )
-
+    const {
+      data: {
+        getUser: { id },
+      },
+    } = getUserResult
     const query = `mutation($id: ID!) {
       createAccount(data: {
         name: "New Account"
@@ -173,7 +173,11 @@ describe('example', () => {
       }
     }`
 
-    const { data } = await graphql(schema, query, null, null, { id })
+    const createAccountResult = await graphql(schema, query, null, null, {
+      id,
+    })
+
+    const { data } = createAccountResult
     expect(data).toHaveProperty('createAccount')
     expect(data.createAccount).toHaveProperty('id')
     const { id: accountId, user } = data.createAccount

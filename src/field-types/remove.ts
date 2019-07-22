@@ -2,20 +2,26 @@ import { GraphQLInputType, GraphQLNonNull } from 'graphql'
 import { order, where } from '../input-types'
 import { memoizeContextModel, toList } from '../utils'
 
-export const remove = memoizeContextModel(contextModel => ({
+export const remove = memoizeContextModel(buildModeModel => ({
   args: {
-    [contextModel.names.arguments.where]: {
-      type: GraphQLNonNull(where(contextModel)),
+    [buildModeModel.names.arguments.where]: {
+      type: GraphQLNonNull(where(buildModeModel)),
     },
   },
-  type: toList(contextModel.getType()) as GraphQLInputType,
+  type: toList(buildModeModel.getType()) as GraphQLInputType,
   resolve: (_, args, context) => {
-    const node = contextModel.service.remove({
-      where: args[contextModel.names.arguments.where],
-    })
-    contextModel.context.pubSub.publish(contextModel.names.events.delete, {
-      node,
-    })
+    const node = buildModeModel.service.remove(
+      {
+        where: args[buildModeModel.names.arguments.where],
+      },
+      context,
+    )
+    buildModeModel.buildMode.pubSub.publish(
+      buildModeModel.names.events.delete,
+      {
+        node,
+      },
+    )
     return node
   },
 }))

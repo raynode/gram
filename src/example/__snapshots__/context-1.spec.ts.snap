@@ -1,8 +1,20 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`testing the example 1 should build the example code 1`] = `
-"\\"\\"\\"Use JavaScript Date object for date/time fields.\\"\\"\\"
+"input CreateUserData {
+  email: String
+  id: ID
+  createdAt: DateTime
+  updatedAt: DateTime
+  deletedAt: DateTime
+}
+
 scalar DateTime
+
+interface List {
+  page: Page
+  nodes: [Node!]!
+}
 
 interface Node {
   id: ID
@@ -11,9 +23,23 @@ interface Node {
   deletedAt: DateTime
 }
 
+type Page {
+  page: Int
+  limit: Int
+  offset: Int
+}
+
 type Query {
-  context: String
+  buildMode: String
   me: User
+}
+
+input UpdateUserData {
+  email: String
+  id: ID
+  createdAt: DateTime
+  updatedAt: DateTime
+  deletedAt: DateTime
 }
 
 type User implements Node {
@@ -22,13 +48,76 @@ type User implements Node {
   createdAt: DateTime
   updatedAt: DateTime
   deletedAt: DateTime
+}
+
+input UserFilter {
+  AND: [UserFilter!]
+  OR: [UserFilter!]
+  NOT: UserFilter
+  email: String
+  email_not: String
+  email_in: [String!]
+  email_not_in: [String!]
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+}
+
+input UserPage {
+  limit: Int
+  offset: Int
+}
+
+type Users implements List {
+  page: Page
+  nodes: [User!]!
+}
+
+enum UserSortOrder {
+  email_ASC
+  email_DESC
+  id_ASC
+  id_DESC
+  createdAt_ASC
+  createdAt_DESC
+  updatedAt_ASC
+  updatedAt_DESC
+  deletedAt_ASC
+  deletedAt_DESC
+}
+
+input UserWhere {
+  AND: [UserFilter!]
+  OR: [UserFilter!]
+  NOT: UserFilter
+  email: String
+  email_not: String
+  email_in: [String!]
+  email_not_in: [String!]
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
 }
 "
 `;
 
 exports[`testing the example 1 should build the example code 2`] = `
-"\\"\\"\\"Use JavaScript Date object for date/time fields.\\"\\"\\"
+"input CreateUserData {
+  email: String
+  id: ID
+  createdAt: DateTime
+  updatedAt: DateTime
+  deletedAt: DateTime
+}
+
 scalar DateTime
+
+interface List {
+  page: Page
+  nodes: [Node!]!
+}
 
 interface Node {
   id: ID
@@ -37,9 +126,23 @@ interface Node {
   deletedAt: DateTime
 }
 
+type Page {
+  page: Int
+  limit: Int
+  offset: Int
+}
+
 type Query {
-  context: String
+  buildMode: String
   me: User
+}
+
+input UpdateUserData {
+  email: String
+  id: ID
+  createdAt: DateTime
+  updatedAt: DateTime
+  deletedAt: DateTime
 }
 
 type User implements Node {
@@ -48,6 +151,57 @@ type User implements Node {
   createdAt: DateTime
   updatedAt: DateTime
   deletedAt: DateTime
+}
+
+input UserFilter {
+  AND: [UserFilter!]
+  OR: [UserFilter!]
+  NOT: UserFilter
+  email: String
+  email_not: String
+  email_in: [String!]
+  email_not_in: [String!]
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+}
+
+input UserPage {
+  limit: Int
+  offset: Int
+}
+
+type Users implements List {
+  page: Page
+  nodes: [User!]!
+}
+
+enum UserSortOrder {
+  email_ASC
+  email_DESC
+  id_ASC
+  id_DESC
+  createdAt_ASC
+  createdAt_DESC
+  updatedAt_ASC
+  updatedAt_DESC
+  deletedAt_ASC
+  deletedAt_DESC
+}
+
+input UserWhere {
+  AND: [UserFilter!]
+  OR: [UserFilter!]
+  NOT: UserFilter
+  email: String
+  email_not: String
+  email_in: [String!]
+  email_not_in: [String!]
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
 }
 "
 `;

@@ -14,17 +14,17 @@ import {
 
 export const isBuilder = (val: any): val is Builder =>
   val && typeof val.type === 'string'
-export const isAttributeBuilder = <Context, Type, AttributeType>(
+export const isAttributeBuilder = <BuildMode, Type, AttributeType>(
   val: any,
-): val is AttributeBuilder<Context, Type, AttributeType> =>
+): val is AttributeBuilder<BuildMode, Type, AttributeType> =>
   isBuilder(val) && val.type === ATTRIBUTEBUILDER
-export const isModelBuilder = <Context, Type>(
+export const isModelBuilder = <BuildMode, Type>(
   val: any,
-): val is ModelBuilder<Context, Type> =>
+): val is ModelBuilder<BuildMode, Type> =>
   isBuilder(val) && val.type === MODELBUILDER
-export const isSchemaBuilder = <Context>(
+export const isSchemaBuilder = <BuildMode>(
   val: any,
-): val is SchemaBuilder<Context> =>
+): val is SchemaBuilder<BuildMode> =>
   isBuilder(val) && val.type === SCHEMABUILDER
 
 export const isFieldDefinition = (val: any): val is FieldDefinition => {

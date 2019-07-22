@@ -29,23 +29,23 @@ describe('testing the example 1', () => {
     const user = builder.model('User')
     user.attr('email', GraphQLString)
 
-    builder.addQuery(({ context }) => ({
-      name: 'context',
+    builder.addQuery(({ buildMode }) => ({
+      name: 'buildMode',
       type: GraphQLString,
-      resolver: () => context,
+      resolver: () => buildMode,
     }))
 
-    builder.addQuery(({ context }) => ({
+    builder.addQuery(({ buildMode }) => ({
       name: 'me',
       type: user,
       resolver: (root, args, queryContext) => {
         if (!queryContext) throw new Error('Need an authToken-context')
-        if (context === 'user' && !queryContext.authToken)
+        if (buildMode === 'user' && !queryContext.authToken)
           throw new Error('Need an user:authToken')
         if (!queryContext.authId) throw new Error('Need an authID')
         return {
           id: queryContext.authId,
-          email: context === 'admin' ? 'admin' : queryContext.authToken,
+          email: buildMode === 'admin' ? 'admin' : queryContext.authToken,
         }
       },
     }))
@@ -53,7 +53,7 @@ describe('testing the example 1', () => {
     const adminSchema = builder.build('admin')
     const userSchema = builder.build('user')
 
-    const source = `{ context me { email }}`
+    const source = `{ buildMode me { email }}`
 
     const adminResult = await graphql({
       schema: adminSchema,
@@ -75,11 +75,11 @@ describe('testing the example 1', () => {
     expect(adminResult).not.toHaveProperty('errors')
     expect(userResult).not.toHaveProperty('errors')
     expect(userResult.data).toEqual({
-      context: 'user',
+      buildMode: 'user',
       me: { email: 'My@Token.com' },
     })
     expect(adminResult.data).toEqual({
-      context: 'admin',
+      buildMode: 'admin',
       me: { email: 'admin' },
     })
   })

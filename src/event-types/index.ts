@@ -1,16 +1,16 @@
-import { createContextModelFieldFn } from '../utils'
+import { createModelFieldFn } from '../utils'
 
-export const create = createContextModelFieldFn(contextModel => ({
-  iterator: contextModel.names.events.create,
+export const create = createModelFieldFn(buildModeModel => ({
+  iterator: buildModeModel.names.events.create,
   condition: 'nonnull',
 }))
 
-export const remove = createContextModelFieldFn(contextModel => ({
-  iterator: contextModel.names.events.delete,
+export const remove = createModelFieldFn(buildModeModel => ({
+  iterator: buildModeModel.names.events.delete,
   condition: 'list',
 }))
 
-export const update = createContextModelFieldFn(contextModel => ({
-  iterator: contextModel.names.events.update,
+export const update = createModelFieldFn(buildModeModel => ({
+  iterator: buildModeModel.names.events.update,
   condition: 'list',
 }))
