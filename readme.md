@@ -6,6 +6,7 @@
 [![Coverage Status](https://coveralls.io/repos/github/raynode/gram/badge.svg?branch=master)](https://coveralls.io/github/raynode/gram?branch=master)
 [![Maintainability](https://api.codeclimate.com/v1/badges/7d6705c7f83a8899fde8/maintainability)](https://codeclimate.com/github/raynode/gram/maintainability)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/7d6705c7f83a8899fde8/test_coverage)](https://codeclimate.com/github/raynode/gram/test_coverage)
+[![Known Vulnerabilities](https://snyk.io//test/github/raynode/gram/badge.svg?targetFile=package.json)](https://snyk.io//test/github/raynode/gram?targetFile=package.json)
 
 # GRAM
 
