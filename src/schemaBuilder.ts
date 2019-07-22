@@ -39,7 +39,6 @@ import {
   Wrapped,
 } from './types'
 import { SCHEMABUILDER } from './types/constants'
-import { isFieldDefinition } from './types/guards'
 
 import { addModel, createBuild } from './createBuild'
 
@@ -63,14 +62,6 @@ const wrapContext = <BuildMode>(
   }
 }
 
-const addNodeAttrs = <BuildMode>(model: ModelBuilder<BuildMode, any>) => {
-  model.attr('id', GraphQLID)
-  model.attr('createdAt', buildMode => buildMode.getScalar('DateTime'))
-  model.attr('updatedAt', buildMode => buildMode.getScalar('DateTime'))
-  model.attr('deletedAt', buildMode => buildMode.getScalar('DateTime'))
-  return model
-}
-
 const createBaseModels = <BuildMode>() => {
   const node = createModelBuilder<BuildMode, NodeType>(
     'Node',
@@ -82,7 +73,10 @@ const createBaseModels = <BuildMode>() => {
     {},
   ).setInterface()
 
-  addNodeAttrs(node)
+  node.attr('id', GraphQLID)
+  node.attr('createdAt', buildMode => buildMode.getScalar('DateTime'))
+  node.attr('updatedAt', buildMode => buildMode.getScalar('DateTime'))
+  node.attr('deletedAt', buildMode => buildMode.getScalar('DateTime'))
 
   page.attr('page', GraphQLInt)
   page.attr('limit', GraphQLInt)
@@ -110,26 +104,6 @@ const setup = <BuildMode>(
   const wrapped = wrapContext(buildMode, scalars, models, filters, pubSub)
   forEach(models, model => model.setup(wrapped))
   return wrapped
-}
-
-export const createSchema = (definition: FieldDefinition) => {
-  const schema: GraphQLSchemaConfig = {
-    query: new GraphQLObjectType({
-      name: 'Query',
-      fields: definition.query,
-    }),
-  }
-  if (Object.keys(definition.mutation).length)
-    schema.mutation = new GraphQLObjectType({
-      name: 'Mutation',
-      fields: definition.mutation,
-    })
-  if (Object.keys(definition.subscription).length)
-    schema.subscription = new GraphQLObjectType({
-      name: 'Subscription',
-      fields: definition.subscription,
-    })
-  return new GraphQLSchema(schema)
 }
 
 export const createSchemaBuilder = <BuildMode = any, QueryContext = any>() => {
@@ -167,10 +141,8 @@ export const createSchemaBuilder = <BuildMode = any, QueryContext = any>() => {
       model.setInterface()
       return model
     },
-    build: (buildMode: BuildMode | FieldDefinition = null) =>
-      isFieldDefinition(buildMode)
-        ? createSchema(buildMode)
-        : builder.createBuild(buildMode).toSchema(),
+    build: (buildMode: BuildMode = null) =>
+      builder.createBuild(buildMode).toSchema(),
     createBuild: buildMode => {
       const pubSub = externalPubSub || new PubSub()
       const wrapped = setup(models, scalars, buildMode, filters, pubSub)
@@ -184,6 +156,7 @@ export const createSchemaBuilder = <BuildMode = any, QueryContext = any>() => {
         createBuild<BuildMode, QueryContext>(buildMode),
         wrapped,
       )
+
       forEach(models, build.addModel)
       forEach(scalars, scalar => build.addType(scalar.toString(), 'scalar'))
 
