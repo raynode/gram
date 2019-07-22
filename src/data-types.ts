@@ -1,16 +1,6 @@
-import {
-  GraphQLInputFieldConfigMap,
-  GraphQLInputType,
-  GraphQLInt,
-  GraphQLNonNull,
-  isObjectType,
-  isScalarType,
-  isType,
-} from 'graphql'
+import { GraphQLInt, isType } from 'graphql'
 
-import { buildType } from './attributeBuilder'
 import { where as whereInput } from './input-types'
-import { isModelBuilder } from './types/guards'
 import {
   conditionalNonNull,
   memoizeContextModel,
@@ -54,10 +44,10 @@ export const list = memoizeContextModel(buildModeModel => ({
   nodes: { type: toList(buildModeModel.getType()) },
 }))
 
-export const page = memoizeContextModel(() => ({
+export const page = () => ({
   limit: { type: GraphQLInt },
   offset: { type: GraphQLInt },
-}))
+})
 
 export const where = memoizeContextModel(buildModeModel =>
   reduceContextFields(

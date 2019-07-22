@@ -12,7 +12,6 @@ import { v4 as uuid } from 'uuid'
 import { isBuildModeGenerator } from './guards'
 import { Build, GQLRecord } from './types'
 
-import * as DataTypes from '../data-types'
 import { buildOrderEnumValues } from '../input-types'
 import { defaultNamingStrategy, Names } from '../strategies/naming'
 import {
