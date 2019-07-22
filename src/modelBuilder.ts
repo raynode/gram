@@ -41,7 +41,10 @@ export const createModelBuilder = <BuildMode, Type, GQLType = Type>(
   let contextMutation: ContextMutator<BuildMode, Type, GQLType> = () => null
   let listType: GraphQLType | ModelBuilder<BuildMode, any> = null
   let isInterface: boolean = false
-  let resolver: ContextFn<BuildMode, IFieldResolver<GQLType, any>> = null
+  let resolver: ContextFn<
+    BuildMode,
+    Record<string, IFieldResolver<GQLType, any>>
+  > = null
   const interfaces: string[] = []
   const visibility = service
     ? serviceToVisibility(service)

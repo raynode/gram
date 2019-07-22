@@ -11,10 +11,10 @@ import {
 } from './types'
 import { reduceRecord } from './utils'
 
-const generateCreateableType = (
+const generateCreateableType = <Source, Context>(
   createable: string,
   typeName: string,
-  config: CreateableTypeConfig,
+  config: CreateableTypeConfig<Source, Context>,
 ) => {
   // console.log(typeName, config.fields)
   return isEmpty(config.fields)
@@ -28,9 +28,9 @@ const generateCreateableType = (
 `
 }
 
-const generateNonEmpty = (
+const generateNonEmpty = <Source, Context>(
   typeName: Resolvables,
-  entries: CreateableTypeConfig,
+  entries: CreateableTypeConfig<Source, Context>,
 ) =>
   isEmpty(entries.fields)
     ? ''
@@ -48,9 +48,9 @@ const generateEnums = (enums: Record<string, EnumTypesRecordConfig>) =>
 const generateScalars = (scalar: string[]) =>
   scalar.map(name => `scalar ${name}`).join('\n')
 
-const generateFields = (
+const generateFields = <Source, Context>(
   createable: string,
-  createables: Record<string, CreateableTypeConfig>,
+  createables: Record<string, CreateableTypeConfig<Source, Context>>,
 ) =>
   reduce(
     createables,
@@ -61,9 +61,9 @@ const generateFields = (
     [],
   ).join('\n')
 
-export const generateTypeDefs = (
-  resolvables: ResolvablesRecord,
-  types: CreateableTypesRecord,
+export const generateTypeDefs = <Source, Context>(
+  resolvables: ResolvablesRecord<Source, Context>,
+  types: CreateableTypesRecord<Source, Context>,
 ): ITypeDefinitions => {
   if (isEmpty(resolvables.Query)) throw new Error('Query cannot be empty')
 

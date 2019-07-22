@@ -30,7 +30,7 @@ import { toList } from './utils'
 
 const fieldBuilderFn = <BuildMode>(
   buildMode: Wrapped<BuildMode>,
-  resolvers: IFieldResolver<any, any>,
+  resolvers: Record<string, IFieldResolver<any, any>>,
 ) => <Type>(
   fields: GraphQLFieldConfigMap<any, any>,
   attr: AttributeBuilder<BuildMode, Type, any>,
@@ -42,7 +42,7 @@ const fieldBuilderFn = <BuildMode>(
 
 const fieldBuilder = <BuildMode>(
   buildMode: Wrapped<BuildMode>,
-  resolvers: IFieldResolver<any, any>,
+  resolvers: Record<string, IFieldResolver<any, any>>,
 ) => <Type>(fields: Array<AttributeBuilder<BuildMode, Type, any>>) =>
   reduce(fields, fieldBuilderFn(buildMode, resolvers), {})
 
@@ -51,7 +51,7 @@ export const createModel = <BuildMode, Type, GQLType = Type>(
   service: Service<Type, GQLType, any>,
   buildMode: Wrapped<BuildMode>,
   visibility: ModelVisibility,
-  resolvers: IFieldResolver<GQLType, any>,
+  resolvers: Record<string, IFieldResolver<GQLType, any>>,
 ) => {
   type Attribute = AttributeBuilder<BuildMode, Type, any>
   const buildFields = fieldBuilder(buildMode, resolvers)
