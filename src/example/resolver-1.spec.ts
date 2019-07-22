@@ -88,7 +88,6 @@ describe('testing the example 1', () => {
     let called = false
     animal.resolve(() => ({
       age: animal => {
-        console.log('i wuz called')
         called = true
         return Math.floor(
           (Date.now() - animal.birthdate) / 1000 / 60 / 60 / 24 / 365,
@@ -98,8 +97,6 @@ describe('testing the example 1', () => {
 
     const { resolvers } = builder.createBuild().toTypeDefs()
     const schema = builder.build()
-
-    console.log(resolvers)
 
     const { data, errors } = await graphql({
       schema,
@@ -114,7 +111,6 @@ describe('testing the example 1', () => {
         }
       }`,
     })
-    console.log(data.getAnimals.nodes)
     // expect the age to be calculated
     expect(data.getAnimals.nodes[0].age).toEqual(age)
     // make sure the default resolvers are still active

@@ -15,9 +15,8 @@ const generateCreateableType = <Source, Context>(
   createable: string,
   typeName: string,
   config: CreateableTypeConfig<Source, Context>,
-) => {
-  // console.log(typeName, config.fields)
-  return isEmpty(config.fields)
+) =>
+  isEmpty(config.fields)
     ? ''
     : `
   ${createable} ${typeName} ${
@@ -26,7 +25,6 @@ const generateCreateableType = <Source, Context>(
     ${reduceRecord(config.fields)}
   }
 `
-}
 
 const generateNonEmpty = <Source, Context>(
   typeName: Resolvables,

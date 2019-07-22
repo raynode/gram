@@ -252,9 +252,6 @@ export const createSchemaBuilder = <BuildMode = any, QueryContext = any>() => {
           : type.name
         build.addQuery(name, { args, type: typeName }, resolver)
       })
-
-      // const result = build.toTypeDefs()
-      // console.log((result.resolvers.Query as any))
       return build
     },
     setScalar: (key, type) => {
