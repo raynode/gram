@@ -130,7 +130,9 @@ describe('createBuild', () => {
     const adminBuild = createBuild<BuildMode>('admin')
     const userBuild = createBuild<BuildMode>('user')
 
-    const Pet = (buildMode: BuildMode): AddObjectArgsType<BuildMode> => [
+    const Pet = <Source, Context>(
+      buildMode: BuildMode,
+    ): AddObjectArgsType<BuildMode, Source, Context> => [
       'Pet',
       'type',
       {
