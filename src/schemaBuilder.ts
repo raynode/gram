@@ -20,11 +20,6 @@ import { GraphQLJSONObject } from 'graphql-type-json'
 import { filter, forEach, reduce } from 'lodash'
 import { v4 as uuid } from 'uuid'
 
-import {
-  mutationFieldsReducer,
-  queryFieldsReducer,
-  subscriptionFieldsReducer,
-} from './field-reducers'
 import { createModelBuilder } from './modelBuilder'
 import { createFilterStrategy, defaultMiddlewares } from './strategies/filter'
 import {
@@ -45,7 +40,6 @@ import {
 } from './types'
 import { SCHEMABUILDER } from './types/constants'
 import { isFieldDefinition } from './types/guards'
-import { extractData, reduceFields } from './utils'
 
 import { addModel, createBuild } from './createBuild'
 
@@ -177,51 +171,6 @@ export const createSchemaBuilder = <BuildMode = any, QueryContext = any>() => {
       isFieldDefinition(buildMode)
         ? createSchema(buildMode)
         : builder.createBuild(buildMode).toSchema(),
-    fields: (buildMode: BuildMode | null = null) => {
-      throw new Error('DO NOT USE THIS ANYMORE!')
-
-      const pubSub = externalPubSub || new PubSub()
-      const wrapped = setup(models, scalars, buildMode, filters, pubSub)
-
-      // build all interfaces
-      filter(models, model => model.isInterface()).forEach(model =>
-        model.build(wrapped),
-      )
-      const query: any = queryDefinitions.reduce((memo, queryDefinition) => {
-        const {
-          args,
-          name,
-          resolver: resolve,
-          type: buildModeType,
-        } = extractData(queryDefinition)(wrapped)
-        const type = isType(buildModeType)
-          ? buildModeType
-          : wrapped
-              .getModel(
-                typeof buildModeType === 'string'
-                  ? buildModeType
-                  : buildModeType.name,
-              )
-              .getType()
-        memo[name] = { name, type, args, resolve }
-        return memo
-      }, {})
-      // create the query, mutation and subscription fields
-
-      return reduceFields(
-        models,
-        {
-          query: queryFieldsReducer(wrapped),
-          mutation: mutationFieldsReducer(wrapped),
-          subscription: subscriptionFieldsReducer(wrapped),
-        },
-        {
-          mutation: {},
-          query,
-          subscription: {},
-        },
-      )
-    },
     createBuild: buildMode => {
       const pubSub = externalPubSub || new PubSub()
       const wrapped = setup(models, scalars, buildMode, filters, pubSub)
@@ -230,10 +179,6 @@ export const createSchemaBuilder = <BuildMode = any, QueryContext = any>() => {
       filter(models, model => model.isInterface()).forEach(model =>
         model.build(wrapped),
       )
-
-      const query = queryFieldsReducer(wrapped)
-      const mutation = mutationFieldsReducer(wrapped)
-      const subscription = subscriptionFieldsReducer(wrapped)
 
       const build = addModel(
         createBuild<BuildMode, QueryContext>(buildMode),

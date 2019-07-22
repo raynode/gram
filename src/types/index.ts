@@ -152,7 +152,6 @@ export interface SchemaBuilder<BuildMode, QueryContext = any> extends Builder {
     modelName: string,
     service?: Service<Type, GQLType>,
   ) => ModelBuilder<BuildMode, Type, GQLType>
-  fields: (buildMode?: BuildMode) => FieldDefinition
   models: Record<string, ModelBuilder<BuildMode, any>>
   type: typeof SCHEMABUILDER
   setScalar: <Type extends GraphQLScalarType>(key: string, type: Type) => Type
