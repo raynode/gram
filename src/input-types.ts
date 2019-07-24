@@ -1,6 +1,6 @@
 import { GraphQLEnumType } from 'graphql'
 import { flatten, mapKeys, memoize, upperFirst } from 'lodash'
-import { createInputType, memoizeContextModel } from 'utils'
+import { createInputType, memoizeContextModel } from './utils'
 
 export const specialCharsMap = new Map([
   ['¼', 'frac14'],
