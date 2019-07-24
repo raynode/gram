@@ -7,8 +7,6 @@ import {
 } from 'graphql'
 import {
   createSchemaBuilder,
-  FilterCheckFn,
-  FilterFn,
   filters,
   isSpecificScalarType,
   Paged,
