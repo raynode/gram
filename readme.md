@@ -423,7 +423,7 @@ When accessing a graphql endpoint we always need to keep in mind who and with wh
 This will generate 2 different graphql schema.
 The user-schema will be used for requests against the graphql system when the request is authenticated and identified to be a normal user.
 The admin-schema will then be used for requests from the system administrators.
-
+The build can also be generated as `typeDefs` and `resolvers` pair.
 
 ## Contributing
 
