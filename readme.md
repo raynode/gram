@@ -1,3 +1,5 @@
+# GRAM
+
 [![Node.js version](https://img.shields.io/badge/node->=%208.2.1-blue.svg)](https://nodejs.org/dist/latest-v8.x/docs/api/)
 [![NPM version](https://img.shields.io/badge/npm->=%205.4.0-blue.svg)](https://docs.npmjs.com/)
 [![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release)
@@ -7,8 +9,6 @@
 [![Maintainability](https://api.codeclimate.com/v1/badges/7d6705c7f83a8899fde8/maintainability)](https://codeclimate.com/github/raynode/gram/maintainability)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/7d6705c7f83a8899fde8/test_coverage)](https://codeclimate.com/github/raynode/gram/test_coverage)
 [![Known Vulnerabilities](https://snyk.io//test/github/raynode/gram/badge.svg?targetFile=package.json)](https://snyk.io//test/github/raynode/gram?targetFile=package.json)
-
-# GRAM
 
 GRAphQL Model builder is a utility to generate all necessary GraphQL query, mutation and subscription Types. It enforces a specific structure for your schema.
 
