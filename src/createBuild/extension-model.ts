@@ -3,6 +3,7 @@ import {
   GraphQLInputFieldConfigMap,
   GraphQLNonNull,
   GraphQLType,
+  isEnumType,
   isType,
 } from 'graphql'
 import { IFieldResolver } from 'graphql-tools'
@@ -32,33 +33,38 @@ export interface WithAddModel<BuildMode, Context>
 const list = (type: string) => `[${type}!]!`
 const nonNull = (type: string) => `${type}!`
 
-const buildAttribute = <BuildMode>(
-  buildMode: BuildMode,
+const buildAttribute = <BuildMode, Context>(
+  build: Build<BuildMode, Context>,
   attr: AttributeBuilder<BuildMode, any, any>,
   wrapped: Wrapped<BuildMode>,
 ) => {
   const type = attr.field(wrapped)
+  if (isType(type) && isEnumType(type))
+    build.addType(type.name, 'enum', {
+      values: type.getValues().map(enumValue => enumValue.name),
+    })
   const gqlType = isType(type) ? type.toString() : `${type.name}`
   if (attr.listType) return list(gqlType)
   if (!attr.nullable) return nonNull(gqlType)
   return gqlType
 }
 
-const getAttributeFields = <BuildMode, Type, GQLType>(
-  buildMode: BuildMode,
+const getAttributeFields = <BuildMode, Context, Type, GQLType>(
+  build: Build<BuildMode, Context>,
   attributes: Array<AttributeBuilder<BuildMode, any, any>>,
   wrapped: Wrapped<BuildMode>,
 ) =>
   reduce(
     attributes,
     (fields, attr) => {
-      fields[attr.name] = buildAttribute(buildMode, attr, wrapped)
+      fields[attr.name] = buildAttribute(build, attr, wrapped)
       return fields
     },
     {},
   )
 
-export const convertGraphQLFieldConfigMap = (
+export const convertGraphQLFieldConfigMap = <BuildMode, Context>(
+  build: Build<BuildMode, Context>,
   fieldMap: GraphQLFieldConfigMap<any, any> | GraphQLInputFieldConfigMap,
 ): GQLRecord =>
   reduce(
@@ -79,7 +85,7 @@ export const createModelInputTypesAdder = <BuildMode, Context>(
   dataType: DataType,
 ) =>
   build.addType((model.names[nameType] as Record<any, string>)[name], 'input', {
-    fields: convertGraphQLFieldConfigMap(model.dataFields(dataType)),
+    fields: convertGraphQLFieldConfigMap(build, model.dataFields(dataType)),
   })
 
 export const addModel = <BuildMode, Context>(
@@ -99,7 +105,7 @@ export const addModel = <BuildMode, Context>(
     const fields = model.getFields()
     const interfaces = modelBuilder.getInterfaces()
     const typeConfig = {
-      fields: getAttributeFields(build.buildMode, fields, wrapped),
+      fields: getAttributeFields(build, fields, wrapped),
       resolver,
       interface: (interfaces && interfaces.join('&')) || null,
     }

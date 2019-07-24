@@ -36,7 +36,6 @@ export type Attributes<BuildMode, Type> = Record<
   AttributeBuilder<BuildMode, any, Type>
 >
 
-export type Fields = Thunk<GraphQLFieldConfigMap<any, any>>
 export type FilterFn = (
   name: string,
   type: GraphQLType,

@@ -19,6 +19,7 @@ import { convertSimpleFieldsToFields, createBuildModeResolver } from './utils'
 import { GQLBUILDER } from '../types/constants'
 
 export * from './extension-model'
+export * from './types'
 
 export const createBuild = <BuildMode = null, Context = any>(
   buildMode?: BuildMode,
