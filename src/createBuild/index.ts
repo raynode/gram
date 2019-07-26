@@ -1,6 +1,6 @@
 import { IFieldResolver, makeExecutableSchema } from 'graphql-tools'
 
-import { forEach } from 'lodash'
+import { forEach, identity } from 'lodash'
 import { generateTypeDefs } from './generateTypeDefs'
 import { createAddType } from './method-addType'
 import { resolvablesCreator } from './method-resolvablesCreator'
@@ -87,7 +87,14 @@ export const createBuild = <BuildMode = null, Context = any>(
 
   const addType = createAddType<BuildMode, any, Context>(
     buildMode,
-    typeName => types.scalar.push(typeName),
+    (typeName, createAble, config = {}) => {
+      resolvers[typeName] = {
+        serialize: config.serialize || identity,
+        parseValue: config.parseValue || identity,
+        parseLiteral: config.parseLiteral || (ast => ast.value),
+      }
+      return types.scalar.push(typeName)
+    },
     addInterfaceOrInputType,
     addInterfaceOrInputType,
     (typeName, createAble, config) =>

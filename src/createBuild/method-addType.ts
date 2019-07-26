@@ -16,7 +16,11 @@ export type DefinableFields<BuildMode, Source, Context> = Definable<
   Record<string, SimpleFieldType<Source, Context>>
 >
 
-export type AddScalarArgsType = [string, 'scalar', never]
+export type AddScalarArgsType<BuildMode, Source, Context> = [
+  string,
+  'scalar',
+  never
+]
 export type AddInterfaceArgsType<BuildMode, Source, Context> = [
   string,
   'interface',
@@ -49,7 +53,7 @@ export type AddObjectArgsType<BuildMode, Source, Context> = [
 ]
 
 export type AddArgs<BuildMode, Source, Context> =
-  | AddScalarArgsType
+  | AddScalarArgsType<BuildMode, Source, Context>
   | AddInterfaceArgsType<BuildMode, Source, Context>
   | AddInputArgsType<BuildMode, Source, Context>
   | AddEnumArgsType<BuildMode, Source, Context>
@@ -58,7 +62,11 @@ export type AddArgs<BuildMode, Source, Context> =
 export type AddScalarType = (
   typeName: string,
   type: 'scalar',
-  config?: {},
+  config?: {
+    serialize?: (value: any) => any;
+    parseValue?: (value: any) => any;
+    parseLiteral?: (valueAST: any) => any;
+  },
 ) => void
 export type AddInterfaceType<BuildMode, Source, Context> = (
   typeName: string,
