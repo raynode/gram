@@ -89,11 +89,6 @@ export const reduceContextFields = <
       base || {},
     )
 
-export const createPageType = <Type>(page: PageData, nodes: Type[]) => ({
-  page,
-  nodes,
-})
-
 export const createInputType = <
   BuildMode,
   Key extends keyof Names,

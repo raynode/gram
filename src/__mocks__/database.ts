@@ -1,8 +1,11 @@
 import { reduce } from 'lodash'
-import { NodeType, Service } from 'types'
+import { NodeType, PageData, Service } from 'types'
 import { v4 as uuid } from 'uuid'
 
-import { createPageType } from 'index'
+const createPageType = <Type>(page: PageData, nodes: Type[]) => ({
+  page,
+  nodes,
+})
 
 // interfaces
 
