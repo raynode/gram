@@ -53,7 +53,7 @@ export interface RemoveArgs<Type> {
   where: Where<Type>
 }
 
-export interface Service<Type, GQLType = Type, Context = any> {
+export interface Service<Type extends NodeType, GQLType = Type, Context = any> {
   findOne?: (args: FindOneArgs<GQLType>, context: Context) => Promise<Type>
   findMany?: (
     args: FindOneMany<GQLType>,
