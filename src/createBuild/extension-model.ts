@@ -1,4 +1,5 @@
 import {
+  GraphQLField,
   GraphQLFieldConfigMap,
   GraphQLInputFieldConfigMap,
   GraphQLNonNull,
@@ -65,12 +66,13 @@ const getAttributeFields = <BuildMode, Context, Type, GQLType>(
 
 export const convertGraphQLFieldConfigMap = <BuildMode, Context>(
   build: Build<BuildMode, Context>,
-  fieldMap: GraphQLFieldConfigMap<any, any> | GraphQLInputFieldConfigMap,
-): GQLRecord =>
+  fieldMap: Record<string, { type: GraphQLType } | string>,
+) =>
   reduce(
     fieldMap,
-    (record, { type }, field) => {
-      record[field] = type
+    (record, type, field) => {
+      // here a type conversion is taking place, we assume the type can also be 'string'
+      record[field] = typeof type === 'string' ? type : type.type
       return record
     },
     {},

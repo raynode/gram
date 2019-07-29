@@ -29,11 +29,6 @@ export interface PageData {
   limit: number
 }
 
-export interface Paged<Type> {
-  page: PageData
-  nodes: Type[]
-}
-
 export interface FindOneArgs<Type> {
   where: Where<Type>
   order: Order
@@ -63,7 +58,7 @@ export interface Service<Type, GQLType = Type, Context = any> {
   findMany?: (
     args: FindOneMany<GQLType>,
     context: Context,
-  ) => Promise<Paged<Type>>
+  ) => Promise<ListType<Type>>
   create?: (args: CreateArgs<GQLType>, context: Context) => Promise<Type>
   update?: (args: UpdateArgs<GQLType>, context: Context) => Promise<Type[]>
   remove?: (args: RemoveArgs<GQLType>, context: Context) => Promise<Type[]>

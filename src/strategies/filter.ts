@@ -9,7 +9,7 @@ import {
   GraphQLScalarType,
   GraphQLType,
   isLeafType,
-  isListType,
+  isListType as isGraphQLListType,
   isNullableType,
   isScalarType,
   isType,
@@ -20,6 +20,55 @@ import { ContextModel, FilterMiddleware, FilterStrategy } from '../types'
 import * as filters from './filters'
 export { filters }
 
+import { reduce } from 'lodash'
+
+const typeToString = (type: GraphQLType | string) =>
+  typeof type === 'string' ? type : type.toString()
+
+export const isListType = (type: string) =>
+  type[0] === '[' && type[type.length - 1] === ']'
+export const isNullable = (type: string) => type[type.length - 1] === '!'
+export const getParentType = (type: string) =>
+  isNullable(type)
+    ? getParentType(type.substr(0, type.length - 1))
+    : isListType(type)
+    ? getParentType(type.substr(1, type.length - 2))
+    : type
+
+export const isSpecificType = (str: string) => (type: string) => type === str
+
+export type Reducer = <State>(state: State, nextState: State) => State
+
+export const joinReduce = <Result>(initial: Result, reducer: Reducer) => <
+  Fn extends (...args: any[]) => Result
+>(
+  ...fns: Fn[]
+) => (...args: Parameters<Fn>) =>
+  fns.reduce((memo, fn) => reducer(memo, fn(...args)), initial)
+
+export type Defined<T> = T extends undefined ? never : T
+export type MergedProperties<T, U> = {
+  [K in keyof T & keyof U]: undefined extends T[K]
+    ? Defined<T[K] | U[K]>
+    : T[K];
+}
+
+export const booleanReduce = joinReduce(true, (memo, next) => memo && next)
+export const objectReduce = joinReduce({}, (memo, next) => ({
+  ...memo,
+  ...next,
+}))
+
+export const reduceObject = <Val, Result>(
+  mapper: (key: string, value: Val) => Result,
+  initial: Result,
+) => <Obj extends Record<string, Val>>(obj: Obj) =>
+  reduce(
+    obj,
+    (memo, value, key) => ({ ...memo, ...mapper(key, value) }),
+    initial,
+  )
+
 const hasParentType = (
   type: any,
 ): type is GraphQLNonNull<any> | GraphQLList<any> =>
@@ -28,12 +77,13 @@ const hasParentType = (
 const isNonNullType = (type: GraphQLType): type is GraphQLNonNull<any> =>
   !isNullableType(type)
 
-const getParentType = (
+const getParentGraphQLType = (
   type: GraphQLType | GraphQLNonNull<any> | GraphQLList<any>,
-): GraphQLType => (hasParentType(type) ? getParentType(type.ofType) : type)
+): GraphQLType =>
+  hasParentType(type) ? getParentGraphQLType(type.ofType) : type
 
 const isList = (type: GraphQLType): type is GraphQLList<any> =>
-  isNonNullType(type) ? isList(type.ofType) : isListType(type)
+  isNonNullType(type) ? isList(type.ofType) : isGraphQLListType(type)
 
 // sadly no correct typescript-guards, as the GraphQL basic types are not real "Types"
 export interface GraphQLScalarTypeInstance<T extends string>
@@ -71,7 +121,7 @@ export const createFilterStrategy = (
   inputName?: string,
 ) => {
   const baseType = isType(inputType) ? inputType : inputType.getType()
-  const type = getParentType(baseType)
+  const type = getParentGraphQLType(baseType)
   const name = inputName
     ? inputName
     : isType(inputType)
@@ -84,7 +134,7 @@ export const createFilterStrategy = (
   return middlewares.reduce(
     (result, [check, filter]) =>
       check(type, isRequired, isListType, baseType)
-        ? { ...result, ...filter(name, type, list) }
+        ? { ...result, ...filter(name, type.toString(), list.toString()) }
         : result,
     {},
   )

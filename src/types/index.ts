@@ -38,9 +38,9 @@ export type Attributes<BuildMode, Type> = Record<
 
 export type FilterFn = (
   name: string,
-  type: GraphQLType,
-  list: GraphQLList<any>,
-) => Record<string, { type: GraphQLType }>
+  type: string,
+  list: string,
+) => Record<string, { type: GraphQLType } | string>
 export type FilterCheckFn = (
   type: GraphQLType,
   required: boolean,

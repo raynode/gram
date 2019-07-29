@@ -9,7 +9,6 @@ import {
   createSchemaBuilder,
   filters,
   isSpecificScalarType,
-  Paged,
   Service,
 } from '..'
 
