@@ -24,7 +24,7 @@ import {
   MODELBUILDER,
   SCHEMABUILDER,
 } from '../types/constants'
-import { Service } from '../types/service'
+import { NodeType, Service } from '../types/service'
 export * from '../types/service'
 
 export interface Builder {
@@ -42,15 +42,15 @@ export type FilterFn = (
   list: string,
 ) => Record<string, { type: GraphQLType } | string>
 export type FilterCheckFn = (
-  type: GraphQLType,
+  type: string,
   required: boolean,
   list: boolean,
-  baseType: GraphQLType,
+  baseType: string,
 ) => boolean
 export type FilterMiddleware = [FilterCheckFn, FilterFn]
 
 export type FilterStrategy = <Type extends GraphQLType = GraphQLType>(
-  inputType: Type | ContextModel<any, any>,
+  inputType: string,
   inputName?: string,
 ) => Record<string, { type: GraphQLType }>
 
@@ -70,7 +70,11 @@ export type FieldDefinition = Record<
   GraphQLFieldConfigMap<any, any>
 >
 
-export interface ContextModel<BuildMode, Type, GQLType = Type> {
+export interface ContextModel<
+  BuildMode,
+  Type extends NodeType,
+  GQLType = Type
+> {
   addField: <AttributeType>(
     field: AttributeBuilder<BuildMode, Type, AttributeType>,
   ) => void
@@ -93,13 +97,13 @@ export interface ContextModel<BuildMode, Type, GQLType = Type> {
 
 export interface Wrapped<BuildMode> {
   id: string
-  getBaseModel: <Type, GQLType>(
+  getBaseModel: <Type extends NodeType, GQLType>(
     name: string,
   ) => ModelBuilder<BuildMode, Type, GQLType>
-  getModel: <Type, GQLType>(
+  getModel: <Type extends NodeType, GQLType>(
     name: string,
   ) => ContextModel<BuildMode, Type, GQLType>
-  addModel: <Type, GQLType>(
+  addModel: <Type extends NodeType, GQLType>(
     name: string,
     model: ContextModel<BuildMode, Type, GQLType>,
   ) => void
@@ -116,11 +120,11 @@ export type ContextModelFn<Result> = <BuildMode>(
 export type ContextFn<BuildMode, Result = boolean> = (
   buildMode: Wrapped<BuildMode>,
 ) => Result
-export type ContextMutator<BuildMode, Type, GQLType> = (
+export type ContextMutator<BuildMode, Type extends NodeType, GQLType> = (
   model: ContextModel<BuildMode, Type, GQLType>,
   buildMode: Wrapped<BuildMode>,
 ) => void
-export type ContextModelFieldFn<Type, GQLType> = <BuildMode>(
+export type ContextModelFieldFn<Type extends NodeType, GQLType> = <BuildMode>(
   buildModeModel: ContextModel<BuildMode, Type, GQLType>,
 ) => Type
 
@@ -130,7 +134,7 @@ export type ModelType<BuildMode> = GraphQLType | ContextModel<BuildMode, any>
 
 export interface QueryTypeDefinition<
   BuildMode,
-  Type,
+  Type extends NodeType,
   QueryContext,
   Args extends Record<string, any> = any
 > {
@@ -143,11 +147,11 @@ export interface QueryTypeDefinition<
 
 export interface SchemaBuilder<BuildMode, QueryContext = any> extends Builder {
   build: (buildMode?: BuildMode | FieldDefinition) => GraphQLSchema
-  interface: <Type>(
+  interface: <Type extends NodeType>(
     interfaceName: string,
     service?: Service<Type>,
   ) => ModelBuilder<BuildMode, Type>
-  model: <Type, GQLType = Type>(
+  model: <Type extends NodeType, GQLType = Type>(
     modelName: string,
     service?: Service<Type, GQLType>,
   ) => ModelBuilder<BuildMode, Type, GQLType>
@@ -157,7 +161,7 @@ export interface SchemaBuilder<BuildMode, QueryContext = any> extends Builder {
   getScalar: (key: string) => GraphQLScalarType
   addFilter: (check: FilterCheckFn, filter: FilterFn) => this
   createBuild: (buildMode?: BuildMode) => WithAddModel<BuildMode, QueryContext>
-  addQuery: <Type>(
+  addQuery: <Type extends NodeType>(
     definition: WithContext<
       BuildMode,
       QueryTypeDefinition<BuildMode, Type, QueryContext>
@@ -172,7 +176,8 @@ export type GraphQLResolverMap<GQLType, Attrs extends string = string> = Record<
   IFieldResolver<GQLType, any>
 >
 
-export interface ModelBuilder<BuildMode, Type, GQLType = Type> extends Builder {
+export interface ModelBuilder<BuildMode, Type extends NodeType, GQLType = Type>
+  extends Builder {
   attr: <AttributeType>(
     attributeName: string,
     type:
@@ -206,8 +211,11 @@ export interface ModelBuilder<BuildMode, Type, GQLType = Type> extends Builder {
   type: typeof MODELBUILDER
 }
 
-export interface AttributeBuilder<BuildMode, Type, AttributeType>
-  extends Builder {
+export interface AttributeBuilder<
+  BuildMode,
+  Type extends NodeType,
+  AttributeType
+> extends Builder {
   name: string
   field: ContextFn<BuildMode, GraphQLType | ContextModel<BuildMode, Type, any>>
   nullable: boolean

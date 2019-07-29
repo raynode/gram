@@ -8,6 +8,8 @@ import {
   toList,
 } from './utils'
 
+import { ModelType } from './types'
+
 export const create = memoizeContextModel(buildModeModel =>
   reduceContextFields(buildModeModel, {}, (create, attr, type, field) => ({
     ...create,
@@ -33,7 +35,7 @@ export const filter = memoizeContextModel(buildModeModel =>
     (where, attr, type, field) => ({
       ...where,
       ...(isType(field)
-        ? buildModeModel.buildMode.filterStrategy(type, attr.name)
+        ? buildModeModel.buildMode.filterStrategy(type.toString(), attr.name)
         : null),
     }),
   ),
@@ -49,6 +51,11 @@ export const page = () => ({
   offset: { type: GraphQLInt },
 })
 
+export const fieldToString = <BuildMode>(field: ModelType<BuildMode>) => {
+  if (isType(field)) return field.toString()
+  return field.getType().toString()
+}
+
 export const where = memoizeContextModel(buildModeModel =>
   reduceContextFields(
     buildModeModel,
@@ -56,7 +63,7 @@ export const where = memoizeContextModel(buildModeModel =>
     (where, attr, type, field) => ({
       ...where,
       ...buildModeModel.buildMode.filterStrategy(
-        isType(type) ? type : field,
+        isType(type) ? type.toString() : fieldToString(field),
         attr.name,
       ),
     }),

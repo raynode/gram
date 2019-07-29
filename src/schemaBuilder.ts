@@ -118,7 +118,7 @@ export const createSchemaBuilder = <BuildMode = any, QueryContext = any>() => {
   const builder: SchemaBuilder<BuildMode, QueryContext> = {
     type: SCHEMABUILDER,
     models,
-    model: <Type, GQLType = Type>(
+    model: <Type extends NodeType, GQLType = Type>(
       modelName: string,
       service: Service<Type, GQLType, QueryContext>,
     ) => {
@@ -129,7 +129,7 @@ export const createSchemaBuilder = <BuildMode = any, QueryContext = any>() => {
       models[modelName] = model
       return model.interface('Node')
     },
-    interface: <Type>(
+    interface: <Type extends NodeType>(
       interfaceName: string,
       service: Service<Type, Type, QueryContext>,
     ) => {

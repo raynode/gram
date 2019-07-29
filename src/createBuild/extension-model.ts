@@ -13,6 +13,7 @@ import { v4 as uuid } from 'uuid'
 
 import { isBuildModeGenerator } from './guards'
 import { Build, GQLRecord } from './types'
+import { list, nonNull } from './utils'
 
 import { buildOrderEnumValues } from '../input-types'
 import { defaultNamingStrategy, Names } from '../strategies/naming'
@@ -21,18 +22,16 @@ import {
   ContextModel,
   DataType,
   ModelBuilder,
+  NodeType,
   Wrapped,
 } from '../types'
 
 export interface WithAddModel<BuildMode, Context>
   extends Build<BuildMode, Context> {
-  addModel: <Type, GQLType = Type>(
+  addModel: <Type extends NodeType, GQLType = Type>(
     model: ModelBuilder<BuildMode, Type, GQLType>,
   ) => void
 }
-
-const list = (type: string) => `[${type}!]!`
-const nonNull = (type: string) => `${type}!`
 
 const buildAttribute = <BuildMode, Context>(
   build: Build<BuildMode, Context>,

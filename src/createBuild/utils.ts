@@ -9,6 +9,9 @@ import {
   SimpleFieldType,
 } from './types'
 
+export const list = (type: string) => `[${type}!]!`
+export const nonNull = (type: string) => `${type}!`
+
 export const reduceRecord = <Source, Context>(
   fields: Fields<Source, Context>,
 ) =>

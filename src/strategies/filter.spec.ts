@@ -1,7 +1,8 @@
 import { reduce } from 'lodash'
 import {
-  booleanReduce,
+  booleanAndReduce,
   getParentType,
+  isIdOrString,
   isListType,
   isNullable,
   isSpecificType,
@@ -158,7 +159,7 @@ describe('type utilities', () => {
 
 describe('reducer utilities', () => {
   it('should join boolean functions correctly', () => {
-    const isNonNullableListType = booleanReduce<(val: string) => boolean>(
+    const isNonNullableListType = booleanAndReduce<(val: string) => boolean>(
       type => /!/.test(type),
       type => /\[.*\]/.test(type),
     )
@@ -226,5 +227,12 @@ describe('reducer utilities', () => {
     )
 
     expect(expectation).toEqual(filterReducer(obj))
+  })
+})
+
+describe('simple filter checks', () => {
+  it('should work with isIdOrString', () => {
+    expect(isIdOrString('String')).toBeTruthy()
+    expect(isIdOrString('Int')).toBeFalsy()
   })
 })

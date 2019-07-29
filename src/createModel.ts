@@ -20,6 +20,7 @@ import {
   GraphQLResolverMap,
   ModelBuilder,
   ModelVisibility,
+  NodeType,
   Service,
   Wrapped,
 } from './types'
@@ -31,7 +32,7 @@ import { toList } from './utils'
 const fieldBuilderFn = <BuildMode>(
   buildMode: Wrapped<BuildMode>,
   resolvers: Record<string, IFieldResolver<any, any>>,
-) => <Type>(
+) => <Type extends NodeType>(
   fields: GraphQLFieldConfigMap<any, any>,
   attr: AttributeBuilder<BuildMode, Type, any>,
 ) => {
@@ -43,10 +44,11 @@ const fieldBuilderFn = <BuildMode>(
 const fieldBuilder = <BuildMode>(
   buildMode: Wrapped<BuildMode>,
   resolvers: Record<string, IFieldResolver<any, any>>,
-) => <Type>(fields: Array<AttributeBuilder<BuildMode, Type, any>>) =>
-  reduce(fields, fieldBuilderFn(buildMode, resolvers), {})
+) => <Type extends NodeType>(
+  fields: Array<AttributeBuilder<BuildMode, Type, any>>,
+) => reduce(fields, fieldBuilderFn(buildMode, resolvers), {})
 
-export const createModel = <BuildMode, Type, GQLType = Type>(
+export const createModel = <BuildMode, Type extends NodeType, GQLType = Type>(
   model: ModelBuilder<BuildMode, any>,
   service: Service<Type, GQLType, any>,
   buildMode: Wrapped<BuildMode>,

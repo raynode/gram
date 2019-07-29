@@ -13,6 +13,7 @@ import {
   ModelBuilder,
   ModelType,
   ModelVisibility,
+  NodeType,
   Service,
 } from './types'
 import { MODELBUILDER } from './types/constants'
@@ -32,7 +33,11 @@ const serviceToVisibility = (service: Service<any>): ModelVisibility => {
   }
 }
 
-export const createModelBuilder = <BuildMode, Type, GQLType = Type>(
+export const createModelBuilder = <
+  BuildMode,
+  Type extends NodeType,
+  GQLType = Type
+>(
   modelName: string,
   service: Service<Type, GQLType>,
   buildModeFn?: ContextMutator<BuildMode, Type, GQLType>,
