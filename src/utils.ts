@@ -20,6 +20,7 @@ import {
   DataType,
   ModelBuilder,
   ModelType,
+  NodeType,
   PageData,
   WithContext,
   Wrapped,
@@ -55,7 +56,11 @@ export const conditionalNonNull = <Type extends GraphQLType>(
   nonNull: boolean,
 ) => (nonNull ? GraphQLNonNull(type) : type)
 
-export const memoizeContextModel = <BuildMode = any, Result = any, Type = any>(
+export const memoizeContextModel = <
+  BuildMode = any,
+  Result = any,
+  Type extends NodeType = any
+>(
   fn: (buildModeModel: ContextModel<BuildMode, Type, any>) => Result,
 ) =>
   memoize(
@@ -63,10 +68,7 @@ export const memoizeContextModel = <BuildMode = any, Result = any, Type = any>(
     (buildModeModel: ContextModel<BuildMode, Type>) => buildModeModel.id,
   )
 
-export const reduceContextFields = <
-  BuildMode,
-  Type extends Record<string, any>
->(
+export const reduceContextFields = <BuildMode, Type extends NodeType>(
   buildModeModel: ContextModel<BuildMode, Type>,
   base: Type = null,
   reducer: (

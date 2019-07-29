@@ -74,7 +74,7 @@ export const createModelBuilder = <
       return builder
     },
     isInterface: () => isInterface,
-    attr: <AttributeType>(
+    attr: <AttributeType extends NodeType>(
       attributeName: string,
       type:
         | ModelType<BuildMode>

@@ -11,6 +11,7 @@ import {
   ContextModel,
   ModelBuilder,
   ModelType,
+  NodeType,
   Wrapped,
 } from './types'
 import { ATTRIBUTEBUILDER } from './types/constants'
@@ -27,7 +28,11 @@ export const buildType = <BuildMode>(
   return gqlType as GraphQLOutputType
 }
 
-export const createAttributeBuilder = <BuildMode, Type, AttributeType>(
+export const createAttributeBuilder = <
+  BuildMode,
+  Type extends NodeType,
+  AttributeType
+>(
   name: string,
   field: ContextFn<BuildMode, ModelType<BuildMode>>,
 ): AttributeBuilder<BuildMode, Type, AttributeType> => {

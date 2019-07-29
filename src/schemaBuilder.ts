@@ -67,11 +67,8 @@ const createBaseModels = <BuildMode>() => {
     'Node',
     {},
   ).setInterface()
-  const page = createModelBuilder<BuildMode, PageData>('Page', {})
-  const list = createModelBuilder<BuildMode, ListType<NodeType>>(
-    'List',
-    {},
-  ).setInterface()
+  const page = createModelBuilder<BuildMode, any>('Page', {})
+  const list = createModelBuilder<BuildMode, any>('List', {}).setInterface()
 
   node.attr('id', GraphQLID)
   node.attr('createdAt', buildMode => buildMode.getScalar('DateTime'))
