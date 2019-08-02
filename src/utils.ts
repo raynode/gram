@@ -28,6 +28,8 @@ import {
 
 import { Names } from './strategies/naming'
 
+import { Fields, FieldType } from './createBuild/types'
+
 export const record = (service: Record<string, any>) => ({
   exists: (key: string) =>
     service.hasOwnProperty(key) && typeof service[key] === 'function',
@@ -35,17 +37,25 @@ export const record = (service: Record<string, any>) => ({
 
 export type ToContextFnResult<BuildMode> = ContextFn<
   BuildMode,
-  GraphQLType | ContextModel<BuildMode, any>
+  FieldType<any, any>
 >
 export const toContextFn = <BuildMode>(
   type:
+    | string
     | ModelType<BuildMode>
     | ModelBuilder<BuildMode, any>
     | ContextFn<BuildMode, GraphQLType>,
 ): ToContextFnResult<BuildMode> => {
-  if (typeof type === 'function') return type
-  if (isType(type)) return () => type
-  return buildMode => buildMode.getModel(type.name)
+  if (typeof type === 'string') return () => ({ type })
+  if (typeof type === 'function')
+    return buildMode => ({ type: type(buildMode).toString() })
+  if (isType(type)) return () => ({ type: type.toString() })
+  return buildMode => ({
+    type: buildMode
+      .getModel(type.name)
+      .getType()
+      .toString(),
+  })
 }
 
 export const toList = <Type extends GraphQLType = GraphQLType>(type: Type) =>
@@ -74,8 +84,8 @@ export const reduceContextFields = <BuildMode, Type extends NodeType>(
   reducer: (
     memo: Type,
     attr: AttributeBuilder<BuildMode, Type, any>,
-    type: GraphQLType,
-    field: ModelType<BuildMode>,
+    type: string,
+    field: FieldType<any, any>,
   ) => Type,
 ) =>
   buildModeModel
@@ -99,14 +109,14 @@ export const createInputType = <
   field: DataType,
   nameType: Key,
   name: Name,
-) =>
-  memoizeContextModel(
-    buildModeModel =>
-      new GraphQLInputObjectType({
-        name: (buildModeModel.names[nameType] as Record<any, string>)[
-          name
-        ] as string,
-        fields: () =>
-          buildModeModel.dataFields(field) as GraphQLInputFieldConfigMap,
-      }),
-  )
+) => (name: string, fields: Fields<any, any>) => {
+  console.log('createInputType: buildModeModel', field, name, fields)
+  return null
+  // return new GraphQLInputObjectType({
+  //   name: (buildModeModel.names[nameType] as Record<any, string>)[
+  //     name
+  //   ] as string,
+  //   fields: () =>
+  //     buildModeModel.dataFields(field) as GraphQLInputFieldConfigMap,
+  // })
+}

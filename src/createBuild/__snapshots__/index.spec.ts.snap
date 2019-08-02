@@ -94,6 +94,8 @@ Object {
   "addType": [Function],
   "buildMode": undefined,
   "getState": [Function],
+  "isScalar": [Function],
+  "isType": [Function],
   "toSchema": [Function],
   "toTypeDefs": [Function],
   "type": "BUILDER:GQLBUILDER",

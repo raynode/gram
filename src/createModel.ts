@@ -25,6 +25,8 @@ import {
   Wrapped,
 } from './types'
 
+import { Fields } from './createBuild/types'
+import { list } from './createBuild/utils'
 import * as DataTypes from './data-types'
 import { filter } from './input-types'
 import { toList } from './utils'
@@ -33,11 +35,11 @@ const fieldBuilderFn = <BuildMode>(
   buildMode: Wrapped<BuildMode>,
   resolvers: Record<string, IFieldResolver<any, any>>,
 ) => <Type extends NodeType>(
-  fields: GraphQLFieldConfigMap<any, any>,
+  fields: Fields<any, any>,
   attr: AttributeBuilder<BuildMode, Type, any>,
 ) => {
   fields[attr.name] = attr.build(buildMode)
-  if (resolvers[attr.name]) fields[attr.name].resolve = resolvers[attr.name]
+  if (resolvers[attr.name]) fields[attr.name].resolver = resolvers[attr.name]
   return fields
 }
 
@@ -60,17 +62,19 @@ export const createModel = <BuildMode, Type extends NodeType, GQLType = Type>(
   const fields: Attribute[] = []
   const getFields = () => buildFields(fields)
   let buildModeModelIsInterface: boolean = false
+  const names = defaultNamingStrategy(model.name)
+  const filterName = names.types.filterType
 
   const buildModeModel: ContextModel<BuildMode, Type, GQLType> = {
     addField: (field: Attribute) => {
       fields.push(field)
       return field
     },
-    baseFilters: memoize(() => ({
-      AND: { type: GraphQLList(GraphQLNonNull(filter(buildModeModel))) },
-      OR: { type: GraphQLList(GraphQLNonNull(filter(buildModeModel))) },
-      NOT: { type: filter(buildModeModel) },
-    })),
+    baseFilters: {
+      AND: { type: list(filterName, true) },
+      OR: { type: list(filterName, true) },
+      NOT: { type: filterName },
+    },
     buildMode,
     dataFields: memoize(type => {
       switch (type) {
@@ -89,18 +93,6 @@ export const createModel = <BuildMode, Type extends NodeType, GQLType = Type>(
       }
     }),
     getFields: () => fields,
-    getListType: memoize(
-      () =>
-        new GraphQLObjectType({
-          name: buildModeModel.names.types.listType,
-          fields: () =>
-            buildModeModel.dataFields('list') as GraphQLFieldConfigMap<
-              any,
-              any
-            >,
-          interfaces: (): any => [buildMode.getModel('List').getType()],
-        }),
-    ),
     getType: memoize(() =>
       buildModeModelIsInterface
         ? new GraphQLInterfaceType({
@@ -122,7 +114,7 @@ export const createModel = <BuildMode, Type extends NodeType, GQLType = Type>(
     id: uuid(),
     isInterface: () => buildModeModelIsInterface,
     name: model.name,
-    names: defaultNamingStrategy(model.name),
+    names,
     service,
     setInterface: () => {
       buildModeModelIsInterface = true

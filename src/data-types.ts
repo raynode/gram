@@ -8,35 +8,40 @@ import {
   toList,
 } from './utils'
 
+import { FieldType } from './createBuild/types'
+import { nonNull } from './createBuild/utils'
 import { ModelType } from './types'
+
+const fieldTypeToString = <Source, Context>(
+  field: FieldType<Source, Context>,
+) => (isType(field.type) ? field.type.toString() : field.type)
+
+const fieldConverter = <Source, Context>(
+  field: FieldType<Source, Context>,
+  nullable = true,
+) => (nullable ? fieldTypeToString(field) : nonNull(fieldTypeToString(field)))
 
 export const create = memoizeContextModel(buildModeModel =>
   reduceContextFields(buildModeModel, {}, (create, attr, type, field) => ({
     ...create,
-    [attr.name]: {
-      type: isType(field)
-        ? type
-        : conditionalNonNull(whereInput(field), !attr.nullable),
-    },
+    [attr.name]: fieldConverter(field, attr.nullable),
   })),
 )
 
 export const data = memoizeContextModel(buildModeModel =>
   reduceContextFields(buildModeModel, {}, (data, attr, type, field) => ({
     ...data,
-    [attr.name]: { type: isType(field) ? type : whereInput(field) },
+    [attr.name]: type,
   })),
 )
 
 export const filter = memoizeContextModel(buildModeModel =>
   reduceContextFields(
     buildModeModel,
-    buildModeModel.baseFilters(),
+    buildModeModel.baseFilters,
     (where, attr, type, field) => ({
       ...where,
-      ...(isType(field)
-        ? buildModeModel.buildMode.filterStrategy(type.toString(), attr.name)
-        : null),
+      ...buildModeModel.buildMode.filterStrategy(type, attr.name),
     }),
   ),
 )
@@ -51,15 +56,15 @@ export const page = () => ({
   offset: { type: GraphQLInt },
 })
 
-export const fieldToString = <BuildMode>(field: ModelType<BuildMode>) => {
-  if (isType(field)) return field.toString()
-  return field.getType().toString()
+export const fieldToString = <BuildMode>(field: FieldType<any, any>) => {
+  if (isType(field.type)) return field.type.toString()
+  return field.type
 }
 
 export const where = memoizeContextModel(buildModeModel =>
   reduceContextFields(
     buildModeModel,
-    buildModeModel.baseFilters(),
+    buildModeModel.baseFilters,
     (where, attr, type, field) => ({
       ...where,
       ...buildModeModel.buildMode.filterStrategy(

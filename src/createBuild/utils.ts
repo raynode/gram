@@ -9,8 +9,23 @@ import {
   SimpleFieldType,
 } from './types'
 
-export const list = (type: string) => `[${type}!]!`
-export const nonNull = (type: string) => `${type}!`
+export const isListType = (type: string) =>
+  type[0] === '[' && type[type.length - 1] === ']'
+export const isNonNullableList = (type: string) =>
+  type[0] === '[' &&
+  type[type.length - 2] === ']' &&
+  type[type.length - 1] === '!'
+export const isNullable = (type: string) => type[type.length - 1] === '!'
+export const getParentType = (type: string) =>
+  isNullable(type)
+    ? getParentType(type.substr(0, type.length - 1))
+    : isListType(type)
+    ? getParentType(type.substr(1, type.length - 2))
+    : type
+
+export const nonNull = (type: string) => `${getParentType(type)}!`
+export const list = (type: string, nullable = false) =>
+  nullable ? `[${nonNull(type)}]` : `[${nonNull(type)}]!`
 
 export const reduceRecord = <Source, Context>(
   fields: Fields<Source, Context>,

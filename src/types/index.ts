@@ -17,6 +17,7 @@ import { PubSub } from 'graphql-subscriptions'
 import { IFieldResolver } from 'graphql-tools'
 
 import { WithAddModel } from '../createBuild/extension-model'
+import { Fields, FieldType } from '../createBuild/types'
 
 import { Names } from '../strategies/naming'
 import {
@@ -40,7 +41,7 @@ export type FilterFn = (
   name: string,
   type: string,
   list: string,
-) => Record<string, { type: GraphQLType } | string>
+) => Fields<any, any>
 export type FilterCheckFn = (
   type: string,
   required: boolean,
@@ -52,7 +53,7 @@ export type FilterMiddleware = [FilterCheckFn, FilterFn]
 export type FilterStrategy = <Type extends GraphQLType = GraphQLType>(
   inputType: string,
   inputName?: string,
-) => Record<string, { type: GraphQLType }>
+) => Fields<any, any>
 
 export type DataType =
   | 'create'
@@ -78,13 +79,10 @@ export interface ContextModel<
   addField: <AttributeType>(
     field: AttributeBuilder<BuildMode, Type, AttributeType>,
   ) => void
-  baseFilters: () => GraphQLInputFieldConfigMap
+  baseFilters: Fields<any, any>
   buildMode: Wrapped<BuildMode>
-  dataFields: (
-    type: DataType,
-  ) => GraphQLInputFieldConfigMap | GraphQLFieldConfigMap<any, any>
+  dataFields: (type: DataType) => Fields<any, any>
   getFields: () => Array<AttributeBuilder<BuildMode, Type, any>>
-  getListType: () => GraphQLType
   getType: () => GraphQLType
   id: string
   isInterface: () => boolean
@@ -181,6 +179,7 @@ export interface ModelBuilder<BuildMode, Type extends NodeType, GQLType = Type>
   attr: <AttributeType>(
     attributeName: string,
     type:
+      | string
       | ModelType<BuildMode>
       | ModelBuilder<BuildMode, any>
       | ContextFn<BuildMode, GraphQLType>,
@@ -199,7 +198,6 @@ export interface ModelBuilder<BuildMode, Type extends NodeType, GQLType = Type>
   ) => this
   getAttributes: () => Attributes<BuildMode, Type>
   getInterfaces: () => string[]
-  getListType: () => GraphQLType | ModelBuilder<BuildMode, any>
   getVisibility: () => ModelVisibility
   getService: () => Service<Type, GQLType>
   interface: (model: string) => this
@@ -217,7 +215,7 @@ export interface AttributeBuilder<
   AttributeType
 > extends Builder {
   name: string
-  field: ContextFn<BuildMode, GraphQLType | ContextModel<BuildMode, Type, any>>
+  field: ContextFn<BuildMode, FieldType<any, any>>
   nullable: boolean
   listType: boolean
   resolve: (resolver: GraphQLFieldResolver<Type, any>) => this
@@ -225,7 +223,7 @@ export interface AttributeBuilder<
   isList: (isList?: boolean) => this
   isNotNullable: (isNotNullable?: boolean) => this
   // buildModeType: ContextFn<BuildMode, ModelType<BuildMode>>
-  build: ContextFn<BuildMode, GraphQLFieldConfig<any, any>>
+  build: ContextFn<BuildMode, FieldType<any, any>>
   type: typeof ATTRIBUTEBUILDER
 }
 

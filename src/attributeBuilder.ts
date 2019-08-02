@@ -17,15 +17,19 @@ import {
 import { ATTRIBUTEBUILDER } from './types/constants'
 import { toList } from './utils'
 
+import { FieldType } from './createBuild/types'
+
 export const buildType = <BuildMode>(
   attr: AttributeBuilder<BuildMode, any, any>,
   buildMode: Wrapped<BuildMode>,
-): GraphQLOutputType => {
-  const type = attr.field(buildMode)
-  const gqlType = isType(type) ? type : buildMode.getModel(type.name).getType()
-  if (attr.listType) return toList(gqlType) as GraphQLOutputType
-  if (!attr.nullable) return GraphQLNonNull(gqlType)
-  return gqlType as GraphQLOutputType
+): string => {
+  const type = attr.field(buildMode).type
+  // @TODO this is probably wrong, need to use listType and nullable
+  if (typeof type === 'string') return type
+  const gqlType = isType(type) ? type : buildMode.getModel(type).getType()
+  if (attr.listType) return toList(gqlType).toString()
+  if (!attr.nullable) return GraphQLNonNull(gqlType).toString()
+  return gqlType.toString()
 }
 
 export const createAttributeBuilder = <
@@ -34,7 +38,7 @@ export const createAttributeBuilder = <
   AttributeType
 >(
   name: string,
-  field: ContextFn<BuildMode, ModelType<BuildMode>>,
+  field: ContextFn<BuildMode, FieldType<any, any>>,
 ): AttributeBuilder<BuildMode, Type, AttributeType> => {
   let resolve: IFieldResolver<Type, any>
   const builder: AttributeBuilder<BuildMode, Type, AttributeType> = {

@@ -1,10 +1,7 @@
 import { reduce } from 'lodash'
 import {
   booleanAndReduce,
-  getParentType,
   isIdOrString,
-  isListType,
-  isNullable,
   isSpecificType,
   joinReduce,
   objectReduce,
@@ -43,119 +40,6 @@ const testTypes = [
   '[ID!]!',
   '[Unkown!]!',
 ]
-
-describe('type utilities', () => {
-  it('should correctly identify list types', () => {
-    const result = testTypes.map(isListType)
-
-    expect(result).toEqual([
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-      true,
-      true,
-      true,
-      true,
-      true,
-      true,
-      true,
-      true,
-      true,
-      true,
-      true,
-      true,
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-    ])
-  })
-
-  it('should correctly identify nullable types', () => {
-    const result = testTypes.map(isNullable)
-
-    expect(result).toEqual([
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-      true,
-      true,
-      true,
-      true,
-      true,
-      true,
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-      true,
-      true,
-      true,
-      true,
-      true,
-      true,
-    ])
-  })
-
-  it('should correctly return parent types', () => {
-    const result = testTypes.map(getParentType)
-
-    expect(result).toEqual([
-      'Int',
-      'Float',
-      'String',
-      'Boolean',
-      'ID',
-      'Unkown',
-      'Int',
-      'Float',
-      'String',
-      'Boolean',
-      'ID',
-      'Unkown',
-      'Int',
-      'Float',
-      'String',
-      'Boolean',
-      'ID',
-      'Unkown',
-      'Int',
-      'Float',
-      'String',
-      'Boolean',
-      'ID',
-      'Unkown',
-      'Int',
-      'Float',
-      'String',
-      'Boolean',
-      'ID',
-      'Unkown',
-    ])
-  })
-})
 
 describe('reducer utilities', () => {
   it('should join boolean functions correctly', () => {

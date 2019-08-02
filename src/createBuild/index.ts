@@ -116,6 +116,10 @@ export const createBuild = <BuildMode = null, Context = any>(
     addResolver,
     addSubscription: createResolvable('Subscription'),
     addType,
+    isScalar: type =>
+      ['String', 'Int', 'Float', 'ID'].includes(type) ||
+      types.scalar.includes(type),
+    isType: type => Object.keys(types.type).includes(type),
     toSchema: () =>
       makeExecutableSchema({
         ...builder.toTypeDefs(),

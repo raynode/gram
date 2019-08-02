@@ -5,9 +5,9 @@ import {
   GraphQLString,
   printSchema,
 } from 'graphql'
-import { createSchemaBuilder, Service } from '..'
+import { createSchemaBuilder, NodeType, Service } from '..'
 
-interface Animal {
+interface Animal extends NodeType {
   type: string
   name: string
   tame: boolean

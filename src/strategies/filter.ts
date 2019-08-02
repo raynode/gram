@@ -3,18 +3,15 @@ import { reduce } from 'lodash'
 import * as filters from './filters'
 export { filters }
 
-import { list, nonNull } from '../createBuild/utils'
+import {
+  getParentType,
+  isListType,
+  isNonNullableList,
+  isNullable,
+  list,
+  nonNull,
+} from '../createBuild/utils'
 import { ContextModel, FilterMiddleware, FilterStrategy } from '../types'
-
-export const isListType = (type: string) =>
-  type[0] === '[' && type[type.length - 1] === ']'
-export const isNullable = (type: string) => type[type.length - 1] === '!'
-export const getParentType = (type: string) =>
-  isNullable(type)
-    ? getParentType(type.substr(0, type.length - 1))
-    : isListType(type)
-    ? getParentType(type.substr(1, type.length - 2))
-    : type
 
 export const isSpecificType = (str: string) => (type: string) => type === str
 
@@ -65,6 +62,7 @@ export const defaultMiddlewares: FilterMiddleware[] = [
   [isBooleanType, equals],
   [isIdOrString, joinFilters([equals, record])],
   [isNumeric, joinFilters([equals, numeric])],
+  [isNonNullableList, listFilter],
   [(type, required, isList) => isScalarType(type) && isList, listFilter],
 ]
 

@@ -68,7 +68,6 @@ export const createModelBuilder = <
     type: MODELBUILDER,
     name: modelName,
     getInterfaces: () => interfaces,
-    getListType: () => listType,
     setInterface: () => {
       isInterface = true
       return builder
@@ -77,6 +76,7 @@ export const createModelBuilder = <
     attr: <AttributeType extends NodeType>(
       attributeName: string,
       type:
+        | string
         | ModelType<BuildMode>
         | ModelBuilder<BuildMode, any>
         | ContextFn<BuildMode, GraphQLType>,
@@ -89,7 +89,7 @@ export const createModelBuilder = <
         BuildMode,
         AttributeType,
         Type
-      >(attributeName, toContextFn<BuildMode>(type)))
+      >(attributeName, toContextFn(type)))
     },
     setup: buildMode => {
       const buildModeModel = createModel(

@@ -18,5 +18,7 @@ it('should build enum types', () => {
     }),
   )
 
+  console.log(builder.createBuild().toTypeDefs().typeDefs)
+
   builder.build()
 })

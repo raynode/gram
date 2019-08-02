@@ -24,6 +24,8 @@ export interface Build<BuildMode, Context> {
   ) => void
   addSubscription: AddResolvable<BuildMode, Context>
   addType: ReturnType<typeof createAddType>
+  isScalar: (type: string) => boolean
+  isType: (type: string) => boolean
   toSchema: () => GraphQLSchema
   toTypeDefs: () => TypeDefs
   getState: () => any

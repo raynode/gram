@@ -1,11 +1,11 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`testing the example 1 should build the example code 1`] = `
+exports[`testing the example 3 should build the example code 1`] = `
 "type Animal implements Node {
-  type: String!
-  name: String
-  tame: Boolean
-  age: Int
+  name: String!
+  mother: Animal
+  father: Animal
+  children: [Animal!]!
   id: ID
   createdAt: DateTime
   updatedAt: DateTime
@@ -16,20 +16,10 @@ input AnimalFilter {
   AND: [AnimalFilter!]
   OR: [AnimalFilter!]
   NOT: AnimalFilter
-  type: String
-  type_not: String
-  type_in: [String!]
-  type_not_in: [String!]
   name: String
   name_not: String
   name_in: [String!]
   name_not_in: [String!]
-  tame: Boolean
-  tame_not: Boolean
-  age: Int
-  age_not: Int
-  age_lt: Int
-  age_gt: Int
   id: ID
   id_not: ID
   id_in: [ID!]
@@ -47,14 +37,14 @@ type Animals implements List {
 }
 
 enum AnimalSortOrder {
-  type_ASC
-  type_DESC
   name_ASC
   name_DESC
-  tame_ASC
-  tame_DESC
-  age_ASC
-  age_DESC
+  mother_ASC
+  mother_DESC
+  father_ASC
+  father_DESC
+  children_ASC
+  children_DESC
   id_ASC
   id_DESC
   createdAt_ASC
@@ -69,20 +59,10 @@ input AnimalWhere {
   AND: [AnimalFilter!]
   OR: [AnimalFilter!]
   NOT: AnimalFilter
-  type: String
-  type_not: String
-  type_in: [String!]
-  type_not_in: [String!]
   name: String
   name_not: String
   name_in: [String!]
   name_not_in: [String!]
-  tame: Boolean
-  tame_not: Boolean
-  age: Int
-  age_not: Int
-  age_lt: Int
-  age_gt: Int
   id: ID
   id_not: ID
   id_in: [ID!]
@@ -90,10 +70,10 @@ input AnimalWhere {
 }
 
 input CreateAnimalData {
-  type: String!
-  name: String
-  tame: Boolean
-  age: Int
+  name: String!
+  mother: AnimalWhere
+  father: AnimalWhere
+  children: AnimalWhere!
   id: ID
   createdAt: DateTime
   updatedAt: DateTime
@@ -105,12 +85,6 @@ scalar DateTime
 interface List {
   page: Page
   nodes: [Node!]!
-}
-
-type Mutation {
-  createAnimal(data: CreateAnimalData!): Animal
-  updateAnimal(data: UpdateAnimalData!, where: AnimalWhere!): [Animal!]!
-  deleteAnimals(where: AnimalWhere!): [Animal!]!
 }
 
 interface Node {
@@ -126,22 +100,11 @@ type Page {
   offset: Int
 }
 
-type Query {
-  getAnimal(where: AnimalWhere!, order: AnimalSortOrder): Animal
-  getAnimals(order: AnimalSortOrder, page: AnimalPage, where: AnimalWhere!): Animals
-}
-
-type Subscription {
-  onCreateAnimal: Animal!
-  onUpdateAnimal: [Animal!]!
-  onDeleteAnimals: [Animal!]!
-}
-
 input UpdateAnimalData {
-  type: String
-  name: String
-  tame: Boolean
-  age: Int
+  name: String!
+  mother: AnimalWhere
+  father: AnimalWhere
+  children: AnimalWhere!
   id: ID
   createdAt: DateTime
   updatedAt: DateTime

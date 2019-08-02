@@ -13,7 +13,7 @@ import { v4 as uuid } from 'uuid'
 
 import { isBuildModeGenerator } from './guards'
 import { Build, GQLRecord } from './types'
-import { list, nonNull } from './utils'
+import { getParentType, isListType, isNullable, list, nonNull } from './utils'
 
 import { buildOrderEnumValues } from '../input-types'
 import { defaultNamingStrategy, Names } from '../strategies/naming'
@@ -25,6 +25,8 @@ import {
   NodeType,
   Wrapped,
 } from '../types'
+
+import { Fields } from '../createBuild/types'
 
 export interface WithAddModel<BuildMode, Context>
   extends Build<BuildMode, Context> {
@@ -38,12 +40,9 @@ const buildAttribute = <BuildMode, Context>(
   attr: AttributeBuilder<BuildMode, any, any>,
   wrapped: Wrapped<BuildMode>,
 ) => {
-  const type = attr.field(wrapped)
-  if (isType(type) && isEnumType(type))
-    build.addType(type.name, 'enum', {
-      values: type.getValues().map(enumValue => enumValue.name),
-    })
-  const gqlType = isType(type) ? type.toString() : `${type.name}`
+  const field = attr.field(wrapped)
+  const type = field.type
+  const gqlType = isType(type) ? type.toString() : `${type}`
   if (attr.listType) return list(gqlType)
   if (!attr.nullable) return nonNull(gqlType)
   return gqlType
@@ -65,13 +64,20 @@ const getAttributeFields = <BuildMode, Context, Type, GQLType>(
 
 export const convertGraphQLFieldConfigMap = <BuildMode, Context>(
   build: Build<BuildMode, Context>,
-  fieldMap: Record<string, { type: GraphQLType } | string>,
+  fieldMap: Fields<any, any>,
+  isModel: (type: string) => boolean,
 ) =>
   reduce(
     fieldMap,
     (record, type, field) => {
       // here a type conversion is taking place, we assume the type can also be 'string'
-      record[field] = typeof type === 'string' ? type : type.type
+      const strType = typeof type === 'string' ? type : type.type.toString()
+      const parentType = getParentType(strType)
+      record[field] = isModel(parentType)
+        ? isNullable(strType)
+          ? nonNull(defaultNamingStrategy(parentType).types.whereType)
+          : defaultNamingStrategy(parentType).types.whereType
+        : strType
       return record
     },
     {},
@@ -80,13 +86,18 @@ export const convertGraphQLFieldConfigMap = <BuildMode, Context>(
 export const createModelInputTypesAdder = <BuildMode, Context>(
   build: Build<BuildMode, Context>,
   model: ContextModel<BuildMode, any, any>,
+  isModel: (type: string) => boolean,
 ) => <Key extends keyof Names, Name extends keyof Names[Key]>(
   nameType: Key,
   name: Name,
   dataType: DataType,
 ) =>
   build.addType((model.names[nameType] as Record<any, string>)[name], 'input', {
-    fields: convertGraphQLFieldConfigMap(build, model.dataFields(dataType)),
+    fields: convertGraphQLFieldConfigMap(
+      build,
+      model.dataFields(dataType),
+      isModel,
+    ),
   })
 
 export const addModel = <BuildMode, Context>(
@@ -97,7 +108,7 @@ export const addModel = <BuildMode, Context>(
   build.addModel = modelBuilder => {
     const resolver = modelBuilder.getResolver(wrapped)
     const model = modelBuilder.build(wrapped)
-
+    const isModel = (type: string) => !!wrapped.getModel(type)
     const visibility = modelBuilder.getVisibility()
     const names = defaultNamingStrategy(modelBuilder.name)
     const service = modelBuilder.getService()
@@ -111,6 +122,11 @@ export const addModel = <BuildMode, Context>(
       interface: (interfaces && interfaces.join('&')) || null,
     }
     forEach(fields, field => {
+      console.log(field.field(wrapped))
+      if (isType(type) && isEnumType(type))
+        build.addType(type.name, 'enum', {
+          values: type.getValues().map(enumValue => enumValue.name),
+        })
       const resolver = field.getResolver()
       if (resolver) build.addResolver(model.name, field.name, { resolver })
     })
@@ -131,16 +147,16 @@ export const addModel = <BuildMode, Context>(
     if (integratedModel) return
 
     // function that connects mutations with pub sub
-    const publishResult = <Root, Args, Context, Result>(
+    const publishResult = <Result, Fn extends (...args: any[]) => Result>(
       event: string,
-      resolver: (root: Root, args: Args, context: Context) => Promise<Result>,
-    ) => async (root: Root, args: Args, context: Context) => {
-      const result = await resolver(root, args, context)
+      resolver: Fn,
+    ) => async (...args: Parameters<Fn>) => {
+      const result = await resolver(...args)
       pubSub.publish(event, { node: result })
       return result
     }
 
-    const addInput = createModelInputTypesAdder(build, model)
+    const addInput = createModelInputTypesAdder(build, model, isModel)
     addInput('types', 'createType', 'create')
     addInput('types', 'dataType', 'data')
     addInput('types', 'filterType', 'filter')
