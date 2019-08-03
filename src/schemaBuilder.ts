@@ -155,7 +155,7 @@ export const createSchemaBuilder = <BuildMode = any, QueryContext = any>() => {
       )
 
       // need to add all scalars first as the models need to know what a scalar is
-      forEach(scalars, scalar => build.addType(scalar.toString(), 'scalar'))
+      forEach(scalars, scalar => build.addType(scalar.toString()))
 
       forEach(models, build.addModel)
 
