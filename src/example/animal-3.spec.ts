@@ -1,9 +1,4 @@
-import {
-  GraphQLBoolean,
-  GraphQLInt,
-  GraphQLString,
-  printSchema,
-} from 'graphql'
+import { GraphQLBoolean, GraphQLInt, GraphQLString, printSchema } from 'graphql'
 import { createSchemaBuilder, ListType, NodeType, Service } from '..'
 
 interface Animal extends NodeType {
@@ -33,7 +28,7 @@ const AnimalService: Service<Animal> = {
 describe('testing the example 3', () => {
   it('should build the example code', () => {
     const builder = createSchemaBuilder()
-    const animal = builder.model('Animal')
+    const animal = builder.model('Animal', AnimalService)
     // animal name like 'Fluffy', 'Rex'
     // field is required
     animal.attr('name', 'String!')

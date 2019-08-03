@@ -1,9 +1,4 @@
-import {
-  GraphQLBoolean,
-  GraphQLInt,
-  GraphQLString,
-  printSchema,
-} from 'graphql'
+import { GraphQLBoolean, GraphQLInt, GraphQLString, printSchema } from 'graphql'
 import { createSchemaBuilder, ListType, NodeType, Service } from '..'
 
 enum AnimalTypes {

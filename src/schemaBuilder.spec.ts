@@ -36,8 +36,8 @@ describe('schemaBuilder', () => {
     expect(typeof builder.model).toBe('function')
   })
 
-  it('should render an empty Schema', () => {
-    expect(printSchema(builder.build(0))).toMatchSnapshot()
+  it('should not render an empty Schema', () => {
+    expect(() => builder.build()).toThrow()
   })
 })
 

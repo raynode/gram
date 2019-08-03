@@ -7,7 +7,7 @@ it('should allow scalars to have resolvers', async () => {
   const TestResultValue = 'Result-Value'
   let called = false
 
-  build.addType('MyScalar', 'scalar', {
+  build.addType('MyScalar', {
     parseValue: btoa,
     serialize: atob,
   })

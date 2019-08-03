@@ -1,9 +1,4 @@
-import {
-  GraphQLNonNull,
-  GraphQLOutputType,
-  GraphQLType,
-  isType,
-} from 'graphql'
+import { GraphQLNonNull, GraphQLOutputType, GraphQLType, isType } from 'graphql'
 import { IFieldResolver } from 'graphql-tools'
 import {
   AttributeBuilder,
@@ -14,22 +9,28 @@ import {
   NodeType,
   Wrapped,
 } from './types'
-import { ATTRIBUTEBUILDER } from './types/constants'
-import { toList } from './utils'
 
 import { FieldType } from './createBuild/types'
+import { list, nonNull } from './createBuild/utils'
+
+import { ATTRIBUTEBUILDER } from './types/constants'
+import { toList } from './utils'
 
 export const buildType = <BuildMode>(
   attr: AttributeBuilder<BuildMode, any, any>,
   buildMode: Wrapped<BuildMode>,
-): string => {
+): string | GraphQLType => {
   const type = attr.field(buildMode).type
   // @TODO this is probably wrong, need to use listType and nullable
-  if (typeof type === 'string') return type
+  if (typeof type === 'string') {
+    if (attr.listType) return list(type)
+    if (!attr.nullable) return nonNull(type)
+    return type
+  }
   const gqlType = isType(type) ? type : buildMode.getModel(type).getType()
   if (attr.listType) return toList(gqlType).toString()
   if (!attr.nullable) return GraphQLNonNull(gqlType).toString()
-  return gqlType.toString()
+  return gqlType
 }
 
 export const createAttributeBuilder = <

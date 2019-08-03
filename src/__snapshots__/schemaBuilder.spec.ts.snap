@@ -368,26 +368,3 @@ Object {
   },
 }
 `;
-
-exports[`schemaBuilder should render an empty Schema 1`] = `
-"scalar DateTime
-
-interface List {
-  page: Page
-  nodes: [Node!]!
-}
-
-interface Node {
-  id: ID
-  createdAt: DateTime
-  updatedAt: DateTime
-  deletedAt: DateTime
-}
-
-type Page {
-  page: Int
-  limit: Int
-  offset: Int
-}
-"
-`;

@@ -1,4 +1,4 @@
-import { isType } from 'graphql'
+import { GraphQLType, isType } from 'graphql'
 import { isEmpty, map, reduce } from 'lodash'
 import { isBuildModeGenerator } from './guards'
 import {
@@ -9,19 +9,25 @@ import {
   SimpleFieldType,
 } from './types'
 
+export const typeToString = (type: string | GraphQLType) =>
+  isType(type) ? type.toString() : type
+
 export const isListType = (type: string) =>
   type[0] === '[' && type[type.length - 1] === ']'
 export const isNonNullableList = (type: string) =>
   type[0] === '[' &&
   type[type.length - 2] === ']' &&
   type[type.length - 1] === '!'
-export const isNullable = (type: string) => type[type.length - 1] === '!'
+export const isNullable = (type: string) => type[type.length - 1] !== '!'
 export const getParentType = (type: string) =>
-  isNullable(type)
+  !isNullable(type)
     ? getParentType(type.substr(0, type.length - 1))
     : isListType(type)
     ? getParentType(type.substr(1, type.length - 2))
     : type
+
+export const nullable = (type: string) =>
+  isNullable(type) ? type : type.substr(0, type.length - 1)
 
 export const nonNull = (type: string) => `${getParentType(type)}!`
 export const list = (type: string, nullable = false) =>

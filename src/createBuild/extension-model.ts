@@ -71,12 +71,18 @@ export const convertGraphQLFieldConfigMap = <BuildMode, Context>(
     fieldMap,
     (record, type, field) => {
       // here a type conversion is taking place, we assume the type can also be 'string'
-      const strType = typeof type === 'string' ? type : type.type.toString()
+      // console.log(type, field)
+      const strType =
+        typeof type === 'string'
+          ? type
+          : isType(type)
+          ? type.toString()
+          : type.type.toString()
       const parentType = getParentType(strType)
       record[field] = isModel(parentType)
         ? isNullable(strType)
-          ? nonNull(defaultNamingStrategy(parentType).types.whereType)
-          : defaultNamingStrategy(parentType).types.whereType
+          ? defaultNamingStrategy(parentType).types.whereType
+          : nonNull(defaultNamingStrategy(parentType).types.whereType)
         : strType
       return record
     },
@@ -92,7 +98,8 @@ export const createModelInputTypesAdder = <BuildMode, Context>(
   name: Name,
   dataType: DataType,
 ) =>
-  build.addType((model.names[nameType] as Record<any, string>)[name], 'input', {
+  build.addType((model.names[nameType] as Record<any, string>)[name], {
+    type: 'input',
     fields: convertGraphQLFieldConfigMap(
       build,
       model.dataFields(dataType),
@@ -118,14 +125,19 @@ export const addModel = <BuildMode, Context>(
     const interfaces = modelBuilder.getInterfaces()
     const typeConfig = {
       fields: getAttributeFields(build, fields, wrapped),
-      resolver,
-      interface: (interfaces && interfaces.join('&')) || null,
+      type,
+      ...(resolver && { resolver }),
+      ...(interfaces &&
+        interfaces.length && {
+          interface: interfaces.join('&'),
+        }),
     }
+
     forEach(fields, field => {
-      console.log(field.field(wrapped))
-      if (isType(type) && isEnumType(type))
-        build.addType(type.name, 'enum', {
-          values: type.getValues().map(enumValue => enumValue.name),
+      const fieldType = field.field(wrapped).type
+      if (isType(fieldType) && isEnumType(fieldType))
+        build.addType(fieldType.name, {
+          values: fieldType.getValues().map(enumValue => enumValue.name),
         })
       const resolver = field.getResolver()
       if (resolver) build.addResolver(model.name, field.name, { resolver })
@@ -133,10 +145,10 @@ export const addModel = <BuildMode, Context>(
 
     const integratedModel = ['Page', 'Node', 'List'].includes(model.name)
 
-    build.addType(modelBuilder.name, type as any, typeConfig)
+    build.addType(modelBuilder.name, typeConfig as any)
 
     if (!integratedModel)
-      build.addType(names.types.listType, 'type', {
+      build.addType(names.types.listType, {
         fields: {
           page: 'Page',
           nodes: list(modelBuilder.name),
@@ -163,7 +175,7 @@ export const addModel = <BuildMode, Context>(
     addInput('types', 'whereType', 'where')
     addInput('types', 'pageType', 'page')
 
-    build.addType(model.names.types.orderType, 'enum', {
+    build.addType(model.names.types.orderType, {
       values: Object.keys(buildOrderEnumValues(model)),
     })
 

@@ -1,7 +1,6 @@
 import { graphql, GraphQLNonNull, GraphQLString, printSchema } from 'graphql'
 import { makeExecutableSchema } from 'graphql-tools'
 import { createBuild } from '.'
-import { AddObjectArgsType, AddObjectType } from './method-addType'
 
 const initialPets = [
   {
@@ -79,7 +78,7 @@ describe('createBuild', () => {
 
   it('should be able to accept a new scalar type', async () => {
     const build = createBuild()
-    build.addType('MyScalar', 'scalar')
+    build.addType('MyScalar')
     build.addQuery('myScalar', 'MyScalar', () => 'TEST')
     const result = await graphql({
       schema: build.toSchema(),
@@ -90,13 +89,14 @@ describe('createBuild', () => {
 
   it('should be able to accept a new object type', async () => {
     const build = createBuild()
-    build.addType('Pet', 'type', {
+    build.addType('Pet', {
       fields: {
         name: GraphQLString,
         age: 'Int!',
       },
     })
     build.addQuery('myPets', '[Pet!]!', () => data.pets)
+
     const result = await graphql({
       schema: build.toSchema(),
       source: '{ myPets { name age } }',
@@ -109,45 +109,18 @@ describe('createBuild', () => {
     const adminBuild = createBuild<BuildMode>('admin')
     const userBuild = createBuild<BuildMode>('user')
 
-    const petFields = (buildMode: BuildMode) => ({
-      name: GraphQLString,
-      age: 'Int!',
-      ...(buildMode === 'admin' && {
-        owner: GraphQLNonNull(GraphQLString),
-      }),
+    const petConfig = (buildMode: BuildMode) => ({
+      fields: {
+        name: GraphQLString,
+        age: 'Int!',
+        ...(buildMode === 'admin' && {
+          owner: GraphQLNonNull(GraphQLString),
+        }),
+      },
     })
 
-    adminBuild.addType('Pet', 'type', { fields: petFields })
-    userBuild.addType('Pet', 'type', { fields: petFields })
-    adminBuild.addQuery('myPets', '[Pet!]!', () => data.pets)
-    userBuild.addQuery('myPets', '[Pet!]!', () => data.pets)
-    expect(adminBuild.toTypeDefs().typeDefs).toMatchSnapshot()
-    expect(userBuild.toTypeDefs().typeDefs).toMatchSnapshot()
-  })
-
-  it('should accept build mode generators on type level', () => {
-    type BuildMode = 'admin' | 'user'
-    const adminBuild = createBuild<BuildMode>('admin')
-    const userBuild = createBuild<BuildMode>('user')
-
-    const Pet = <Source, Context>(
-      buildMode: BuildMode,
-    ): AddObjectArgsType<BuildMode, Source, Context> => [
-      'Pet',
-      'type',
-      {
-        fields: {
-          name: GraphQLString,
-          age: 'Int!',
-          ...(buildMode === 'admin' && {
-            owner: GraphQLNonNull(GraphQLString),
-          }),
-        },
-      },
-    ]
-
-    adminBuild.addType(Pet)
-    userBuild.addType(Pet)
+    adminBuild.addType('Pet', petConfig)
+    userBuild.addType('Pet', petConfig)
     adminBuild.addQuery('myPets', '[Pet!]!', () => data.pets)
     userBuild.addQuery('myPets', '[Pet!]!', () => data.pets)
     expect(adminBuild.toTypeDefs().typeDefs).toMatchSnapshot()
@@ -157,7 +130,7 @@ describe('createBuild', () => {
   it('should render enums correctly', () => {
     const build = createBuild()
     build.addQuery('currentState', 'State')
-    build.addType('State', 'enum', {
+    build.addType('State', {
       values: ['IDLE', 'WORKING', 'CLEANUP'],
     })
     expect(build.toTypeDefs().typeDefs).toMatchSnapshot()

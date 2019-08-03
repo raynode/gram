@@ -48,13 +48,10 @@ export const toContextFn = <BuildMode>(
 ): ToContextFnResult<BuildMode> => {
   if (typeof type === 'string') return () => ({ type })
   if (typeof type === 'function')
-    return buildMode => ({ type: type(buildMode).toString() })
-  if (isType(type)) return () => ({ type: type.toString() })
+    return buildMode => ({ type: type(buildMode) })
+  if (isType(type)) return () => ({ type })
   return buildMode => ({
-    type: buildMode
-      .getModel(type.name)
-      .getType()
-      .toString(),
+    type: buildMode.getModel(type.name).getType(),
   })
 }
 
@@ -84,7 +81,7 @@ export const reduceContextFields = <BuildMode, Type extends NodeType>(
   reducer: (
     memo: Type,
     attr: AttributeBuilder<BuildMode, Type, any>,
-    type: string,
+    type: string | GraphQLType,
     field: FieldType<any, any>,
   ) => Type,
 ) =>

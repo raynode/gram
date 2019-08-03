@@ -31,11 +31,6 @@ export interface Build<BuildMode, Context> {
   getState: () => any
 }
 
-export interface CreateableTypeConfig<Source, Context> {
-  fields: Fields<Source, Context>
-  interface?: string
-}
-
 export type GQLRecord = Record<string, string | GraphQLType>
 export type Resolvers = IResolvers
 export type BuildModeGenerator<BuildMode, Result> = (
@@ -53,10 +48,11 @@ export type SimpleFieldType<Source, Context> =
   | string
   | GraphQLType
   | FieldType<Source, Context>
-export type Fields<Source, Context> = Record<
-  string,
-  FieldType<Source, Context>
->
+export type Fields<Source, Context> = Record<string, FieldType<Source, Context>>
+
+export interface CreateableTypeConfig<Source, Context> {
+  fields: Fields<Source, Context>
+}
 
 export type Resolvables = 'Query' | 'Mutation' | 'Subscription'
 export type ResolvablesRecord<Source, Context> = Record<
@@ -65,14 +61,16 @@ export type ResolvablesRecord<Source, Context> = Record<
 >
 export interface ObjectTypesRecordConfig<Source, Context>
   extends CreateableTypeConfig<Source, Context> {
-  interface: string
+  interface?: string
 }
 // tslint:disable-next-line:no-empty-interface
 export interface InterfaceTypesRecordConfig<Source, Context>
   extends CreateableTypeConfig<Source, Context> {}
-// tslint:disable-next-line:no-empty-interface
+
 export interface InputTypesRecordConfig<Source, Context>
-  extends CreateableTypeConfig<Source, Context> {}
+  extends CreateableTypeConfig<Source, Context> {
+  interface?: string
+}
 export interface EnumTypesRecordConfig {
   values: string[]
 }
@@ -87,6 +85,14 @@ export type CreateableTypes<Source, Context> = keyof CreateableTypesRecord<
   Source,
   Context
 >
+
+// string === scalar
+export type AnyCreateableTypeConfig<Source, Context> =
+  | string
+  | ObjectTypesRecordConfig<Source, Context>
+  | InterfaceTypesRecordConfig<Source, Context>
+  | InputTypesRecordConfig<Source, Context>
+  | EnumTypesRecordConfig
 
 export interface AddResolvableConfig<Source, Context> {
   args?: GQLRecord

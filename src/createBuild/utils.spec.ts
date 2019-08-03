@@ -75,12 +75,6 @@ describe('type utilities', () => {
     const result = testTypes.map(isNullable)
 
     expect(result).toEqual([
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
       true,
       true,
       true,
@@ -93,18 +87,24 @@ describe('type utilities', () => {
       false,
       false,
       false,
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
       true,
       true,
       true,
       true,
       true,
       true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
     ])
   })
 

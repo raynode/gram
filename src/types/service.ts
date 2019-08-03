@@ -1,9 +1,9 @@
 export type AnyPartial<Type> = { [Key in keyof Type]?: Type[Key] }
 
 export type Filter<Type> = {
-  AND?: Array<Filter<Type>>;
-  OR?: Array<Filter<Type>>;
-  NOT?: Filter<Type>;
+  AND?: Array<Filter<Type>>
+  OR?: Array<Filter<Type>>
+  NOT?: Filter<Type>,
 } & AnyPartial<Type> &
   Record<string, any>
 

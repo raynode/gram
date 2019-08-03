@@ -11,51 +11,6 @@ Object {
 }
 `;
 
-exports[`createBuild should accept build mode generators on type level 1`] = `
-"
-    
-    
-    
-  type Pet {
-    name: String
-    age: Int!
-    owner: String!
-  }
-
-    
-    
-  type Query {
-    myPets: [Pet!]!
-  }
-
-    
-    
-    
-  "
-`;
-
-exports[`createBuild should accept build mode generators on type level 2`] = `
-"
-    
-    
-    
-  type Pet {
-    name: String
-    age: Int!
-  }
-
-    
-    
-  type Query {
-    myPets: [Pet!]!
-  }
-
-    
-    
-    
-  "
-`;
-
 exports[`createBuild should be able to accept a new object type 1`] = `
 Object {
   "data": Object {
@@ -122,16 +77,14 @@ exports[`createBuild should have types that are different based on buildMode 1`]
 "
     
     
-    
-  type Pet {
+    type Pet {
     name: String
     age: Int!
     owner: String!
   }
 
     
-    
-  type Query {
+    type Query {
     myPets: [Pet!]!
   }
 
@@ -145,15 +98,13 @@ exports[`createBuild should have types that are different based on buildMode 2`]
 "
     
     
-    
-  type Pet {
+    type Pet {
     name: String
     age: Int!
   }
 
     
-    
-  type Query {
+    type Query {
     myPets: [Pet!]!
   }
 
@@ -169,8 +120,7 @@ exports[`createBuild should render enums correctly 1`] = `
     
     
     enum State { IDLE WORKING CLEANUP }
-    
-  type Query {
+    type Query {
     currentState: State
   }
 

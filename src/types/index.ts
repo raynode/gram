@@ -185,7 +185,10 @@ export interface ModelBuilder<BuildMode, Type extends NodeType, GQLType = Type>
       | ContextFn<BuildMode, GraphQLType>,
   ) => AttributeBuilder<BuildMode, Type, AttributeType>
   resolve: <Attrs extends string>(
-    resolver: ContextFn<BuildMode, Record<string, IFieldResolver<GQLType, any>>>,
+    resolver: ContextFn<
+      BuildMode,
+      Record<string, IFieldResolver<GQLType, any>>
+    >,
   ) => this
   getResolver: (
     buildMode: Wrapped<BuildMode>,

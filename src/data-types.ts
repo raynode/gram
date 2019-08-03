@@ -9,7 +9,7 @@ import {
 } from './utils'
 
 import { FieldType } from './createBuild/types'
-import { nonNull } from './createBuild/utils'
+import { nonNull, nullable, typeToString } from './createBuild/utils'
 import { ModelType } from './types'
 
 const fieldTypeToString = <Source, Context>(
@@ -31,7 +31,8 @@ export const create = memoizeContextModel(buildModeModel =>
 export const data = memoizeContextModel(buildModeModel =>
   reduceContextFields(buildModeModel, {}, (data, attr, type, field) => ({
     ...data,
-    [attr.name]: type,
+    // unsure about this, it removed required
+    [attr.name]: nullable(typeToString(type)),
   })),
 )
 
@@ -41,7 +42,10 @@ export const filter = memoizeContextModel(buildModeModel =>
     buildModeModel.baseFilters,
     (where, attr, type, field) => ({
       ...where,
-      ...buildModeModel.buildMode.filterStrategy(type, attr.name),
+      ...buildModeModel.buildMode.filterStrategy(
+        isType(type) ? type.toString() : type,
+        attr.name,
+      ),
     }),
   ),
 )

@@ -100,11 +100,16 @@ type Page {
   offset: Int
 }
 
+type Query {
+  getAnimal(where: AnimalWhere!, order: AnimalSortOrder): Animal
+  getAnimals(order: AnimalSortOrder, page: AnimalPage, where: AnimalWhere!): Animals
+}
+
 input UpdateAnimalData {
-  name: String!
+  name: String
   mother: AnimalWhere
   father: AnimalWhere
-  children: AnimalWhere!
+  children: AnimalWhere
   id: ID
   createdAt: DateTime
   updatedAt: DateTime

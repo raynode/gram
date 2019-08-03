@@ -1,5 +1,7 @@
 import { ITypeDefinitions } from 'graphql-tools'
 import { isEmpty, map, reduce } from 'lodash'
+
+import { isObjectTypesRecordConfig } from './guards'
 import {
   CreateableTypeConfig,
   CreateableTypes,
@@ -15,16 +17,20 @@ const generateCreateableType = <Source, Context>(
   createable: string,
   typeName: string,
   config: CreateableTypeConfig<Source, Context>,
-) =>
-  isEmpty(config.fields)
-    ? ''
-    : `
-  ${createable} ${typeName} ${
-        config.interface ? `implements ${config.interface} ` : ''
-      }{
+) => {
+  if (isEmpty(config.fields))
+    throw new Error(
+      `"${typeName}" needs fields, without it's an invalid configuration`,
+    )
+  return `${createable} ${typeName} ${
+    isObjectTypesRecordConfig(config) && config.interface
+      ? `implements ${config.interface} `
+      : ''
+  }{
     ${reduceRecord(config.fields)}
   }
 `
+}
 
 const generateNonEmpty = <Source, Context>(
   typeName: Resolvables,
