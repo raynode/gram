@@ -312,7 +312,7 @@ To install another type, simply attach it to the `schemabuilder`.
   // is it a tame animal
   animal.attr('tame', GraphQLBoolean)
   // age of the animal
-  animal.attr('date-of-birth', DateTime)
+  animal.attr('dateOfBirth', DateTime)
   // feeding type of the animal
   animal.attr('feed', EatingType)
 ```
@@ -324,7 +324,7 @@ To install another type, simply attach it to the `schemabuilder`.
   type Animal implements Node {
     name: String
     tame: Boolean
-    date-of-birth: DateTime
+    dateOfBirth: DateTime
     feed: EatingType
     id: ID
     createdAt: DateTime
@@ -373,10 +373,32 @@ With `gram` you could also just build up a graphQL schema by hand, it provides a
 
 ### GraphQL Types or String
 
+Since version `2.1.2` it is now possible to set attribute types as strings, and not as GraphQLType objects.
+
 ```typescript
+  const builder = createSchemaBuilder()
+  const animal = builder.model('Animal', AnimalService)
+  // animal name like 'Fluffy', 'Rex'
+  // field is required
+  animal.attr('name', 'String!')
+  // parents
+  animal.attr('mother', 'Animal')
+  animal.attr('father', 'Animal')
+  // children
+  animal.attr('children', '[Animal!]!')
 ```
 
 ```graphQL
+type Animal implements Node {
+  name: String!
+  mother: Animal
+  father: Animal
+  children: [Animal!]!
+  id: ID
+  createdAt: DateTime
+  updatedAt: DateTime
+  deletedAt: DateTime
+}
 ```
 
 ### Context
