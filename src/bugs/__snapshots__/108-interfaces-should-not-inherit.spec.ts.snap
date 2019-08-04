@@ -1,0 +1,83 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`should not at inherit to interface definitions 1`] = `
+"
+    interface Node {
+    id: ID
+    createdAt: DateTime
+    updatedAt: DateTime
+    deletedAt: DateTime
+  }
+
+interface List {
+    page: Page
+    nodes: [Node!]!
+  }
+
+interface Model {
+    id: ID
+    createdAt: DateTime
+    updatedAt: DateTime
+    deletedAt: DateTime
+  }
+
+    input CreateModelData {
+    id: ID
+    createdAt: DateTime
+    updatedAt: DateTime
+    deletedAt: DateTime
+  }
+
+input UpdateModelData {
+    id: ID
+    createdAt: DateTime
+    updatedAt: DateTime
+    deletedAt: DateTime
+  }
+
+input ModelFilter {
+    AND: [ModelFilter!]
+    OR: [ModelFilter!]
+    NOT: ModelFilter
+    id: ID
+    id_not: ID
+    id_in: [ID!]
+    id_not_in: [ID!]
+  }
+
+input ModelWhere {
+    AND: [ModelFilter!]
+    OR: [ModelFilter!]
+    NOT: ModelFilter
+    id: ID
+    id_not: ID
+    id_in: [ID!]
+    id_not_in: [ID!]
+  }
+
+input ModelPage {
+    limit: Int
+    offset: Int
+  }
+
+    type Page {
+    page: Int
+    limit: Int
+    offset: Int
+  }
+
+type Models implements List {
+    page: Page
+    nodes: [Model!]!
+  }
+
+    enum ModelSortOrder { id_ASC id_DESC createdAt_ASC createdAt_DESC updatedAt_ASC updatedAt_DESC deletedAt_ASC deletedAt_DESC }
+    type Query {
+    getModel(where: ModelWhere!,order: ModelSortOrder): Model
+  }
+
+    
+    
+    scalar DateTime
+  "
+`;

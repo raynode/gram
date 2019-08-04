@@ -128,6 +128,7 @@ export const addModel = <BuildMode, Context>(
       type,
       ...(resolver && { resolver }),
       ...(interfaces &&
+        type !== 'interface' &&
         interfaces.length && {
           interface: interfaces.join('&'),
         }),
