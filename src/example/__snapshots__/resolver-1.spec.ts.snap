@@ -138,7 +138,7 @@ type Subscription {
 }
 
 input UpdateAnimalData {
-  type: String!
+  type: String
   name: String
   tame: Boolean
   age: Int

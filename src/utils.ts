@@ -20,12 +20,15 @@ import {
   DataType,
   ModelBuilder,
   ModelType,
+  NodeType,
   PageData,
   WithContext,
   Wrapped,
 } from './types'
 
 import { Names } from './strategies/naming'
+
+import { Fields, FieldType } from './createBuild/types'
 
 export const record = (service: Record<string, any>) => ({
   exists: (key: string) =>
@@ -34,17 +37,22 @@ export const record = (service: Record<string, any>) => ({
 
 export type ToContextFnResult<BuildMode> = ContextFn<
   BuildMode,
-  GraphQLType | ContextModel<BuildMode, any>
+  FieldType<any, any>
 >
 export const toContextFn = <BuildMode>(
   type:
+    | string
     | ModelType<BuildMode>
     | ModelBuilder<BuildMode, any>
     | ContextFn<BuildMode, GraphQLType>,
 ): ToContextFnResult<BuildMode> => {
-  if (typeof type === 'function') return type
-  if (isType(type)) return () => type
-  return buildMode => buildMode.getModel(type.name)
+  if (typeof type === 'string') return () => ({ type })
+  if (typeof type === 'function')
+    return buildMode => ({ type: type(buildMode) })
+  if (isType(type)) return () => ({ type })
+  return buildMode => ({
+    type: buildMode.getModel(type.name).getType(),
+  })
 }
 
 export const toList = <Type extends GraphQLType = GraphQLType>(type: Type) =>
@@ -55,7 +63,11 @@ export const conditionalNonNull = <Type extends GraphQLType>(
   nonNull: boolean,
 ) => (nonNull ? GraphQLNonNull(type) : type)
 
-export const memoizeContextModel = <BuildMode = any, Result = any, Type = any>(
+export const memoizeContextModel = <
+  BuildMode = any,
+  Result = any,
+  Type extends NodeType = any
+>(
   fn: (buildModeModel: ContextModel<BuildMode, Type, any>) => Result,
 ) =>
   memoize(
@@ -63,17 +75,14 @@ export const memoizeContextModel = <BuildMode = any, Result = any, Type = any>(
     (buildModeModel: ContextModel<BuildMode, Type>) => buildModeModel.id,
   )
 
-export const reduceContextFields = <
-  BuildMode,
-  Type extends Record<string, any>
->(
+export const reduceContextFields = <BuildMode, Type extends NodeType>(
   buildModeModel: ContextModel<BuildMode, Type>,
   base: Type = null,
   reducer: (
     memo: Type,
     attr: AttributeBuilder<BuildMode, Type, any>,
-    type: GraphQLType,
-    field: ModelType<BuildMode>,
+    type: string | GraphQLType,
+    field: FieldType<any, any>,
   ) => Type,
 ) =>
   buildModeModel
@@ -89,11 +98,6 @@ export const reduceContextFields = <
       base || {},
     )
 
-export const createPageType = <Type>(page: PageData, nodes: Type[]) => ({
-  page,
-  nodes,
-})
-
 export const createInputType = <
   BuildMode,
   Key extends keyof Names,
@@ -102,14 +106,14 @@ export const createInputType = <
   field: DataType,
   nameType: Key,
   name: Name,
-) =>
-  memoizeContextModel(
-    buildModeModel =>
-      new GraphQLInputObjectType({
-        name: (buildModeModel.names[nameType] as Record<any, string>)[
-          name
-        ] as string,
-        fields: () =>
-          buildModeModel.dataFields(field) as GraphQLInputFieldConfigMap,
-      }),
-  )
+) => (name: string, fields: Fields<any, any>) => {
+  console.log('createInputType: buildModeModel', field, name, fields)
+  return null
+  // return new GraphQLInputObjectType({
+  //   name: (buildModeModel.names[nameType] as Record<any, string>)[
+  //     name
+  //   ] as string,
+  //   fields: () =>
+  //     buildModeModel.dataFields(field) as GraphQLInputFieldConfigMap,
+  // })
+}

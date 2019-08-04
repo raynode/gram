@@ -8,8 +8,8 @@ import {
 import {
   createSchemaBuilder,
   filters,
-  isSpecificScalarType,
-  Paged,
+  isSpecificType,
+  NodeType,
   Service,
 } from '..'
 
@@ -18,7 +18,7 @@ enum AnimalTypes {
   Dog,
 }
 
-interface Animal {
+interface Animal extends NodeType {
   type: AnimalTypes
   name: string
   tame: boolean
@@ -64,7 +64,7 @@ describe('testing the example 3', () => {
     const builder = createSchemaBuilder()
     builder.setScalar('EatingType', EatingType)
 
-    const checkFn = isSpecificScalarType('EatingType')
+    const checkFn = isSpecificType('EatingType')
     const filterFn = filters.joinFilters([
       filters.equals, // adds equal & not-equal filter
       filters.record, // adds in && not-in filters

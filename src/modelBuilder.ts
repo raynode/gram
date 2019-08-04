@@ -13,6 +13,7 @@ import {
   ModelBuilder,
   ModelType,
   ModelVisibility,
+  NodeType,
   Service,
 } from './types'
 import { MODELBUILDER } from './types/constants'
@@ -32,7 +33,11 @@ const serviceToVisibility = (service: Service<any>): ModelVisibility => {
   }
 }
 
-export const createModelBuilder = <BuildMode, Type, GQLType = Type>(
+export const createModelBuilder = <
+  BuildMode,
+  Type extends NodeType,
+  GQLType = Type
+>(
   modelName: string,
   service: Service<Type, GQLType>,
   buildModeFn?: ContextMutator<BuildMode, Type, GQLType>,
@@ -63,15 +68,15 @@ export const createModelBuilder = <BuildMode, Type, GQLType = Type>(
     type: MODELBUILDER,
     name: modelName,
     getInterfaces: () => interfaces,
-    getListType: () => listType,
     setInterface: () => {
       isInterface = true
       return builder
     },
     isInterface: () => isInterface,
-    attr: <AttributeType>(
+    attr: <AttributeType extends NodeType>(
       attributeName: string,
       type:
+        | string
         | ModelType<BuildMode>
         | ModelBuilder<BuildMode, any>
         | ContextFn<BuildMode, GraphQLType>,
@@ -84,7 +89,7 @@ export const createModelBuilder = <BuildMode, Type, GQLType = Type>(
         BuildMode,
         AttributeType,
         Type
-      >(attributeName, toContextFn<BuildMode>(type)))
+      >(attributeName, toContextFn(type)))
     },
     setup: buildMode => {
       const buildModeModel = createModel(

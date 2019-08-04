@@ -1,9 +1,9 @@
 export type AnyPartial<Type> = { [Key in keyof Type]?: Type[Key] }
 
 export type Filter<Type> = {
-  AND?: Array<Filter<Type>>;
-  OR?: Array<Filter<Type>>;
-  NOT?: Filter<Type>;
+  AND?: Array<Filter<Type>>
+  OR?: Array<Filter<Type>>
+  NOT?: Filter<Type>,
 } & AnyPartial<Type> &
   Record<string, any>
 
@@ -27,11 +27,6 @@ export interface ListType<Type extends NodeType> {
 export interface PageData {
   offset: number
   limit: number
-}
-
-export interface Paged<Type> {
-  page: PageData
-  nodes: Type[]
 }
 
 export interface FindOneArgs<Type> {
@@ -58,12 +53,12 @@ export interface RemoveArgs<Type> {
   where: Where<Type>
 }
 
-export interface Service<Type, GQLType = Type, Context = any> {
+export interface Service<Type extends NodeType, GQLType = Type, Context = any> {
   findOne?: (args: FindOneArgs<GQLType>, context: Context) => Promise<Type>
   findMany?: (
     args: FindOneMany<GQLType>,
     context: Context,
-  ) => Promise<Paged<Type>>
+  ) => Promise<ListType<Type>>
   create?: (args: CreateArgs<GQLType>, context: Context) => Promise<Type>
   update?: (args: UpdateArgs<GQLType>, context: Context) => Promise<Type[]>
   remove?: (args: RemoveArgs<GQLType>, context: Context) => Promise<Type[]>

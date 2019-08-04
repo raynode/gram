@@ -1,17 +1,12 @@
-import {
-  GraphQLBoolean,
-  GraphQLInt,
-  GraphQLString,
-  printSchema,
-} from 'graphql'
-import { createSchemaBuilder, Paged, Service } from '..'
+import { GraphQLBoolean, GraphQLInt, GraphQLString, printSchema } from 'graphql'
+import { createSchemaBuilder, ListType, NodeType, Service } from '..'
 
 enum AnimalTypes {
   Cat,
   Dog,
 }
 
-interface Animal {
+interface Animal extends NodeType {
   type: AnimalTypes
   name: string
   tame: boolean
@@ -52,7 +47,7 @@ const createAnimalService = <Type extends Animal>(
         where: { ...where, type },
       },
       context,
-    ) as Promise<Paged<Type>>,
+    ) as Promise<ListType<Type>>,
 })
 
 const Cats = createAnimalService<Cat>(AnimalTypes.Cat)

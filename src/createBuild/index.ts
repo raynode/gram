@@ -25,15 +25,9 @@ export const createBuild = <BuildMode = null, Context = any>(
   buildMode?: BuildMode,
 ) => {
   const resolvables: ResolvablesRecord<any, Context> = {
-    Mutation: {
-      fields: {},
-    },
-    Query: {
-      fields: {},
-    },
-    Subscription: {
-      fields: {},
-    },
+    Mutation: { fields: {} },
+    Query: { fields: {} },
+    Subscription: { fields: {} },
   }
   const types: CreateableTypesRecord<any, Context> = {
     enum: {},
@@ -79,15 +73,15 @@ export const createBuild = <BuildMode = null, Context = any>(
   )
 
   const buildModeResolver = createBuildModeResolver(buildMode)
-  const addInterfaceOrInputType = (typeName, createAble, config) =>
-    (types[createAble][typeName] = {
+  const addInterfaceOrInputType = (createable: string) => (typeName, config) =>
+    (types[createable][typeName] = {
       ...config,
       fields: convertSimpleFieldsToFields(buildModeResolver(config.fields)),
     })
 
   const addType = createAddType<BuildMode, any, Context>(
     buildMode,
-    (typeName, createAble, config = {}) => {
+    (typeName, config = {}) => {
       resolvers[typeName] = {
         serialize: config.serialize || identity,
         parseValue: config.parseValue || identity,
@@ -95,11 +89,11 @@ export const createBuild = <BuildMode = null, Context = any>(
       }
       return types.scalar.push(typeName)
     },
-    addInterfaceOrInputType,
-    addInterfaceOrInputType,
-    (typeName, createAble, config) =>
+    addInterfaceOrInputType('interface'),
+    addInterfaceOrInputType('input'),
+    (typeName, config) =>
       (types.enum[typeName] = { values: buildModeResolver(config.values) }),
-    (typeName, createAble, config) => {
+    (typeName, config) => {
       if (config.resolver) addResolvers(typeName, config.resolver)
       return (types.type[typeName] = {
         fields: convertSimpleFieldsToFields(buildModeResolver(config.fields)),
@@ -116,6 +110,10 @@ export const createBuild = <BuildMode = null, Context = any>(
     addResolver,
     addSubscription: createResolvable('Subscription'),
     addType,
+    isScalar: type =>
+      ['String', 'Int', 'Float', 'ID'].includes(type) ||
+      types.scalar.includes(type),
+    isType: type => Object.keys(types.type).includes(type),
     toSchema: () =>
       makeExecutableSchema({
         ...builder.toTypeDefs(),

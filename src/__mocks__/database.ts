@@ -1,8 +1,14 @@
 import { reduce } from 'lodash'
-import { NodeType, Service } from 'types'
+import { ListType, NodeType, PageData, Service } from 'types'
 import { v4 as uuid } from 'uuid'
 
-import { createPageType } from 'index'
+const createPageType = <Type extends NodeType>(
+  page: PageData,
+  nodes: Type[],
+): ListType<Type> => ({
+  page,
+  nodes,
+})
 
 // interfaces
 
@@ -10,10 +16,6 @@ export interface Page {
   limit: number
   offset: number
   page: number
-}
-export interface Paged<Type> {
-  page: Page
-  nodes: Type[]
 }
 export interface Account extends NodeType {
   id: string
@@ -71,7 +73,7 @@ export const findMany = <Type>(where: any, order: any): Type[] =>
 const findOne = <Type>(where: any, order: any) =>
   findMany<Type>(where, order)[0]
 
-const pagedFindMany = <Type>(where: any, order: any) =>
+const pagedFindMany = <Type extends NodeType>(where: any, order: any) =>
   createPageType<Type>(order, findMany(where, order))
 
 export const Nodes: Service<NodeType> = {

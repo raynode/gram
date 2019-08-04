@@ -371,6 +371,14 @@ With `gram` you could also just build up a graphQL schema by hand, it provides a
   }
 ```
 
+### GraphQL Types or String
+
+```typescript
+```
+
+```graphQL
+```
+
 ### Context
 
 The schema builder will allow you to create different schemas from one definition.

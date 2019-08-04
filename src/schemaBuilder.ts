@@ -67,11 +67,8 @@ const createBaseModels = <BuildMode>() => {
     'Node',
     {},
   ).setInterface()
-  const page = createModelBuilder<BuildMode, PageData>('Page', {})
-  const list = createModelBuilder<BuildMode, ListType<NodeType>>(
-    'List',
-    {},
-  ).setInterface()
+  const page = createModelBuilder<BuildMode, any>('Page', {})
+  const list = createModelBuilder<BuildMode, any>('List', {}).setInterface()
 
   node.attr('id', GraphQLID)
   node.attr('createdAt', buildMode => buildMode.getScalar('DateTime'))
@@ -118,7 +115,7 @@ export const createSchemaBuilder = <BuildMode = any, QueryContext = any>() => {
   const builder: SchemaBuilder<BuildMode, QueryContext> = {
     type: SCHEMABUILDER,
     models,
-    model: <Type, GQLType = Type>(
+    model: <Type extends NodeType, GQLType = Type>(
       modelName: string,
       service: Service<Type, GQLType, QueryContext>,
     ) => {
@@ -129,7 +126,7 @@ export const createSchemaBuilder = <BuildMode = any, QueryContext = any>() => {
       models[modelName] = model
       return model.interface('Node')
     },
-    interface: <Type>(
+    interface: <Type extends NodeType>(
       interfaceName: string,
       service: Service<Type, Type, QueryContext>,
     ) => {
@@ -157,8 +154,10 @@ export const createSchemaBuilder = <BuildMode = any, QueryContext = any>() => {
         wrapped,
       )
 
+      // need to add all scalars first as the models need to know what a scalar is
+      forEach(scalars, scalar => build.addType(scalar.toString()))
+
       forEach(models, build.addModel)
-      forEach(scalars, scalar => build.addType(scalar.toString(), 'scalar'))
 
       forEach(queryDefinitions, queryDefinition => {
         const { name, args, type, resolver } =

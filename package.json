@@ -27,7 +27,7 @@
   },
   "lint-staged": {
     "src/**/*.{ts,tsx}": [
-      "prettier --write",
+      "pretty-quick --staged",
       "tslint --fix",
       "git add"
     ]
@@ -60,16 +60,17 @@
     "@types/uuid": "^3.4.5",
     "coveralls": "^3.0.5",
     "graphql": "^14.4.2",
-    "husky": "^3.0.1",
+    "husky": "^3.0.2",
     "jest": "^24.8.0",
     "lint-staged": "^9.2.0",
     "prettier": "^1.18.2",
+    "pretty-quick": "^1.11.1",
     "rimraf": "^2.6.3",
+    "semantic-release": "^15.13.18",
     "ts-jest": "^24.0.2",
     "ts-node": "^8.3.0",
     "tslint": "^5.18.0",
-    "typescript": "^3.5.3",
-    "semantic-release": "^15.13.18"
+    "typescript": "^3.5.3"
   },
   "snyk": true
 }
