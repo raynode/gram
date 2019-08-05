@@ -48,6 +48,7 @@ Object {
   "addSubscription": [Function],
   "addType": [Function],
   "buildMode": undefined,
+  "extendType": [Function],
   "getState": [Function],
   "isScalar": [Function],
   "isType": [Function],
