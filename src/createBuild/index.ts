@@ -2,7 +2,7 @@ import { IFieldResolver, makeExecutableSchema } from 'graphql-tools'
 
 import { forEach, identity } from 'lodash'
 import { generateTypeDefs } from './generateTypeDefs'
-import { createAddType } from './method-addType'
+import { AddObjectTypeConfig, createAddType } from './method-addType'
 import { resolvablesCreator } from './method-resolvablesCreator'
 import {
   AddResolvableConfig,
@@ -102,6 +102,26 @@ export const createBuild = <BuildMode = null, Context = any>(
     },
   )
 
+  const extendType = <Source>(
+    typeName: string,
+    config: AddObjectTypeConfig<BuildMode, Source, Context>,
+  ) => {
+    const baseConfig = types.type[typeName]
+    if (!baseConfig)
+      throw new Error('Cannot extend an type that is not defined!')
+    if (config.resolver) addResolvers(typeName, config.resolver)
+    const fields = convertSimpleFieldsToFields(buildModeResolver(config.fields))
+    const interfaces = baseConfig.interface
+      .split('&')
+      .concat((buildModeResolver(config.interface) || '').split('&'))
+      .filter(_ => _)
+    types.type[typeName] = {
+      // adding new fields
+      fields: { ...baseConfig.fields, ...fields },
+      interface: interfaces.join('&'),
+    }
+  }
+
   const builder: Build<BuildMode, Context> = {
     type: GQLBUILDER,
     buildMode,
@@ -110,6 +130,7 @@ export const createBuild = <BuildMode = null, Context = any>(
     addResolver,
     addSubscription: createResolvable('Subscription'),
     addType,
+    extendType,
     isScalar: type =>
       ['String', 'Int', 'Float', 'ID'].includes(type) ||
       types.scalar.includes(type),
