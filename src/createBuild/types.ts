@@ -3,7 +3,7 @@ import { IFieldResolver, IResolvers, ITypeDefinitions } from 'graphql-tools'
 
 import { GQLBUILDER } from '../types/constants'
 
-import { createAddType } from './method-addType'
+import { AddObjectTypeConfig, createAddType } from './method-addType'
 
 // Context == GraphQLContext ({ user: {…}, db: DBConnection })
 // BuildMode == BuildMode of the build ('user' | 'admin')
@@ -24,6 +24,10 @@ export interface Build<BuildMode, Context> {
   ) => void
   addSubscription: AddResolvable<BuildMode, Context>
   addType: ReturnType<typeof createAddType>
+  extendType: <Source>(
+    typeName: string,
+    config: AddObjectTypeConfig<BuildMode, Source, Context>,
+  ) => void
   isScalar: (type: string) => boolean
   isType: (type: string) => boolean
   toSchema: () => GraphQLSchema
