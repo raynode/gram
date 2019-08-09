@@ -31,25 +31,6 @@ import * as DataTypes from './data-types'
 import { filter } from './input-types'
 import { toList } from './utils'
 
-const fieldBuilderFn = <BuildMode>(
-  buildMode: Wrapped<BuildMode>,
-  resolvers: Record<string, IFieldResolver<any, any>>,
-) => <Type extends NodeType>(
-  fields: Fields<any, any>,
-  attr: AttributeBuilder<BuildMode, Type, any>,
-) => {
-  fields[attr.name] = attr.build(buildMode)
-  if (resolvers[attr.name]) fields[attr.name].resolver = resolvers[attr.name]
-  return fields
-}
-
-const fieldBuilder = <BuildMode>(
-  buildMode: Wrapped<BuildMode>,
-  resolvers: Record<string, IFieldResolver<any, any>>,
-) => <Type extends NodeType>(
-  fields: Array<AttributeBuilder<BuildMode, Type, any>>,
-) => reduce(fields, fieldBuilderFn(buildMode, resolvers), {})
-
 export const createModel = <BuildMode, Type extends NodeType, GQLType = Type>(
   model: ModelBuilder<BuildMode, any>,
   service: Service<Type, GQLType, any>,
@@ -58,9 +39,8 @@ export const createModel = <BuildMode, Type extends NodeType, GQLType = Type>(
   resolvers: Record<string, IFieldResolver<GQLType, any>>,
 ) => {
   type Attribute = AttributeBuilder<BuildMode, Type, any>
-  const buildFields = fieldBuilder(buildMode, resolvers)
   const fields: Attribute[] = []
-  const getFields = () => buildFields(fields)
+  const getFields = () => null
   let buildModeModelIsInterface: boolean = false
   const names = defaultNamingStrategy(model.name)
   const filterName = names.types.filterType
