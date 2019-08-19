@@ -1,9 +1,11 @@
 import {
+  AddResolvableConfig,
   BuildModeGenerator,
   CreateableTypeConfig,
   InputTypesRecordConfig,
   InterfaceTypesRecordConfig,
   ObjectTypesRecordConfig,
+  SubscriptionResolvableConfig,
 } from './types'
 
 import {
@@ -72,3 +74,8 @@ export const isAddObjectTypeConfig = <BuildMode, Source, Context>(
   // set by property
   val.hasOwnProperty('fields') &&
   hasFields(val)
+
+export const isSubscriptionResolvableConfig = <Source, Context, Args, Result>(
+  val: AddResolvableConfig<Source, Context, Args, Result>,
+): val is SubscriptionResolvableConfig<Source, Context, Args, Result> =>
+  val.hasOwnProperty('subscribe') || val.hasOwnProperty('resolve')

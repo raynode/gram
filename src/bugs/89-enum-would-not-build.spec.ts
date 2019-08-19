@@ -19,7 +19,7 @@ it('should build enum types', () => {
   )
 
   const build = builder.createBuild()
-  build.addQuery('Base', 'String')
+  build.addQuery('Base', 'String', {})
 
   // this needs to work or throw
   build.toSchema()

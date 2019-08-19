@@ -23,7 +23,7 @@ describe('createBuild', () => {
 
   it('should be able to create a simple graphql interface', async () => {
     const build = createBuild()
-    build.addQuery('test', GraphQLString, () => 'TEST')
+    build.addQuery('test', GraphQLString, { resolver: () => 'TEST' })
     const { typeDefs, resolvers } = build.toTypeDefs()
     const schema = makeExecutableSchema({
       typeDefs,
@@ -35,7 +35,7 @@ describe('createBuild', () => {
 
   it('should generate the schema directly', async () => {
     const build = createBuild()
-    build.addQuery('test', GraphQLString, () => 'TEST')
+    build.addQuery('test', GraphQLString, { resolver: () => 'TEST' })
     const result = await graphql({
       schema: build.toSchema(),
       source: '{ test }',
@@ -45,16 +45,12 @@ describe('createBuild', () => {
 
   it('should handle args in addQuery', async () => {
     const build = createBuild()
-    build.addQuery(
-      'test',
-      {
-        args: {
-          name: GraphQLNonNull(GraphQLString),
-        },
-        type: GraphQLString,
+    build.addQuery('test', GraphQLString, {
+      args: {
+        name: GraphQLNonNull(GraphQLString),
       },
-      (_, { name }) => name,
-    )
+      resolver: (_, { name }) => name,
+    })
     const result = await graphql({
       schema: build.toSchema(),
       source: '{ test(name:"My-Test") }',
@@ -79,7 +75,7 @@ describe('createBuild', () => {
   it('should be able to accept a new scalar type', async () => {
     const build = createBuild()
     build.addType('MyScalar')
-    build.addQuery('myScalar', 'MyScalar', () => 'TEST')
+    build.addQuery('myScalar', 'MyScalar', { resolver: () => 'TEST' })
     const result = await graphql({
       schema: build.toSchema(),
       source: '{ myScalar }',
@@ -95,7 +91,7 @@ describe('createBuild', () => {
         age: 'Int!',
       },
     })
-    build.addQuery('myPets', '[Pet!]!', () => data.pets)
+    build.addQuery('myPets', '[Pet!]!', { resolver: () => data.pets })
 
     const result = await graphql({
       schema: build.toSchema(),
@@ -121,8 +117,8 @@ describe('createBuild', () => {
 
     adminBuild.addType('Pet', petConfig)
     userBuild.addType('Pet', petConfig)
-    adminBuild.addQuery('myPets', '[Pet!]!', () => data.pets)
-    userBuild.addQuery('myPets', '[Pet!]!', () => data.pets)
+    adminBuild.addQuery('myPets', '[Pet!]!', { resolver: () => data.pets })
+    userBuild.addQuery('myPets', '[Pet!]!', { resolver: () => data.pets })
     expect(adminBuild.toTypeDefs().typeDefs).toMatchSnapshot()
     expect(userBuild.toTypeDefs().typeDefs).toMatchSnapshot()
   })

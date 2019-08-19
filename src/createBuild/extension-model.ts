@@ -148,16 +148,17 @@ export const addModel = <BuildMode, Context>(
 
     build.addType(modelBuilder.name, typeConfig as any)
 
-    if (!integratedModel)
-      build.addType(names.types.listType, {
-        fields: {
-          page: 'Page',
-          nodes: list(modelBuilder.name),
-        },
-        interface: 'List',
-      })
-
     if (integratedModel) return
+
+    build.addType(names.types.listType, {
+      fields: {
+        page: 'Page',
+        nodes: modelBuilder.isInterface()
+          ? list('Node')
+          : list(modelBuilder.name),
+      },
+      interface: 'List',
+    })
 
     // function that connects mutations with pub sub
     const publishResult = <Result, Fn extends (...args: any[]) => Result>(
@@ -230,8 +231,7 @@ export const addModel = <BuildMode, Context>(
       })
 
     if (visibility.updateMutation)
-      build.addMutation(names.fields.update, {
-        type: list(modelBuilder.name),
+      build.addMutation(names.fields.update, list(modelBuilder.name), {
         args: {
           [names.arguments.data]: nonNull(names.types.dataType),
           [names.arguments.where]: nonNull(names.types.whereType),
