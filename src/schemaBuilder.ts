@@ -169,7 +169,7 @@ export const createSchemaBuilder = <BuildMode = any, QueryContext = any>() => {
           : typeof type === 'string'
           ? type
           : type.name
-        build.addQuery(name, { args, type: typeName }, resolver)
+        build.addQuery(name, typeName, { args, resolver })
       })
       return build
     },

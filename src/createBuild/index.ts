@@ -5,18 +5,31 @@ import { generateTypeDefs } from './generateTypeDefs'
 import { AddObjectTypeConfig, createAddType } from './method-addType'
 import { resolvablesCreator } from './method-resolvablesCreator'
 import {
+  AddMutation,
+  AddQuery,
+  AddResolvable,
   AddResolvableConfig,
   AddResolver,
+  AddSubscription,
   Build,
   CreateableTypesRecord,
   GQLRecord,
+  MutationResolvableConfig,
+  QueryResolvableConfig,
   Resolvables,
   ResolvablesRecord,
   Resolvers,
+  SubscriptionResolvableConfig,
 } from './types'
-import { convertSimpleFieldsToFields, createBuildModeResolver } from './utils'
+import {
+  convertSimpleFieldsToFields,
+  createBuildModeResolver,
+  simpleFieldTypeToFieldType,
+} from './utils'
 
 import { GQLBUILDER } from '../types/constants'
+
+import { isSubscriptionResolvableConfig } from './guards'
 
 export * from './extension-model'
 export * from './types'
@@ -42,13 +55,12 @@ export const createBuild = <BuildMode = null, Context = any>(
     types,
     resolvers,
   }
-  const addResolver: AddResolver<Context> = (
-    base,
-    name,
-    { args, resolver },
-  ) => {
+  const addResolver: AddResolver<Context> = (base, name, config) => {
     resolvers[base] = resolvers[base] || {}
-    resolvers[base][name] = resolver
+    const resolver = isSubscriptionResolvableConfig(config)
+      ? { resolve: config.resolve, subscribe: config.subscribe }
+      : config.resolver
+    if (resolver) resolvers[base][name] = resolver
   }
 
   const addResolvers = <Source>(
@@ -65,12 +77,6 @@ export const createBuild = <BuildMode = null, Context = any>(
         typeof resolver === 'function' ? { resolver } : resolver,
       ),
     )
-
-  const createResolvable = resolvablesCreator<BuildMode, any, Context>(
-    buildMode,
-    resolvables,
-    addResolver,
-  )
 
   const buildModeResolver = createBuildModeResolver(buildMode)
   const addInterfaceOrInputType = (createable: string) => (typeName, config) =>
@@ -122,13 +128,24 @@ export const createBuild = <BuildMode = null, Context = any>(
     }
   }
 
+  const addResolvable: AddResolvable<BuildMode, Context> = (
+    typeName: 'Query' | 'Mutation' | 'Subscription',
+  ) => (name, type, config: AddResolvableConfig<any, any> = {}) => {
+    const { args } = config
+    const fieldType = simpleFieldTypeToFieldType(buildModeResolver(type))
+    if (!fieldType.args && args) fieldType.args = args
+    resolvables[typeName].fields[name] = fieldType
+    addResolver(typeName, name, config)
+  }
+
   const builder: Build<BuildMode, Context> = {
     type: GQLBUILDER,
     buildMode,
-    addMutation: createResolvable('Mutation'),
-    addQuery: createResolvable('Query'),
+    addMutation: addResolvable('Mutation'),
+    // createResolvable('Query')
+    addQuery: addResolvable('Query'),
     addResolver,
-    addSubscription: createResolvable('Subscription'),
+    addSubscription: addResolvable('Subscription'),
     addType,
     extendType,
     isScalar: type =>

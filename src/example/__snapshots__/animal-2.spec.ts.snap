@@ -30,7 +30,7 @@ input AnimalPage {
 
 type Animals implements List {
   page: Page
-  nodes: [Animal!]!
+  nodes: [Node!]!
 }
 
 enum AnimalSortOrder {
@@ -224,7 +224,7 @@ input AnimalPage {
 
 type Animals implements List {
   page: Page
-  nodes: [Animal!]!
+  nodes: [Node!]!
 }
 
 enum AnimalSortOrder {

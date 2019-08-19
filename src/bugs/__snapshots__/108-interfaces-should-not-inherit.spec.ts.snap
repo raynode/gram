@@ -68,7 +68,7 @@ input ModelPage {
 
 type Models implements List {
     page: Page
-    nodes: [Model!]!
+    nodes: [Node!]!
   }
 
     enum ModelSortOrder { id_ASC id_DESC createdAt_ASC createdAt_DESC updatedAt_ASC updatedAt_DESC deletedAt_ASC deletedAt_DESC }

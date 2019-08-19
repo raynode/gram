@@ -1,5 +1,5 @@
-import { GraphQLSchema, GraphQLType } from 'graphql'
-import { IFieldResolver, IResolvers, ITypeDefinitions } from 'graphql-tools'
+import { GraphQLResolveInfo, GraphQLSchema, GraphQLType } from 'graphql'
+import { IResolvers, ITypeDefinitions, MergeInfo } from 'graphql-tools'
 
 import { GQLBUILDER } from '../types/constants'
 
@@ -8,6 +8,87 @@ import { AddObjectTypeConfig, createAddType } from './method-addType'
 // Context == GraphQLContext ({ user: {…}, db: DBConnection })
 // BuildMode == BuildMode of the build ('user' | 'admin')
 
+/// replaces the FieldResolver to have a ResultType as well
+export type GraphQLFieldResolver<Source, Args, Context, Result> = (
+  source: Source,
+  args: Args,
+  context: Context,
+  info: GraphQLResolveInfo & { mergeInfo: MergeInfo },
+) => Result
+
+export type MaybeGenerated<Type, BuildMode> =
+  | Type
+  | BuildModeGenerator<BuildMode, Type>
+
+export type MaybeGeneratedSimpleFieldType<
+  BuildMode,
+  Source,
+  Context
+> = MaybeGenerated<SimpleFieldType<Source, Context>, BuildMode>
+
+export interface BaseResolvableConfig {
+  args?: GQLRecord
+}
+
+export interface QueryResolvableConfig<
+  Source,
+  Context,
+  Args = any,
+  Result = any
+> extends BaseResolvableConfig {
+  resolver?: GraphQLFieldResolver<Source, Args, Context, Result>
+}
+export interface MutationResolvableConfig<
+  Source,
+  Context,
+  Args = any,
+  Result = any
+> extends BaseResolvableConfig {
+  resolver?: GraphQLFieldResolver<Source, Args, Context, Result>
+}
+export interface SubscriptionResolvableConfig<
+  Source,
+  Context,
+  Args = any,
+  Result = any
+> extends BaseResolvableConfig {
+  resolve?: GraphQLFieldResolver<never, Args, Context, Result>
+  subscribe?: GraphQLFieldResolver<Source, Args, Context, AsyncIterator<Result>>
+}
+export type AddResolvable<BuildMode, Context> = ((
+  typeName: 'Query',
+) => AddQuery<BuildMode, Context>) &
+  ((typeName: 'Mutation') => AddMutation<BuildMode, Context>) &
+  ((typeName: 'Subscription') => AddSubscription<BuildMode, Context>)
+export type AddQuery<BuildMode, Context> = <Source, Args = any, Result = any>(
+  name: string,
+  type: MaybeGeneratedSimpleFieldType<BuildMode, Source, Context>,
+  config?: QueryResolvableConfig<Source, Context, Args, Result>,
+) => void
+export type AddSubscription<BuildMode, Context> = <
+  Source,
+  Args = any,
+  Result = any
+>(
+  name: string,
+  type: MaybeGeneratedSimpleFieldType<BuildMode, Source, Context>,
+  config: SubscriptionResolvableConfig<Source, Context, Args, Result>,
+) => void
+export type AddMutation<BuildMode, Context> = <
+  Source,
+  Args = any,
+  Result = any
+>(
+  name: string,
+  type: MaybeGeneratedSimpleFieldType<BuildMode, Source, Context>,
+  config: MutationResolvableConfig<Source, Context, Args, Result>,
+) => void
+
+export type AddResolvableConfig<Source, Context, Args = any, Result = any> =
+  | QueryResolvableConfig<Source, Context, Args, Result>
+  | SubscriptionResolvableConfig<Source, Context, Args, Result>
+  | MutationResolvableConfig<Source, Context, Args, Result>
+
 export interface TypeDefs {
   typeDefs: ITypeDefinitions
   resolvers: IResolvers
@@ -15,14 +96,14 @@ export interface TypeDefs {
 export interface Build<BuildMode, Context> {
   type: typeof GQLBUILDER
   buildMode: BuildMode
-  addMutation: AddResolvable<BuildMode, Context>
-  addQuery: AddResolvable<BuildMode, Context>
+  addMutation: AddMutation<BuildMode, Context>
+  addQuery: AddQuery<BuildMode, Context>
   addResolver: <Source>(
     base: string,
     name: string,
     resolver: AddResolvableConfig<Source, Context>,
   ) => void
-  addSubscription: AddResolvable<BuildMode, Context>
+  addSubscription: AddSubscription<BuildMode, Context>
   addType: ReturnType<typeof createAddType>
   extendType: <Source>(
     typeName: string,
@@ -43,10 +124,10 @@ export type BuildModeGenerator<BuildMode, Result> = (
 export type BuildModeArgsGenerator<BuildMode, Args, Result = void> = (
   buildModeGenerator: BuildModeGenerator<BuildMode, Args>,
 ) => Result
-export interface FieldType<Source, Context> {
+export interface FieldType<Source, Context, Args = any, Result = any> {
   args?: GQLRecord
   type: string | GraphQLType
-  resolver?: IFieldResolver<Source, Context>
+  resolver?: GraphQLFieldResolver<Source, Args, Context, Result>
 }
 export type SimpleFieldType<Source, Context> =
   | string
@@ -97,23 +178,6 @@ export type AnyCreateableTypeConfig<Source, Context> =
   | InterfaceTypesRecordConfig<Source, Context>
   | InputTypesRecordConfig<Source, Context>
   | EnumTypesRecordConfig
-
-export interface AddResolvableConfig<Source, Context> {
-  args?: GQLRecord
-  resolver?: IFieldResolver<Source, Context>
-  subscribe?: () => any
-  resolve?: () => any
-}
-export type AddResolvable<BuildMode, Context> = (<Source>(
-  name: string,
-  type: SimpleFieldType<Source, Context>,
-  config?: any,
-) => void) &
-  (<Source>(
-    name: string,
-    type: BuildModeGenerator<BuildMode, SimpleFieldType<Source, Context>>,
-    config?: any,
-  ) => void)
 
 export type AddResolver<Context> = <Source>(
   base: string,
