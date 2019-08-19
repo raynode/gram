@@ -3,7 +3,6 @@ import { IFieldResolver, makeExecutableSchema } from 'graphql-tools'
 import { forEach, identity } from 'lodash'
 import { generateTypeDefs } from './generateTypeDefs'
 import { AddObjectTypeConfig, createAddType } from './method-addType'
-import { resolvablesCreator } from './method-resolvablesCreator'
 import {
   AddMutation,
   AddQuery,
