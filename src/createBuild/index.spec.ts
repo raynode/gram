@@ -131,4 +131,27 @@ describe('createBuild', () => {
     })
     expect(build.toTypeDefs().typeDefs).toMatchSnapshot()
   })
+
+  it('should be able to have arguments in properties', () => {
+    const build = createBuild()
+
+    build.addType('Type', {
+      fields: {
+        id: 'ID',
+        name: 'String',
+        childs: {
+          args: {
+            name: 'String!',
+          },
+          type: '[Type!]!',
+        },
+      },
+    })
+
+    build.addQuery('types', '[Types!]!', {
+      args: { name: 'String' },
+    })
+
+    expect(build.toTypeDefs().typeDefs).toMatchSnapshot()
+  })
 })

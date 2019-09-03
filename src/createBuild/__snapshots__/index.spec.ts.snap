@@ -40,6 +40,27 @@ Object {
 }
 `;
 
+exports[`createBuild should be able to have arguments in properties 1`] = `
+"
+    
+    
+    type Type {
+    id: ID
+    name: String
+    childs(name: String!): [Type!]!
+  }
+
+    
+    type Query {
+    types(name: String): [Types!]!
+  }
+
+    
+    
+    
+  "
+`;
+
 exports[`createBuild should create a base object with methods to add everything for gql 1`] = `
 Object {
   "addMutation": [Function],
