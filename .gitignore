@@ -7,8 +7,11 @@ pids
 *.pid
 
 # Coverage directory used by tools like istanbul
-build
 coverage
+
+# Generated content
+docs
+build
 lib
 
 # Dependency directory

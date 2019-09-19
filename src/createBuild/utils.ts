@@ -12,12 +12,14 @@ import {
 export const typeToString = (type: string | GraphQLType) =>
   isType(type) ? type.toString() : type
 
-export const isListType = (type: string) =>
+export const isNullableListType = (type: string) =>
   type[0] === '[' && type[type.length - 1] === ']'
 export const isNonNullableList = (type: string) =>
   type[0] === '[' &&
   type[type.length - 2] === ']' &&
   type[type.length - 1] === '!'
+export const isListType = (type: string) =>
+  isNullableListType(type) || isNonNullableList(type)
 export const isNullable = (type: string) => type[type.length - 1] !== '!'
 export const getParentType = (type: string) =>
   !isNullable(type)

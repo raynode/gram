@@ -1,6 +1,8 @@
 import { reduce } from 'lodash'
 import {
   booleanAndReduce,
+  createFilterStrategy,
+  defaultMiddlewares,
   isIdOrString,
   isSpecificType,
   joinReduce,
@@ -116,7 +118,19 @@ describe('reducer utilities', () => {
 
 describe('simple filter checks', () => {
   it('should work with isIdOrString', () => {
-    expect(isIdOrString('String')).toBeTruthy()
-    expect(isIdOrString('Int')).toBeFalsy()
+    expect(isIdOrString('String', false, false, 'String')).toBeTruthy()
+    expect(isIdOrString('Int', false, false, 'Int')).toBeFalsy()
+  })
+})
+
+describe('default middleware for filters', () => {
+  it('should convert the input correctly', () => {
+    const strategy = createFilterStrategy(defaultMiddlewares)
+    expect(strategy('ID', 'id')).toMatchSnapshot()
+    expect(strategy('[String!]!', 'non nullable string list')).toMatchSnapshot()
+    expect(strategy('[String!]', 'nullable string list')).toMatchSnapshot()
+    expect(strategy('[String]', 'string list')).toMatchSnapshot()
+    expect(strategy('String', 'string')).toMatchSnapshot()
+    expect(strategy('String!', 'non null string')).toMatchSnapshot()
   })
 })

@@ -20,6 +20,8 @@ input AnimalFilter {
   name_not: String
   name_in: [String!]
   name_not_in: [String!]
+  children_contains: AnimalWhere
+  children_not_contains: AnimalWhere
   id: ID
   id_not: ID
   id_in: [ID!]
@@ -63,6 +65,8 @@ input AnimalWhere {
   name_not: String
   name_in: [String!]
   name_not_in: [String!]
+  children_contains: AnimalWhere
+  children_not_contains: AnimalWhere
   id: ID
   id_not: ID
   id_in: [ID!]

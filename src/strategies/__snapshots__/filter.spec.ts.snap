@@ -1,0 +1,85 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`default middleware for filters should convert the input correctly 1`] = `
+Object {
+  "id": Object {
+    "type": "ID",
+  },
+  "id_in": Object {
+    "type": "[ID!]",
+  },
+  "id_not": Object {
+    "type": "ID",
+  },
+  "id_not_in": Object {
+    "type": "[ID!]",
+  },
+}
+`;
+
+exports[`default middleware for filters should convert the input correctly 2`] = `
+Object {
+  "non nullable string list_contains": Object {
+    "type": "String",
+  },
+  "non nullable string list_not_contains": Object {
+    "type": "String",
+  },
+}
+`;
+
+exports[`default middleware for filters should convert the input correctly 3`] = `
+Object {
+  "nullable string list_contains": Object {
+    "type": "String",
+  },
+  "nullable string list_not_contains": Object {
+    "type": "String",
+  },
+}
+`;
+
+exports[`default middleware for filters should convert the input correctly 4`] = `
+Object {
+  "string list_contains": Object {
+    "type": "String",
+  },
+  "string list_not_contains": Object {
+    "type": "String",
+  },
+}
+`;
+
+exports[`default middleware for filters should convert the input correctly 5`] = `
+Object {
+  "string": Object {
+    "type": "String",
+  },
+  "string_in": Object {
+    "type": "[String!]",
+  },
+  "string_not": Object {
+    "type": "String",
+  },
+  "string_not_in": Object {
+    "type": "[String!]",
+  },
+}
+`;
+
+exports[`default middleware for filters should convert the input correctly 6`] = `
+Object {
+  "non null string": Object {
+    "type": "String",
+  },
+  "non null string_in": Object {
+    "type": "[String!]",
+  },
+  "non null string_not": Object {
+    "type": "String",
+  },
+  "non null string_not_in": Object {
+    "type": "[String!]",
+  },
+}
+`;

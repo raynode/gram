@@ -6,7 +6,6 @@ export { filters }
 import {
   getParentType,
   isListType,
-  isNonNullableList,
   isNullable,
   list,
   nonNull,
@@ -47,8 +46,18 @@ export const isStringType = isSpecificType('String')
 export const isFloatType = isSpecificType('Float')
 export const isIntType = isSpecificType('Int')
 
-export const isIdOrString = booleanOrReduce(isIdType, isStringType)
-export const isNumeric = booleanOrReduce(isFloatType, isIntType)
+export const isListTypeCheck = (parentType, isRequired, ilt, baseType) => ilt
+export const isNotListTypeCheck = (parentType, isRequired, ilt, baseType) =>
+  !ilt
+
+export const isIdOrString = booleanAndReduce(
+  isNotListTypeCheck,
+  booleanOrReduce(isIdType, isStringType),
+)
+export const isNumeric = booleanAndReduce(
+  isNotListTypeCheck,
+  booleanOrReduce(isFloatType, isIntType),
+)
 export const isScalarType = booleanOrReduce(
   isBooleanType,
   isIdType,
@@ -62,7 +71,7 @@ export const defaultMiddlewares: FilterMiddleware[] = [
   [isBooleanType, equals],
   [isIdOrString, joinFilters([equals, record])],
   [isNumeric, joinFilters([equals, numeric])],
-  [isNonNullableList, listFilter],
+  [isListTypeCheck, listFilter],
   [(type, required, isList) => isScalarType(type) && isList, listFilter],
 ]
 

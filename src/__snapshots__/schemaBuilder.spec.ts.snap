@@ -73,6 +73,8 @@ input UserFilter {
   name_not: String
   name_in: [String!]
   name_not_in: [String!]
+  friends_contains: UserWhere
+  friends_not_contains: UserWhere
   id: ID
   id_not: ID
   id_in: [ID!]
@@ -297,6 +299,10 @@ input UserFilter {
   name_not: String
   name_in: [String!]
   name_not_in: [String!]
+  friends_contains: UserWhere
+  friends_not_contains: UserWhere
+  accounts_contains: AccountWhere
+  accounts_not_contains: AccountWhere
   id: ID
   id_not: ID
   id_in: [ID!]
