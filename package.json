@@ -55,7 +55,7 @@
   "devDependencies": {
     "@types/graphql": "^14.2.3",
     "@types/inflection": "^1.5.28",
-    "@types/jest": "^24.0.16",
+    "@types/jest": "^25.1.0",
     "@types/lodash": "^4.14.136",
     "@types/uuid": "^3.4.5",
     "coveralls": "^3.0.5",
