@@ -43,7 +43,7 @@
     "@saeris/graphql-scalars": "^2.0.0",
     "@types/graphql-type-json": "^0.3.0",
     "graphql-subscriptions": "^1.1.0",
-    "graphql-tools": "^7.0.0",
+    "graphql-tools": "^8.0.0",
     "graphql-type-json": "^0.3.0",
     "inflection": "^1.12.0",
     "lodash": "^4.17.15",
